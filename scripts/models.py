@@ -1,7 +1,7 @@
 
 # models.py
 
-# Neural network definitions for the ICU-Sepsis offline learning project.
+# Neural network definitions for the ICU-Sepsis, eICU, and other experiments.
 
 
 # Libraries used
