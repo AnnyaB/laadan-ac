@@ -262,12 +262,13 @@ python scripts/safety_failure_analysis.py --help
 
 ## Saved checkpoints
 
-The released `results/` folders include `.pt` checkpoint files for the trained models. Git LFS is recommended for storing these files:
+The released `results/` folders include `.pt` checkpoint files for the trained models. These checkpoint files are stored with Git LFS. Before cloning the repository, install Git LFS:
 
 ```bash
 git lfs install
-git lfs track "*.pt"
-git add .gitattributes
+git clone https://github.com/AnnyaB/laadan-ac.git
+cd laadan-ac
+git lfs pull
 ```
 
 Including checkpoints allows the final metrics and safety-failure diagnostics to be reloaded directly from the repository.
