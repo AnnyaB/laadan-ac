@@ -26,21 +26,14 @@ class ICUSepsisOfflineBenchmark:
     Offline benchmark loader for ICU-Sepsis.
 
     Conceptually, the released ICU-Sepsis benchmark is a tabular Markov Decision
-    Process (MDP). However, the release also provides continuous state-cluster
+    Process (MDP). However, the release also provides a continuous state-cluster
     centre vectors, which allows this project to use neural networks on top
     of the fixed benchmark dynamics.
 
-    This class therefore supports two possible state representations:
+    This class, therefore, supports two possible state representations:
     1. one-hot state identity vectors
     2. released continuous state-centre features
 
-    The class is responsible for:
-    - loading transition, reward, initial-state, expert-policy, and admissibility
-      data from the benchmark files
-    - storing them in NumPy form for exact evaluation
-    - storing them again in PyTorch tensor form for model training
-    - providing exact finite-horizon evaluation of learned policies
-    - providing reference policies such as random, expert, and optimal
     """
 
     def __init__(self, data_dir, horizon=20, device="cpu", use_one_hot_states=False):
@@ -79,7 +72,7 @@ class ICUSepsisOfflineBenchmark:
         self.transition = None
 
         # Reward assigned by next state.
-        # In this benchmark, reward depends only on the state transitioned into.
+        # In this benchmark, the reward depends only on the state transitioned into.
         self.reward_by_next_state = None
 
         # Initial-state distribution d0(s).
@@ -547,7 +540,6 @@ class ICUSepsisOfflineBenchmark:
         """
         Filtering the expert policy through the admissibility mask and renormalising it.
 
-        This ensures expert comparisons only use supported benchmark actions.
         """
         safe = self.expert_policy * self.admissible_mask.astype(np.float32)
         return self._row_normalize(safe)
@@ -734,7 +726,7 @@ class ICUSepsisOfflineBenchmark:
             # Greedy value update on non-terminal states only.
             value = mask * np.max(q_values, axis=1)
 
-        # Converting final Q-values into deterministic greedy policy.
+        # Converting final Q-values into a deterministic greedy policy.
         policy = np.zeros((self.num_states, self.num_actions), dtype=np.float32)
         best_actions = np.argmax(q_values, axis=1)
         policy[np.arange(self.num_states), best_actions] = 1.0
@@ -996,8 +988,6 @@ class ICUSepsisOfflineBenchmark:
         """
         Saving a short JSON file describing the loaded benchmark configuration.
 
-        This improves reproducibility by recording the benchmark settings that
-        were actually used in an experiment run.
         """
 
         # Building description payload.
