@@ -295,9 +295,9 @@ These figures summarise the architecture, cross-domain portability check, compon
   <img src="assets/safety_failure_analysis.png" width="80%">
 </p>
 
-## *Important* note
+## *Important*
 
-*This repository is a benchmark research implementation. It is **not** a clinical decision-support system and must not be used to guide patient treatment. The experiments evaluate return, admissibility, and expert alignment under fixed benchmark Markov decision processes.*
+*This repository is a **benchmark research** implementation. It is **not** a clinical decision-support system and must not be used to guide patient treatment. The experiments evaluate return, admissibility, and expert alignment under **fixed benchmark Markov decision processes**.*
 
 ## Citation
 
