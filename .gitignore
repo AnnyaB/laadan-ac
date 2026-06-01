@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.DS_Store
+.ipynb_checkpoints/
+*.zip
+physionet.org/
+data/eicu_crd_demo_raw/
+old_icu_sepsis_results/
+*.code-workspace

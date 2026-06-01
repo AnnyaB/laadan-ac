@@ -1,0 +1,23 @@
+{
+  "avg_return": 0.8075860738754272,
+  "survival_rate": 0.8075860738754272,
+  "mortality_rate": 0.19241392612457275,
+  "avg_length": 8.172890663146973,
+  "inadmissibility_rate": 0.0,
+  "expert_argmax_match": 0.7206900119781494,
+  "mean_kl_to_expert": 4.8650970458984375,
+  "policy_entropy": -0.0,
+  "mean_action_deviation_from_expert": 2.2705349922180176,
+  "soft_survival_rate": 0.7794535756111145,
+  "soft_inadmissibility_rate": 0.0,
+  "soft_avg_return": 0.7794535756111145,
+  "soft_policy_entropy": 0.546593189239502,
+  "soft_mean_kl_to_expert": 0.038161903619766235,
+  "trajectory_mean_action_jump": 3.6360193287188194,
+  "trajectory_normalised_action_jump": 0.15150080536328414,
+  "variant_folder": "posthoc_masked_voac",
+  "variant_name": "Post-hoc Masked VOAC",
+  "uses_action_mask": true,
+  "uses_lagrangian": false,
+  "cost_budget": 0.0
+}

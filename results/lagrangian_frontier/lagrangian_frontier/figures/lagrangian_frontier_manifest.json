@@ -1,0 +1,10 @@
+{
+  "summary_csv": "results/lagrangian_frontier/budgeted_lagrangian_summary.csv",
+  "summary_json": "results/lagrangian_frontier/budgeted_lagrangian_summary.json",
+  "final_models_csv": "results/final_lagrangian_frontier_models/final_lagrangian_frontier_model_selection.csv",
+  "final_models_json": "results/final_lagrangian_frontier_models/final_lagrangian_frontier_model_selection.json",
+  "pareto_frontier_png": "results/lagrangian_frontier/figures/budgeted_lagrangian_pareto_frontier.png",
+  "mechanism_comparison_png": "results/lagrangian_frontier/figures/safety_mechanism_comparison.png",
+  "component_ablation_png": "results/lagrangian_frontier/figures/laadan_component_ablation_comparison.png",
+  "lagrange_dynamics_png": "results/lagrangian_frontier/figures/no_mask_lagrangian_training_dynamics.png"
+}

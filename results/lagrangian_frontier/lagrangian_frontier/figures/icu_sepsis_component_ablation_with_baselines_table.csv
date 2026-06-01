@@ -1,0 +1,28 @@
+label,group,source,survival_rate,inadmissibility_rate,expert_argmax_match,mean_kl_to_expert,policy_entropy,mean_action_deviation_from_expert
+BC,Baselines / fixed,main_selected_checkpoint,0.7880703806877136,0.0,0.9464251399040222,3.952603340148926,-0.0,1.3215172290802002
+CQL,Baselines / fixed,main_selected_checkpoint,0.7852136492729187,0.0008706539719872855,0.8972227573394775,4.038132190704346,-0.0,1.5532941818237305
+VOAC,Baselines / fixed,main_selected_checkpoint,0.8044760823249817,0.4075235395544109,0.09235057234764099,16.408803939819336,-0.0,11.418888092041016
+LAADAN-AC fixed,Baselines / fixed,main_selected_checkpoint,0.7940747141838074,0.0,0.9547857046127319,3.951958656311035,-0.0,1.4233516454696655
+"Full LAADAN-AC
+(ablation run)",Full model,lagrangian_frontier_selected_checkpoint,0.7938821911811829,0.0,0.954016923904419,,,
+Masking only,Component ablation,lagrangian_frontier_selected_checkpoint,0.8007687330245972,0.0,0.7440899610519409,,,
+"No conservative
+critic",Component ablation,lagrangian_frontier_selected_checkpoint,0.807662308216095,0.0,0.7491351366043091,,,
+No expert KL,Component ablation,lagrangian_frontier_selected_checkpoint,0.7916161417961121,0.0,0.876849889755249,,,
+"No smoothness
+proxy",Component ablation,lagrangian_frontier_selected_checkpoint,0.7936782836914062,0.0,0.956323266029358,,,
+No Lagrangian,Component ablation,lagrangian_frontier_selected_checkpoint,0.7938821911811829,0.0,0.954016923904419,,,
+"Post-hoc
+masked VOAC",Post-hoc mask,lagrangian_frontier_selected_checkpoint,0.8075860738754272,0.0,0.7206900119781494,,,
+"No mask +
+Lagrangian",No-mask / budget frontier,lagrangian_frontier_selected_checkpoint,0.789232611656189,0.0147234852814869,0.8227465152740479,,,
+"No mask,
+no Lagrangian",No-mask / budget frontier,lagrangian_frontier_selected_checkpoint,0.789232611656189,0.0147234852814869,0.8227465152740479,,,
+"No mask,
+d = 0.005",No-mask / budget frontier,lagrangian_frontier_selected_checkpoint,0.789232611656189,0.0147234852814869,0.8227465152740479,,,
+"No mask,
+d = 0.01",No-mask / budget frontier,lagrangian_frontier_selected_checkpoint,0.789232611656189,0.0147234852814869,0.8227465152740479,,,
+"No mask,
+d = 0.02",No-mask / budget frontier,lagrangian_frontier_selected_checkpoint,0.789232611656189,0.0147234852814869,0.8227465152740479,,,
+"No mask,
+d = 0.05",No-mask / budget frontier,lagrangian_frontier_selected_checkpoint,0.789232611656189,0.0147234852814869,0.8227465152740479,,,

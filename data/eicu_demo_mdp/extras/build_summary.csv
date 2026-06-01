@@ -1,0 +1,2 @@
+num_states,num_nonterminal_states,num_actions,feature_dim,death_state,survival_state,num_episodes,num_observed_transitions
+202,200,25,22,200,201,2309,76051

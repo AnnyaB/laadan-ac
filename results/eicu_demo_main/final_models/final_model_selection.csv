@@ -1,0 +1,5 @@
+agent_dir,agent_name,best_seed,survival_rate,inadmissibility_rate,avg_return
+bc,Behavior Cloning,seed_42,0.73314368724823,0.0,0.73314368724823
+cql,Conservative Q-Learning,seed_42,0.738547146320343,0.0035423015238930213,0.738547146320343
+voac,Vanilla Offline Actor-Critic,seed_44,0.7337906956672668,0.053121682008682454,0.7337906956672668
+laadan_ac,LAADAN-AC,seed_43,0.733410120010376,0.0,0.733410120010376

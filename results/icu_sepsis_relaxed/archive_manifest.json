@@ -1,0 +1,11 @@
+{
+  "experiment_name": "ICU-Sepsis relaxed LAADAN-AC sensitivity run",
+  "source_results_dir": "/kaggle/working/results",
+  "copied_results_dir": "/kaggle/working/results_icu_sepsis_relaxed",
+  "notes": [
+    "This archive contains the full Kaggle results folder for the ICU-Sepsis relaxed LAADAN-AC run.",
+    "The run keeps BC, CQL and VOAC settings unchanged.",
+    "Only LAADAN-AC soft regularisation was relaxed.",
+    "Final models and checkpoint verification are inside final_models/."
+  ]
+}

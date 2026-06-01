@@ -1,0 +1,14 @@
+folder,model,best_seed,survival_rate,inadmissibility_rate,expert_argmax_match,cost_budget
+full_laadan_ac,Full LAADAN-AC,seed_43,0.7938821911811829,0.0,0.954016923904419,0.0
+masking_only_actor_critic,Masking-only actor-critic,seed_46,0.8007687330245972,0.0,0.7440899610519409,0.0
+no_mask_lagrangian,LAADAN without action mask,seed_46,0.789232611656189,0.014723485281486929,0.8227465152740479,0.0
+no_mask_no_lagrangian,No-mask no-Lagrangian,seed_46,0.789232611656189,0.014723485281486929,0.8227465152740479,0.0
+budget_0_005,No-mask budget 0.005,seed_46,0.789232611656189,0.014723485281486929,0.8227465152740479,0.005
+budget_0_01,No-mask budget 0.01,seed_46,0.789232611656189,0.014723485281486929,0.8227465152740479,0.01
+budget_0_02,No-mask budget 0.02,seed_46,0.789232611656189,0.014723485281486929,0.8227465152740479,0.02
+budget_0_05,No-mask budget 0.05,seed_46,0.789232611656189,0.014723485281486929,0.8227465152740479,0.05
+no_lagrangian,LAADAN without Lagrangian cost control,seed_43,0.7938821911811829,0.0,0.954016923904419,0.0
+no_conservative,LAADAN without conservative critic,seed_45,0.807662308216095,0.0,0.7491351366043091,0.0
+no_expert_kl,LAADAN without expert KL,seed_43,0.7916161417961121,0.0,0.876849889755249,0.0
+no_smoothness,LAADAN without smoothness proxy,seed_43,0.7936782836914062,0.0,0.9563232660293579,0.0
+posthoc_masked_voac,Post-hoc Masked VOAC,seed_final_voac,0.8075860738754272,0.0,0.7206900119781494,0.0

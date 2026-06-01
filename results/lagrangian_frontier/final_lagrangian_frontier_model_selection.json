@@ -1,0 +1,119 @@
+[
+  {
+    "folder": "full_laadan_ac",
+    "model": "Full LAADAN-AC",
+    "best_seed": "seed_43",
+    "survival_rate": 0.7938821911811829,
+    "inadmissibility_rate": 0.0,
+    "expert_argmax_match": 0.954016923904419,
+    "cost_budget": 0.0
+  },
+  {
+    "folder": "masking_only_actor_critic",
+    "model": "Masking-only actor-critic",
+    "best_seed": "seed_46",
+    "survival_rate": 0.8007687330245972,
+    "inadmissibility_rate": 0.0,
+    "expert_argmax_match": 0.7440899610519409,
+    "cost_budget": 0.0
+  },
+  {
+    "folder": "no_mask_lagrangian",
+    "model": "LAADAN without action mask",
+    "best_seed": "seed_46",
+    "survival_rate": 0.789232611656189,
+    "inadmissibility_rate": 0.014723485281486929,
+    "expert_argmax_match": 0.8227465152740479,
+    "cost_budget": 0.0
+  },
+  {
+    "folder": "no_mask_no_lagrangian",
+    "model": "No-mask no-Lagrangian",
+    "best_seed": "seed_46",
+    "survival_rate": 0.789232611656189,
+    "inadmissibility_rate": 0.014723485281486929,
+    "expert_argmax_match": 0.8227465152740479,
+    "cost_budget": 0.0
+  },
+  {
+    "folder": "budget_0_005",
+    "model": "No-mask budget 0.005",
+    "best_seed": "seed_46",
+    "survival_rate": 0.789232611656189,
+    "inadmissibility_rate": 0.014723485281486929,
+    "expert_argmax_match": 0.8227465152740479,
+    "cost_budget": 0.005
+  },
+  {
+    "folder": "budget_0_01",
+    "model": "No-mask budget 0.01",
+    "best_seed": "seed_46",
+    "survival_rate": 0.789232611656189,
+    "inadmissibility_rate": 0.014723485281486929,
+    "expert_argmax_match": 0.8227465152740479,
+    "cost_budget": 0.01
+  },
+  {
+    "folder": "budget_0_02",
+    "model": "No-mask budget 0.02",
+    "best_seed": "seed_46",
+    "survival_rate": 0.789232611656189,
+    "inadmissibility_rate": 0.014723485281486929,
+    "expert_argmax_match": 0.8227465152740479,
+    "cost_budget": 0.02
+  },
+  {
+    "folder": "budget_0_05",
+    "model": "No-mask budget 0.05",
+    "best_seed": "seed_46",
+    "survival_rate": 0.789232611656189,
+    "inadmissibility_rate": 0.014723485281486929,
+    "expert_argmax_match": 0.8227465152740479,
+    "cost_budget": 0.05
+  },
+  {
+    "folder": "no_lagrangian",
+    "model": "LAADAN without Lagrangian cost control",
+    "best_seed": "seed_43",
+    "survival_rate": 0.7938821911811829,
+    "inadmissibility_rate": 0.0,
+    "expert_argmax_match": 0.954016923904419,
+    "cost_budget": 0.0
+  },
+  {
+    "folder": "no_conservative",
+    "model": "LAADAN without conservative critic",
+    "best_seed": "seed_45",
+    "survival_rate": 0.807662308216095,
+    "inadmissibility_rate": 0.0,
+    "expert_argmax_match": 0.7491351366043091,
+    "cost_budget": 0.0
+  },
+  {
+    "folder": "no_expert_kl",
+    "model": "LAADAN without expert KL",
+    "best_seed": "seed_43",
+    "survival_rate": 0.7916161417961121,
+    "inadmissibility_rate": 0.0,
+    "expert_argmax_match": 0.876849889755249,
+    "cost_budget": 0.0
+  },
+  {
+    "folder": "no_smoothness",
+    "model": "LAADAN without smoothness proxy",
+    "best_seed": "seed_43",
+    "survival_rate": 0.7936782836914062,
+    "inadmissibility_rate": 0.0,
+    "expert_argmax_match": 0.9563232660293579,
+    "cost_budget": 0.0
+  },
+  {
+    "folder": "posthoc_masked_voac",
+    "model": "Post-hoc Masked VOAC",
+    "best_seed": "seed_final_voac",
+    "survival_rate": 0.8075860738754272,
+    "inadmissibility_rate": 0.0,
+    "expert_argmax_match": 0.7206900119781494,
+    "cost_budget": 0.0
+  }
+]

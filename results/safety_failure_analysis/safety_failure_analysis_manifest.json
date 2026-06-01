@@ -1,0 +1,11 @@
+{
+  "state_inadmissibility_csv": "final_models/safety_failure_analysis/tables/state_level_inadmissibility.csv",
+  "feature_distribution_csv": "final_models/safety_failure_analysis/tables/safe_vs_unsafe_feature_distribution.csv",
+  "action_counts_csv": "final_models/safety_failure_analysis/tables/action_level_inadmissibility_counts.csv",
+  "action_confusion_csv": "final_models/safety_failure_analysis/tables/expert_voac_laadan_action_confusion.csv",
+  "q_values_csv": "final_models/safety_failure_analysis/tables/representative_state_q_values.csv",
+  "trajectory_csv": "final_models/safety_failure_analysis/tables/sample_trajectory_voac_vs_laadan.csv",
+  "timepoint_csv": "final_models/safety_failure_analysis/tables/trajectory_timepoint_inadmissibility.csv",
+  "four_panel_figure_png": "final_models/safety_failure_analysis/figures/safety_failure_four_panel_analysis.png",
+  "manifest_json": "final_models/safety_failure_analysis/safety_failure_analysis_manifest.json"
+}

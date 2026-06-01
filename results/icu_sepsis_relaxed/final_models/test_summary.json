@@ -1,0 +1,487 @@
+{
+  "device_used": "cpu",
+  "data_dir": "/kaggle/input/datasets/annyab/icu-sepsis-ias/data/icu_sepsis",
+  "final_models_dir": "results/final_models",
+  "config_path": "results/run_config.json",
+  "horizon": 50,
+  "use_one_hot_states": false,
+  "core_tolerance": 1e-05,
+  "aux_tolerance": 1e-05,
+  "benchmark_description": {
+    "num_states": 716,
+    "num_actions": 25,
+    "feature_dim": 47,
+    "death_state": 713,
+    "survival_state": 714
+  },
+  "agents": [
+    {
+      "agent_name": "Behavior Cloning",
+      "folder": "bc",
+      "checkpoint_path": "results/final_models/bc/model.pt",
+      "architecture": {
+        "hidden_dim": 128,
+        "latent_dim": 128,
+        "dropout": 0.1
+      },
+      "policy_rule_used": "greedy policy from behaviour-cloning logits",
+      "policy_check": {
+        "has_nan": false,
+        "has_negative_prob": false,
+        "min_probability": 0.0,
+        "max_probability": 1.0,
+        "min_row_sum": 1.0,
+        "max_row_sum": 1.0
+      },
+      "saved_metrics": {
+        "avg_return": 0.7880703806877136,
+        "survival_rate": 0.7880703806877136,
+        "mortality_rate": 0.21192961931228638,
+        "avg_length": 9.012838363647461,
+        "inadmissibility_rate": 0.0,
+        "expert_argmax_match": 0.9464251399040222,
+        "mean_kl_to_expert": 3.952603340148926,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 1.3215172290802002,
+        "soft_survival_rate": 0.7785298228263855,
+        "soft_inadmissibility_rate": 0.007534426645849472,
+        "soft_avg_return": 0.7785298228263855,
+        "soft_policy_entropy": 0.5275357365608215,
+        "soft_mean_kl_to_expert": 0.00709757674485445
+      },
+      "recomputed_metrics": {
+        "avg_return": 0.7880703806877136,
+        "survival_rate": 0.7880703806877136,
+        "mortality_rate": 0.21192961931228638,
+        "avg_length": 9.012838363647461,
+        "inadmissibility_rate": 0.0,
+        "expert_argmax_match": 0.9464251399040222,
+        "mean_kl_to_expert": 3.952603340148926,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 1.3215172290802002,
+        "soft_survival_rate": 0.7785298228263855,
+        "soft_inadmissibility_rate": 0.007534427458100579,
+        "soft_avg_return": 0.7785298228263855,
+        "soft_policy_entropy": 0.5275357365608215
+      },
+      "saved_vs_recomputed": {
+        "avg_return": {
+          "saved": 0.7880703806877136,
+          "recomputed": 0.7880703806877136,
+          "abs_diff": 0.0
+        },
+        "survival_rate": {
+          "saved": 0.7880703806877136,
+          "recomputed": 0.7880703806877136,
+          "abs_diff": 0.0
+        },
+        "mortality_rate": {
+          "saved": 0.21192961931228638,
+          "recomputed": 0.21192961931228638,
+          "abs_diff": 0.0
+        },
+        "avg_length": {
+          "saved": 9.012838363647461,
+          "recomputed": 9.012838363647461,
+          "abs_diff": 0.0
+        },
+        "inadmissibility_rate": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "expert_argmax_match": {
+          "saved": 0.9464251399040222,
+          "recomputed": 0.9464251399040222,
+          "abs_diff": 0.0
+        },
+        "mean_kl_to_expert": {
+          "saved": 3.952603340148926,
+          "recomputed": 3.952603340148926,
+          "abs_diff": 0.0
+        },
+        "policy_entropy": {
+          "saved": -0.0,
+          "recomputed": -0.0,
+          "abs_diff": 0.0
+        },
+        "mean_action_deviation_from_expert": {
+          "saved": 1.3215172290802002,
+          "recomputed": 1.3215172290802002,
+          "abs_diff": 0.0
+        },
+        "soft_survival_rate": {
+          "saved": 0.7785298228263855,
+          "recomputed": 0.7785298228263855,
+          "abs_diff": 0.0
+        },
+        "soft_inadmissibility_rate": {
+          "saved": 0.007534426645849472,
+          "recomputed": 0.007534427458100579,
+          "abs_diff": 8.122511066521731e-10
+        },
+        "soft_avg_return": {
+          "saved": 0.7785298228263855,
+          "recomputed": 0.7785298228263855,
+          "abs_diff": 0.0
+        },
+        "soft_policy_entropy": {
+          "saved": 0.5275357365608215,
+          "recomputed": 0.5275357365608215,
+          "abs_diff": 0.0
+        }
+      },
+      "pass_flags": {
+        "core_max_abs_diff": 0.0,
+        "aux_max_abs_diff": 0.0,
+        "core_pass": true,
+        "aux_pass": true,
+        "overall_pass": true
+      }
+    },
+    {
+      "agent_name": "Conservative Q-Learning",
+      "folder": "cql",
+      "checkpoint_path": "results/final_models/cql/model.pt",
+      "architecture": {
+        "hidden_dim": 128,
+        "latent_dim": 128,
+        "dropout": 0.1
+      },
+      "policy_rule_used": "greedy policy from CQL Q-values",
+      "policy_check": {
+        "has_nan": false,
+        "has_negative_prob": false,
+        "min_probability": 0.0,
+        "max_probability": 1.0,
+        "min_row_sum": 1.0,
+        "max_row_sum": 1.0
+      },
+      "saved_metrics": {
+        "avg_return": 0.7852136492729187,
+        "survival_rate": 0.7852136492729187,
+        "mortality_rate": 0.2147863507270813,
+        "avg_length": 8.87900161743164,
+        "inadmissibility_rate": 0.0008706539719872855,
+        "expert_argmax_match": 0.8972227573394775,
+        "mean_kl_to_expert": 4.038132190704346,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 1.5532941818237305
+      },
+      "recomputed_metrics": {
+        "avg_return": 0.7852136492729187,
+        "survival_rate": 0.7852136492729187,
+        "mortality_rate": 0.2147863507270813,
+        "avg_length": 8.87900161743164,
+        "inadmissibility_rate": 0.0008706539719872855,
+        "expert_argmax_match": 0.8972227573394775,
+        "mean_kl_to_expert": 4.038132190704346,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 1.5532941818237305
+      },
+      "saved_vs_recomputed": {
+        "avg_return": {
+          "saved": 0.7852136492729187,
+          "recomputed": 0.7852136492729187,
+          "abs_diff": 0.0
+        },
+        "survival_rate": {
+          "saved": 0.7852136492729187,
+          "recomputed": 0.7852136492729187,
+          "abs_diff": 0.0
+        },
+        "mortality_rate": {
+          "saved": 0.2147863507270813,
+          "recomputed": 0.2147863507270813,
+          "abs_diff": 0.0
+        },
+        "avg_length": {
+          "saved": 8.87900161743164,
+          "recomputed": 8.87900161743164,
+          "abs_diff": 0.0
+        },
+        "inadmissibility_rate": {
+          "saved": 0.0008706539719872855,
+          "recomputed": 0.0008706539719872855,
+          "abs_diff": 0.0
+        },
+        "expert_argmax_match": {
+          "saved": 0.8972227573394775,
+          "recomputed": 0.8972227573394775,
+          "abs_diff": 0.0
+        },
+        "mean_kl_to_expert": {
+          "saved": 4.038132190704346,
+          "recomputed": 4.038132190704346,
+          "abs_diff": 0.0
+        },
+        "policy_entropy": {
+          "saved": -0.0,
+          "recomputed": -0.0,
+          "abs_diff": 0.0
+        },
+        "mean_action_deviation_from_expert": {
+          "saved": 1.5532941818237305,
+          "recomputed": 1.5532941818237305,
+          "abs_diff": 0.0
+        }
+      },
+      "pass_flags": {
+        "core_max_abs_diff": 0.0,
+        "aux_max_abs_diff": 0.0,
+        "core_pass": true,
+        "aux_pass": true,
+        "overall_pass": true
+      }
+    },
+    {
+      "agent_name": "Vanilla Offline Actor-Critic",
+      "folder": "voac",
+      "checkpoint_path": "results/final_models/voac/model.pt",
+      "architecture": {
+        "hidden_dim": 128,
+        "latent_dim": 128,
+        "dropout": 0.1
+      },
+      "policy_rule_used": "greedy policy from VOAC actor logits",
+      "policy_check": {
+        "has_nan": false,
+        "has_negative_prob": false,
+        "min_probability": 0.0,
+        "max_probability": 1.0,
+        "min_row_sum": 1.0,
+        "max_row_sum": 1.0
+      },
+      "saved_metrics": {
+        "avg_return": 0.8044760823249817,
+        "survival_rate": 0.8044760823249817,
+        "mortality_rate": 0.1955239176750183,
+        "avg_length": 8.31523323059082,
+        "inadmissibility_rate": 0.4075235395544109,
+        "expert_argmax_match": 0.09235057234764099,
+        "mean_kl_to_expert": 16.408803939819336,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 11.418888092041016,
+        "soft_survival_rate": 0.776201069355011,
+        "soft_inadmissibility_rate": 0.8533653985460647,
+        "soft_avg_return": 0.776201069355011,
+        "soft_policy_entropy": 3.216397762298584,
+        "soft_mean_kl_to_expert": 2.6994481086730957
+      },
+      "recomputed_metrics": {
+        "avg_return": 0.8044760823249817,
+        "survival_rate": 0.8044760823249817,
+        "mortality_rate": 0.1955239176750183,
+        "avg_length": 8.31523323059082,
+        "inadmissibility_rate": 0.4075235395544109,
+        "expert_argmax_match": 0.09235057234764099,
+        "mean_kl_to_expert": 16.408803939819336,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 11.418888092041016,
+        "soft_survival_rate": 0.7762011289596558,
+        "soft_inadmissibility_rate": 0.8533654853073287,
+        "soft_avg_return": 0.776201069355011,
+        "soft_policy_entropy": 3.216397762298584
+      },
+      "saved_vs_recomputed": {
+        "avg_return": {
+          "saved": 0.8044760823249817,
+          "recomputed": 0.8044760823249817,
+          "abs_diff": 0.0
+        },
+        "survival_rate": {
+          "saved": 0.8044760823249817,
+          "recomputed": 0.8044760823249817,
+          "abs_diff": 0.0
+        },
+        "mortality_rate": {
+          "saved": 0.1955239176750183,
+          "recomputed": 0.1955239176750183,
+          "abs_diff": 0.0
+        },
+        "avg_length": {
+          "saved": 8.31523323059082,
+          "recomputed": 8.31523323059082,
+          "abs_diff": 0.0
+        },
+        "inadmissibility_rate": {
+          "saved": 0.4075235395544109,
+          "recomputed": 0.4075235395544109,
+          "abs_diff": 0.0
+        },
+        "expert_argmax_match": {
+          "saved": 0.09235057234764099,
+          "recomputed": 0.09235057234764099,
+          "abs_diff": 0.0
+        },
+        "mean_kl_to_expert": {
+          "saved": 16.408803939819336,
+          "recomputed": 16.408803939819336,
+          "abs_diff": 0.0
+        },
+        "policy_entropy": {
+          "saved": -0.0,
+          "recomputed": -0.0,
+          "abs_diff": 0.0
+        },
+        "mean_action_deviation_from_expert": {
+          "saved": 11.418888092041016,
+          "recomputed": 11.418888092041016,
+          "abs_diff": 0.0
+        },
+        "soft_survival_rate": {
+          "saved": 0.776201069355011,
+          "recomputed": 0.7762011289596558,
+          "abs_diff": 5.960464477539063e-08
+        },
+        "soft_inadmissibility_rate": {
+          "saved": 0.8533653985460647,
+          "recomputed": 0.8533654853073287,
+          "abs_diff": 8.676126395101846e-08
+        },
+        "soft_avg_return": {
+          "saved": 0.776201069355011,
+          "recomputed": 0.776201069355011,
+          "abs_diff": 0.0
+        },
+        "soft_policy_entropy": {
+          "saved": 3.216397762298584,
+          "recomputed": 3.216397762298584,
+          "abs_diff": 0.0
+        }
+      },
+      "pass_flags": {
+        "core_max_abs_diff": 0.0,
+        "aux_max_abs_diff": 0.0,
+        "core_pass": true,
+        "aux_pass": true,
+        "overall_pass": true
+      }
+    },
+    {
+      "agent_name": "LAADAN-AC",
+      "folder": "laadan_ac",
+      "checkpoint_path": "results/final_models/laadan_ac/model.pt",
+      "architecture": {
+        "hidden_dim": 128,
+        "latent_dim": 128,
+        "dropout": 0.1
+      },
+      "policy_rule_used": "masked greedy policy from LAADAN actor logits",
+      "policy_check": {
+        "has_nan": false,
+        "has_negative_prob": false,
+        "min_probability": 0.0,
+        "max_probability": 1.0,
+        "min_row_sum": 1.0,
+        "max_row_sum": 1.0
+      },
+      "saved_metrics": {
+        "avg_return": 0.8059503436088562,
+        "survival_rate": 0.8059503436088562,
+        "mortality_rate": 0.1940496563911438,
+        "avg_length": 7.025330543518066,
+        "inadmissibility_rate": 0.0,
+        "expert_argmax_match": 0.743945837020874,
+        "mean_kl_to_expert": 4.614441871643066,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 2.4029734134674072,
+        "soft_survival_rate": 0.8054445385932922,
+        "soft_inadmissibility_rate": 0.0,
+        "soft_avg_return": 0.8054445385932922,
+        "soft_policy_entropy": 0.13651025295257568,
+        "soft_mean_kl_to_expert": 0.619324803352356
+      },
+      "recomputed_metrics": {
+        "avg_return": 0.8059503436088562,
+        "survival_rate": 0.8059503436088562,
+        "mortality_rate": 0.1940496563911438,
+        "avg_length": 7.025330543518066,
+        "inadmissibility_rate": 0.0,
+        "expert_argmax_match": 0.743945837020874,
+        "mean_kl_to_expert": 4.614441871643066,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 2.4029734134674072,
+        "soft_survival_rate": 0.8054445385932922,
+        "soft_inadmissibility_rate": 0.0,
+        "soft_avg_return": 0.8054445385932922,
+        "soft_policy_entropy": 0.13651025295257568
+      },
+      "saved_vs_recomputed": {
+        "avg_return": {
+          "saved": 0.8059503436088562,
+          "recomputed": 0.8059503436088562,
+          "abs_diff": 0.0
+        },
+        "survival_rate": {
+          "saved": 0.8059503436088562,
+          "recomputed": 0.8059503436088562,
+          "abs_diff": 0.0
+        },
+        "mortality_rate": {
+          "saved": 0.1940496563911438,
+          "recomputed": 0.1940496563911438,
+          "abs_diff": 0.0
+        },
+        "avg_length": {
+          "saved": 7.025330543518066,
+          "recomputed": 7.025330543518066,
+          "abs_diff": 0.0
+        },
+        "inadmissibility_rate": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "expert_argmax_match": {
+          "saved": 0.743945837020874,
+          "recomputed": 0.743945837020874,
+          "abs_diff": 0.0
+        },
+        "mean_kl_to_expert": {
+          "saved": 4.614441871643066,
+          "recomputed": 4.614441871643066,
+          "abs_diff": 0.0
+        },
+        "policy_entropy": {
+          "saved": -0.0,
+          "recomputed": -0.0,
+          "abs_diff": 0.0
+        },
+        "mean_action_deviation_from_expert": {
+          "saved": 2.4029734134674072,
+          "recomputed": 2.4029734134674072,
+          "abs_diff": 0.0
+        },
+        "soft_survival_rate": {
+          "saved": 0.8054445385932922,
+          "recomputed": 0.8054445385932922,
+          "abs_diff": 0.0
+        },
+        "soft_inadmissibility_rate": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "soft_avg_return": {
+          "saved": 0.8054445385932922,
+          "recomputed": 0.8054445385932922,
+          "abs_diff": 0.0
+        },
+        "soft_policy_entropy": {
+          "saved": 0.13651025295257568,
+          "recomputed": 0.13651025295257568,
+          "abs_diff": 0.0
+        }
+      },
+      "pass_flags": {
+        "core_max_abs_diff": 0.0,
+        "aux_max_abs_diff": 0.0,
+        "core_pass": true,
+        "aux_pass": true,
+        "overall_pass": true
+      }
+    }
+  ],
+  "overall_pass": true
+}
