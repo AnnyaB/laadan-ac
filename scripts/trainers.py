@@ -198,7 +198,6 @@ def greedy_policy_from_logits(logits):
 
 def masked_greedy_policy_from_logits(logits, admissible_mask): 
     
-    
     """
     Deterministic one-hot policy from logits after admissibility masking.
 
@@ -226,9 +225,8 @@ def masked_greedy_policy_from_logits(logits, admissible_mask):
 
 def weighted_policy_kl(logits, target_policy, admissible_mask=None):
     
-    
     # Choosing either masked or unmasked log-probabilities depending on whether
-    # the action space should be restricted.
+    # The action space should be restricted.
     if admissible_mask is None:
         log_probs = plain_log_softmax_from_logits(logits)
     else:
@@ -273,8 +271,6 @@ def cql_regularizer(q_values, expert_policy, admissible_mask=None):
 
 def masked_action_mse(pred, target, action_mask=None): 
     
-
-    
     """
     Mean squared error over all actions or over a masked subset.
     
@@ -296,15 +292,11 @@ def masked_action_mse(pred, target, action_mask=None):
     return torch.sum(squared * weights) / denom
 
 
-
-
 def save_history_csv(path, rows):
     
     """
     Writing a list of dictionaries to CSV, allowing rows to have different keys.
 
-    This is helpful because some metrics appear only at evaluation epochs,
-    while others appear every epoch.
     """
     # If there is no history to save, do nothing.
     if not rows:
@@ -379,7 +371,7 @@ def epoch_to_fraction_of_best(history, metric_name, fraction=0.95):
     
     """
     Finding the first epoch that reaches a fraction of the best value.
-
+    
     """
     # Collecting all finite (epoch, value) pairs for the requested metric.
     metric_pairs = []
@@ -430,7 +422,6 @@ def save_model_run(seed_dir, model, history, metrics):
 
 @torch.no_grad()  
 def evaluate_policy_set(benchmark, policy, soft_policy=None):
-    
     
     """
     Evaluating the primary policy and optionally a secondary soft policy.
@@ -545,7 +536,7 @@ def train_behavior_cloning(benchmark, seed, results_dir, config):
         # Updating parameters.
         optimizer.step() 
 
-        # Starting the row with always-available training values. Save current epoch’s training values.
+        # Starting the row with always-available training values. Save the current epoch’s training values.
         row = {
             "epoch": epoch,
             "loss": float(loss.item()),
@@ -634,7 +625,6 @@ def train_behavior_cloning(benchmark, seed, results_dir, config):
 
 
 def train_cql(benchmark, seed, results_dir, config): # CQL is value-learning.
-    
     
     """
     Training the conservative offline value-learning baseline.
@@ -1126,7 +1116,6 @@ def train_voac(benchmark, seed, results_dir, config):
 
 
 def train_laadan_ac(benchmark, seed, results_dir, config):
-    
     
     """
     Train the proposed LAADAN-AC model.
