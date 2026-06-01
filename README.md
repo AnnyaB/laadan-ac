@@ -20,7 +20,7 @@ We introduce **Lagrangian Admissibility-Aware Deep Action-Nudging Actor-Critic (
 
 ## Abstract
 
-Offline reinforcement learning offers a way to study sepsis treatment policies without online patient experimentation, but high estimated survival can be misleading when a policy selects poorly supported or inadmissible actions. LAADAN-AC learns within a benchmark-defined admissible action interface by combining hard action masking, twin reward critics, conservative critic regularisation, expert-policy regularisation, a state-action smoothness proxy and Lagrangian cost control. We evaluate the framework on the ICU-Sepsis benchmark using five random seeds and exact finite-horizon Markov decision process evaluation, then test portability on a constructed eICU Collaborative Research Database Demo Markov decision process. On ICU-Sepsis, LAADAN-AC achieves competitive survival/return with zero selected-action inadmissibility and the strongest expert alignment among the main methods. A relaxed LAADAN-AC variant raises selected-checkpoint return on both ICU-Sepsis and eICU-CRD Demo while retaining zero inadmissibility. Ablations, a no-mask Lagrangian frontier and safety-failure diagnostics show that hard masking supplies the direct admissibility guarantee, while conservative and expert-guided regularisation shape the policy learned inside the admissible set.
+Offline reinforcement learning offers a way to study sepsis treatment policies without online patient experimentation, but high estimated survival can be misleading when a policy selects poorly supported or inadmissible actions. LAADAN-AC learns within a benchmark-defined admissible action interface by combining hard action masking, twin reward critics, conservative critic regularisation, expert-policy regularisation, a state-action smoothness proxy, and Lagrangian cost control. We evaluate the framework on the ICU-Sepsis benchmark using five random seeds and exact finite-horizon Markov decision process evaluation, then test portability on a constructed eICU Collaborative Research Database Demo Markov decision process. On ICU-Sepsis, LAADAN-AC achieves competitive survival/return with zero selected-action inadmissibility and the strongest expert alignment among the main methods. A relaxed LAADAN-AC variant raises selected-checkpoint return on both ICU-Sepsis and eICU-CRD Demo while retaining zero inadmissibility. Ablations, a no-mask Lagrangian frontier, and safety-failure diagnostics show that hard masking supplies the direct admissibility guarantee, while conservative and expert-guided regularisation shape the policy learned inside the admissible set.
 
 ## Main findings
 
@@ -29,10 +29,13 @@ Offline reinforcement learning offers a way to study sepsis treatment policies w
 | ICU-Sepsis main comparison | LAADAN-AC achieves zero selected-action inadmissibility and the strongest expert argmax agreement among the main methods |
 | VOAC comparison | Vanilla Offline Actor-Critic reaches higher return but selects inadmissible actions at a high rate |
 | Relaxed LAADAN-AC | Lower soft regularisation improves selected-checkpoint return on ICU-Sepsis and eICU-CRD Demo while retaining zero inadmissibility |
-| eICU-CRD Demo portability check | The same pipeline can be reused under a shifted MDP when transition dynamics, expert policy and admissibility masks are available |
+| eICU-CRD Demo portability check | The same pipeline can be reused under a shifted MDP when transition dynamics, expert policy, and admissibility masks are available |
 | Component ablation | Hard masking provides the direct admissibility guarantee; conservative and expert-guided regularisation shape the policy within the admissible set |
 | No-mask Lagrangian frontier | Lagrangian cost control alone does not replace masked admissible action selection in this benchmark |
-| Safety-failure analysis | VOAC's return advantage is associated with unsupported action selection at state, action, value and trajectory levels |
+| Safety-failure analysis | VOAC's return advantage is associated with unsupported action selection at state, action, value, and trajectory levels |
+
+### *Note: In the current benchmark implementation, hard admissibility masking is the direct mechanism that guarantees zero selected-action inadmissibility. The CMDP/Lagrangian cost-control component is retained as part of the tested framework and ablation study, but the present results show that it is secondary to hard masking rather than a replacement for it.*
+
 
 <p align="center">
   <img src="assets/cross_domain_portability.png" width="80%">
@@ -44,7 +47,7 @@ Offline reinforcement learning offers a way to study sepsis treatment policies w
 laadan-ac/
 ├── README.md
 ├── LICENSE
-├── CITATION.cff
+├── CODE_OF_CONDUCT.md
 ├── requirements.txt
 ├── .gitignore
 ├── assets/
@@ -53,7 +56,7 @@ laadan-ac/
 │   ├── component_ablation.png
 │   └── safety_failure_analysis.png
 ├── data/
-│   ├── README.md
+│   │
 │   ├── icu_sepsis/
 │   │   ├── expertPolicy.csv
 │   │   ├── initialStateDistribution.csv
