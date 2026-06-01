@@ -9,7 +9,7 @@
 We introduce **Lagrangian Admissibility-Aware Deep Action-Nudging Actor-Critic (LAADAN-AC)**, an offline actor-critic framework that combines hard admissibility masking, twin reward critics, conservative critic regularisation, expert-policy regularisation, a state-action smoothness proxy and Lagrangian cost control. The method is evaluated on the **ICU-Sepsis** benchmark and on a constructed **eICU-CRD Demo** Markov decision process used as a cross-source portability check.
 
 <p align="center">
-   <b>[ <a href="https://github.com/AnnyaB/laadan-ac">Code</a> | Results included in this repository ]</b>
+   <b>[ <a href="https://github.com/AnnyaB/laadan-ac">Code</a>]</b>
 </p>
 
 <br>
