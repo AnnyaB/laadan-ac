@@ -1,10 +1,8 @@
-# LAADAN-AC
-
-### Beyond Survival in Admissible Offline Treatment-Policy Learning
+### LAADAN-AC: Beyond Survival in Admissible Offline Treatment-Policy Learning
 
 [Riya Basak](https://github.com/AnnyaB), [Manal Helal](https://github.com/mhelal)
 
-**LAADAN-AC** is a research codebase for admissibility-aware offline reinforcement learning in sepsis treatment-policy benchmarks. The project studies a central failure mode in offline treatment-policy learning: a policy may obtain high estimated survival/return while selecting actions that are weakly supported or inadmissible under the benchmark action mask.
+**LAADAN-AC** is a research codebase for admissibility-aware offline reinforcement learning in sepsis treatment-policy benchmarks. The project studies a central failure mode in offline treatment-policy learning: a policy may obtain a high estimated survival/return while selecting actions that are weakly supported or inadmissible under the benchmark action mask.
 
 We introduce **Lagrangian Admissibility-Aware Deep Action-Nudging Actor-Critic (LAADAN-AC)**, an offline actor-critic framework that combines hard admissibility masking, twin reward critics, conservative critic regularisation, expert-policy regularisation, a state-action smoothness proxy, and Lagrangian cost control. The method is evaluated on the **ICU-Sepsis** benchmark and on a constructed **eICU-CRD Demo** Markov decision process used as a cross-source portability check.
 
@@ -20,7 +18,7 @@ We introduce **Lagrangian Admissibility-Aware Deep Action-Nudging Actor-Critic (
 
 ## Abstract
 
-Offline reinforcement learning offers a way to study sepsis treatment policies without online patient experimentation, but high estimated survival can be misleading when a policy selects poorly supported or inadmissible actions. LAADAN-AC learns within a benchmark-defined admissible action interface by combining hard action masking, twin reward critics, conservative critic regularisation, expert-policy regularisation, a state-action smoothness proxy, and Lagrangian cost control. We evaluate the framework on the ICU-Sepsis benchmark using five random seeds and exact finite-horizon Markov decision process evaluation, then test portability on a constructed eICU Collaborative Research Database Demo Markov decision process. On ICU-Sepsis, LAADAN-AC achieves competitive survival/return with zero selected-action inadmissibility and the strongest expert alignment among the main methods. A relaxed LAADAN-AC variant raises selected-checkpoint return on both ICU-Sepsis and eICU-CRD Demo while retaining zero inadmissibility. Ablations, a no-mask Lagrangian frontier, and safety-failure diagnostics show that hard masking supplies the direct admissibility guarantee, while conservative and expert-guided regularisation shape the policy learned inside the admissible set.
+*Offline reinforcement learning* offers a way to study sepsis treatment policies without online patient experimentation, but high estimated survival can be misleading when a policy selects poorly supported or inadmissible actions. *LAADAN-AC* learns within a benchmark-defined admissible action interface by combining hard action masking, twin reward critics, conservative critic regularisation, expert-policy regularisation, a state-action smoothness proxy, and Lagrangian cost control. We evaluate the framework on the *ICU-Sepsis benchmark* using five random seeds and exact finite-horizon Markov decision process evaluation, then test portability on a constructed *eICU Collaborative Research Database Demo* Markov decision process. On ICU-Sepsis, *LAADAN-AC* achieves competitive survival/return with zero selected-action inadmissibility and the strongest expert alignment among the main methods. A *relaxed LAADAN-AC* variant raises selected-checkpoint return on both ICU-Sepsis and eICU-CRD Demo while retaining zero inadmissibility. Ablations, a no-mask Lagrangian frontier, and safety-failure diagnostics show that hard masking supplies the direct admissibility guarantee, while conservative and expert-guided regularisation shape the policy learned inside the admissible set.
 
 ## Main findings
 
