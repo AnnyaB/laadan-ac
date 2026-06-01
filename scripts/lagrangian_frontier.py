@@ -1,9 +1,8 @@
 
 # lagrangian_frontier.py
 
-#
 # This script runs the LAADAN-AC Lagrangian frontier experiments.
-# This script is intended to be self contained and reproducible
+# This script is intended to be self-contained and reproducible
 
 # Libraries used in this script:
 
@@ -15,11 +14,11 @@ import argparse
 # summary table and the final model selection table.
 import csv
 
-#  used to save structured summaries, metrics, manifests and benchmark
+#  used to save structured summaries, metrics, manifests, and benchmark
 # descriptions in a machine-readable format.
 import json
 
-# os is used to build file paths, check whether files/folders exist and create
+# os is used to build file paths, check whether files/folders exist, and create
 # output paths in a platform-independent way.
 import os
 
