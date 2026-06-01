@@ -6,7 +6,7 @@
 
 **LAADAN-AC** is a research codebase for admissibility-aware offline reinforcement learning in sepsis treatment-policy benchmarks. The project studies a central failure mode in offline treatment-policy learning: a policy may obtain high estimated survival/return while selecting actions that are weakly supported or inadmissible under the benchmark action mask.
 
-We introduce **Lagrangian Admissibility-Aware Deep Action-Nudging Actor-Critic (LAADAN-AC)**, an offline actor-critic framework that combines hard admissibility masking, twin reward critics, conservative critic regularisation, expert-policy regularisation, a state-action smoothness proxy and Lagrangian cost control. The method is evaluated on the **ICU-Sepsis** benchmark and on a constructed **eICU-CRD Demo** Markov decision process used as a cross-source portability check.
+We introduce **Lagrangian Admissibility-Aware Deep Action-Nudging Actor-Critic (LAADAN-AC)**, an offline actor-critic framework that combines hard admissibility masking, twin reward critics, conservative critic regularisation, expert-policy regularisation, a state-action smoothness proxy, and Lagrangian cost control. The method is evaluated on the **ICU-Sepsis** benchmark and on a constructed **eICU-CRD Demo** Markov decision process used as a cross-source portability check.
 
 <p align="center">
    <b>[ <a href="https://github.com/AnnyaB/laadan-ac">Code</a> ]</b>
@@ -157,7 +157,7 @@ The released experiments use the processed `data/eicu_demo_mdp/` files above.
 
 ## Using the code
 
-The repository is organised around the final experiments and outputs used in the manuscript. The `results/` folder contains training histories, metric files, selected checkpoints and diagnostic outputs for:
+The repository is organised around the final experiments and outputs used in the manuscript. The `results/` folder contains training histories, metric files, selected checkpoints, and diagnostic outputs for:
 
 ```text
 results/icu_sepsis_main/
@@ -299,7 +299,7 @@ These figures summarise the architecture, cross-domain portability check, compon
 
 ## Important note
 
-This repository is a benchmark research implementation. It is **not** a clinical decision-support system and must not be used to guide patient treatment. The experiments evaluate return, admissibility and expert alignment under fixed benchmark Markov decision processes.
+*This repository is a benchmark research implementation. It is **not** a clinical decision-support system and must not be used to guide patient treatment. The experiments evaluate return, admissibility, and expert alignment under fixed benchmark Markov decision processes.*
 
 ## Citation
 
@@ -317,4 +317,4 @@ If you find this code useful, please cite it as:
 
 ## Contact and contributions
 
-For questions, reproducibility issues or suggested improvements, please open a GitHub issue.
+For questions, reproducibility issues, or suggested improvements, please open a GitHub issue.
