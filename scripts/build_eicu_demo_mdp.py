@@ -4,13 +4,13 @@
 
 # This script converts the official eICU Collaborative Research Database Demo
 # into a small tabular Markov Decision Process (MDP) that follows the same file
-# layout as the ICU-Sepsis benchmark used in this project.
+# layout as the ICU-Sepsis benchmark used in this experiment.
 
 
 #  note:
 # This script creates a small real-data cross-source portability task. It is not
 # intended to replace full external clinical validation. The aim is to test
-# whether the BC, CQL-inspired, VOAC and LAADAN-AC pipeline can be reused on a
+# whether the BC, CQL-inspired, VOAC, and LAADAN-AC pipeline can be reused on a
 # second ICU trajectory source with the same evaluation interface.
 
 # argparse is used to read command-line options.
@@ -42,10 +42,6 @@ from sklearn.preprocessing import StandardScaler
 class CSVTemplateWriter:
     """
     Writes MDP files in a format compatible with the existing project.
-
-    The ICU-Sepsis benchmark files already used by the project are treated as a
-    formatting template. This avoids guessing whether a file should be dense,
-    sparse, headerless or headered.
     """
 
     def __init__(self, template_dir):
@@ -260,10 +256,10 @@ class EICUDemoMDPBuilder:
         Build the action-name dictionary used in the generated MDP.
 
         The 25-action mode follows the same spirit as the ICU-Sepsis benchmark:
-        each action is a combination of two discretised treatment dimensions.
-        The dimensions are not copied from ICU-Sepsis, because eICU demo exposes
+        Each action is a combination of two discrete treatment dimensions.
+        The dimensions are not copied from ICU-Sepsis, because the eICU demo exposes
         different treatment tables. Instead, they are estimated from real eICU
-        medication, infusion, treatment and respiratory-care records.
+        medication, infusion, treatment, and respiratory-care records.
         """
         if int(self.args.action_grid) == 5:
             return {
@@ -308,7 +304,7 @@ class EICUDemoMDPBuilder:
 
         This is a real-data discretisation: all counts come from observed eICU
         clinical records. It is still an approximation and should be described as
-        a portability MDP, not as a validated clinical treatment protocol.
+        a portability MDP.
         """
         fluid_count = int(fluid_count)
         antibiotic_count = int(antibiotic_count)
@@ -695,11 +691,9 @@ class EICUDemoMDPBuilder:
         Assign one treatment-action label to each patient-hour.
 
         The improved default uses a 25-action ICU-Sepsis-style grid rather than
-        only five broad categories. This matters because a five-action task can
-        be too coarse: the admissibility mask may leave only one action per
-        state, causing BC, CQL and LAADAN-AC to become almost identical.
+        only five broad categories.
 
-        The 25-action grid keeps the task real-data based while giving the agent
+        The 25-action grid keeps the task real-data-based while giving the agent
         more supported choices:
         - haemodynamic axis: none, low fluid, high fluid, vasopressor/cardiac, combined;
         - support axis: none, antibiotic, respiratory, antibiotic+respiratory, high combined.
