@@ -34,7 +34,7 @@ Offline reinforcement learning offers a way to study sepsis treatment policies w
 | No-mask Lagrangian frontier | Lagrangian cost control alone does not replace masked admissible action selection in this benchmark |
 | Safety-failure analysis | VOAC's return advantage is associated with unsupported action selection at state, action, value, and trajectory levels |
 
-### *Note: In the current benchmark implementation, hard admissibility masking is the direct mechanism that guarantees zero selected-action inadmissibility. The CMDP/Lagrangian cost-control component is retained as part of the tested framework and ablation study, but the present results show that it is secondary to hard masking rather than a replacement for it.*
+#### *Note: In the current benchmark implementation, hard admissibility masking is the direct mechanism that guarantees zero selected-action inadmissibility. The CMDP/Lagrangian cost-control component is retained as part of the tested framework and ablation study, but the present results show that it is secondary to hard masking rather than a replacement for it.*
 
 
 <p align="center">
