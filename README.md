@@ -54,7 +54,6 @@ laadan-ac/
 │   ├── component_ablation.png
 │   └── safety_failure_analysis.png
 ├── data/
-│   │
 │   ├── icu_sepsis/
 │   │   ├── expertPolicy.csv
 │   │   ├── initialStateDistribution.csv
@@ -112,6 +111,18 @@ Check that the main scripts compile:
 ```bash
 python -m py_compile scripts/*.py
 ```
+## Reproducibility environment
+
+The released experiments were run in a Kaggle GPU notebook environment with the following recorded software and hardware setup:
+
+```text
+NumPy: 2.0.2
+PyTorch: 2.10.0+cu128
+CUDA available: True
+GPU: Tesla T4
+```
+
+Small numerical differences *may* occur if the experiments are rerun under a *different* PyTorch, CUDA, GPU, or CPU environment.
 
 ## Data
 
