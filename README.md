@@ -312,17 +312,20 @@ These figures summarise the architecture, cross-domain portability check, compon
 
 ## Citation
 
-If you find this code useful, please cite it as:
+If you use this repository, code, saved checkpoints, experiment scripts, or LAADAN-AC implementation, please cite:
 
 ```bibtex
 @misc{basak2026laadanac,
-  title        = {LAADAN-AC: Beyond Survival in Admissible Offline Treatment-Policy Learning},
   author       = {Basak, Riya and Helal, Manal},
+  title        = {{LAADAN-AC}: Beyond Survival in Admissible Offline Treatment-Policy Learning},
   year         = {2026},
+  month        = jun,
   url          = {https://github.com/AnnyaB/laadan-ac},
-  note         = {Research code repository}
+  note         = {Research code repository accompanying a manuscript submitted to ICaTAS 2026 on 1 June 2026}
 }
 ```
+
+The accompanying manuscript was submitted to ICaTAS 2026 on 1 June 2026. Until acceptance or publication, please cite the repository as research software rather than as a published conference paper.
 
 ## Contact and contributions
 
