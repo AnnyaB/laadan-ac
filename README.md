@@ -325,7 +325,7 @@ If you use this repository, code, saved checkpoints, experiment scripts, or LAAD
 }
 ```
 
-The accompanying manuscript was submitted to ICaTAS 2026 on 1 June 2026. Until acceptance or publication, please cite the repository as research software rather than as a published conference paper.
+The accompanying manuscript was submitted to ICaTAS 2026 on 1 June 2026. Until acceptance or publication, please cite the repository as research software.
 
 ## Contact and contributions
 
