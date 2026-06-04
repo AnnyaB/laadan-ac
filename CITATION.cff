@@ -1,0 +1,27 @@
+
+cff-version: 1.2.0
+message: "If you use this repository, code, saved checkpoints, experiment scripts, or LAADAN-AC implementation, please cite this work."
+title: "LAADAN-AC: Beyond Survival in Admissible Offline Treatment-Policy Learning"
+type: software
+authors:
+  - family-names: "Basak"
+    given-names: "Riya"
+    affiliation: "University of Hertfordshire"
+  - family-names: "Helal"
+    given-names: "Manal"
+    affiliation: "University of Hertfordshire"
+repository-code: "https://github.com/AnnyaB/laadan-ac"
+url: "https://github.com/AnnyaB/laadan-ac"
+date-released: "2026-06-01"
+license: "MIT"
+abstract: "LAADAN-AC is a research codebase for admissibility-aware offline reinforcement learning in sepsis treatment-policy benchmarks. It implements Lagrangian Admissibility-Aware Deep Action-Nudging Actor-Critic with hard admissibility masking, twin reward critics, conservative critic regularisation, expert-policy regularisation, a state-action smoothness proxy, and Lagrangian cost control. The repository includes experiments on ICU-Sepsis and a constructed eICU-CRD Demo Markov decision process."
+keywords:
+  - offline reinforcement learning
+  - safe reinforcement learning
+  - ICU-Sepsis
+  - sepsis treatment
+  - admissibility masking
+  - actor-critic
+  - Lagrangian cost control
+  - clinical decision support
+
