@@ -1,45 +1,84 @@
-### LAADAN-AC: Beyond Survival in Admissible Offline Treatment-Policy Learning
+<a id="top"></a>
 
-[Riya Basak](https://github.com/AnnyaB), [Manal Helal](https://github.com/mhelal)
+<div align="center">
 
-**LAADAN-AC** is a research codebase for admissibility-aware offline reinforcement learning in sepsis treatment-policy benchmarks. The project studies a central failure mode in offline treatment-policy learning: a policy may obtain a high estimated survival/return while selecting actions that are weakly supported or inadmissible under the benchmark action mask.
+# LAADAN-AC
 
-We introduce **Lagrangian Admissibility-Aware Deep Action-Nudging Actor-Critic (LAADAN-AC)**, an offline actor-critic framework that combines hard admissibility masking, twin reward critics, conservative critic regularisation, expert-policy regularisation, a state-action smoothness proxy, and Lagrangian cost control. The method is evaluated on the **ICU-Sepsis** benchmark and on a constructed **eICU-CRD Demo** Markov decision process used as a cross-source portability check.
+**Beyond Survival in Admissible Offline Treatment-Policy Learning**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+![Python](https://img.shields.io/badge/Python-3.x-blue.svg)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.10.0%2Bcu128-ee4c2c.svg)
+![Research Software](https://img.shields.io/badge/Research%20Software-LAADAN--AC-1f6feb.svg)
+![Manuscript](https://img.shields.io/badge/Manuscript-Submitted%20to%20ICaTAS%202026-6f42c1.svg)
+
+**Riya Basak**, **Manal Helal**
+
+[Code](https://github.com/AnnyaB/laadan-ac) • [Overview](#overview) • [Main Findings](#main-findings) • [Installation](#installation) • [Data](#data) • [Usage](#usage) • [Citation](#citation)
+
+</div>
+
+---
+
+## Overview
+
+**LAADAN-AC** is a research codebase for admissibility-aware offline reinforcement learning in sepsis treatment-policy benchmarks.
+
+The project studies a central failure mode in offline treatment-policy learning: a policy may obtain a high estimated survival or return while selecting actions that are weakly supported or inadmissible under the benchmark action mask.
+
+We introduce **Lagrangian Admissibility-Aware Deep Action-Nudging Actor-Critic (LAADAN-AC)**, an offline actor-critic framework that combines:
+
+* hard admissibility masking,
+* twin reward critics,
+* conservative critic regularisation,
+* expert-policy regularisation,
+* a state-action smoothness proxy,
+* and Lagrangian cost control.
+
+The method is evaluated on the **ICU-Sepsis** benchmark and on a constructed **eICU-CRD Demo** Markov decision process used as a cross-source portability check.
 
 <p align="center">
-   <b>[ <a href="https://github.com/AnnyaB/laadan-ac">Code</a> ]</b>
+  <img src="assets/architecture_diagram.png" width="82%" alt="LAADAN-AC architecture diagram">
 </p>
 
-<br>
-
-<p align="center">
-  <img src="assets/architecture_diagram.png" width="80%">
-</p>
+---
 
 ## Abstract
 
-*Offline reinforcement learning* offers a way to study *sepsis* treatment policies without online patient experimentation, but high estimated survival can be misleading when a policy selects poorly supported or inadmissible actions. *LAADAN-AC* learns within a benchmark-defined admissible action interface by combining hard action masking, twin reward critics, conservative critic regularisation, expert-policy regularisation, a state-action smoothness proxy, and Lagrangian cost control. We evaluate the framework on the *ICU-Sepsis benchmark* using five random seeds and exact finite-horizon Markov decision process evaluation, then test portability on a constructed *eICU Collaborative Research Database Demo* Markov decision process. On ICU-Sepsis, *LAADAN-AC* achieves competitive survival/return with zero selected-action inadmissibility and the strongest expert alignment among the main methods. A *relaxed LAADAN-AC* variant raises selected-checkpoint return on both ICU-Sepsis and eICU-CRD Demo while retaining zero inadmissibility. Ablations, a no-mask Lagrangian frontier, and safety-failure diagnostics show that hard masking supplies the direct admissibility guarantee, while conservative and expert-guided regularisation shape the policy learned inside the admissible set.
+*Offline reinforcement learning* offers a way to study *sepsis* treatment policies without online patient experimentation, but high estimated survival can be misleading when a policy selects poorly supported or inadmissible actions.
 
-## Main findings
+*LAADAN-AC* learns within a benchmark-defined admissible action interface by combining hard action masking, twin reward critics, conservative critic regularisation, expert-policy regularisation, a state-action smoothness proxy, and Lagrangian cost control.
 
-| Experiment | Finding |
-|---|---|
-| ICU-Sepsis main comparison | LAADAN-AC achieves zero selected-action inadmissibility and the strongest expert argmax agreement among the main methods |
-| VOAC comparison | Vanilla Offline Actor-Critic reaches higher return but selects inadmissible actions at a high rate |
-| Relaxed LAADAN-AC | Lower soft regularisation improves selected-checkpoint return on ICU-Sepsis and eICU-CRD Demo while retaining zero inadmissibility |
-| eICU-CRD Demo portability check | The same pipeline can be reused under a shifted MDP when transition dynamics, expert policy, and admissibility masks are available |
-| Component ablation | Hard masking provides the direct admissibility guarantee; conservative and expert-guided regularisation shape the policy within the admissible set |
-| No-mask Lagrangian frontier | Lagrangian cost control alone does not replace masked admissible action selection in this benchmark |
-| Safety-failure analysis | VOAC's return advantage is associated with unsupported action selection at state, action, value, and trajectory levels |
+We evaluate the framework on the *ICU-Sepsis benchmark* using five random seeds and exact finite-horizon Markov decision process evaluation, then test portability on a constructed *eICU Collaborative Research Database Demo* Markov decision process.
 
-#### *Note: In the current benchmark implementation, hard admissibility masking is the direct mechanism that guarantees zero selected-action inadmissibility. The CMDP/Lagrangian cost-control component is retained as part of the tested framework and ablation study, but the present results show that it is secondary to hard masking rather than a replacement for it.*
+On ICU-Sepsis, *LAADAN-AC* achieves competitive survival/return with zero selected-action inadmissibility and the strongest expert alignment among the main methods. A *relaxed LAADAN-AC* variant raises selected-checkpoint return on both ICU-Sepsis and eICU-CRD Demo while retaining zero inadmissibility.
 
+Ablations, a no-mask Lagrangian frontier, and safety-failure diagnostics show that hard masking supplies the direct admissibility guarantee, while conservative and expert-guided regularisation shape the policy learned inside the admissible set.
+
+---
+
+## Main Findings
+
+| Experiment                      | Finding                                                                                                                                             |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ICU-Sepsis main comparison      | LAADAN-AC achieves zero selected-action inadmissibility and the strongest expert argmax agreement among the main methods.                           |
+| VOAC comparison                 | Vanilla Offline Actor-Critic reaches higher return but selects inadmissible actions at a high rate.                                                 |
+| Relaxed LAADAN-AC               | Lower soft regularisation improves selected-checkpoint return on ICU-Sepsis and eICU-CRD Demo while retaining zero inadmissibility.                 |
+| eICU-CRD Demo portability check | The same pipeline can be reused under a shifted MDP when transition dynamics, expert policy, and admissibility masks are available.                 |
+| Component ablation              | Hard masking provides the direct admissibility guarantee; conservative and expert-guided regularisation shape the policy within the admissible set. |
+| No-mask Lagrangian frontier     | Lagrangian cost control alone does not replace masked admissible action selection in this benchmark.                                                |
+| Safety-failure analysis         | VOAC's return advantage is associated with unsupported action selection at state, action, value, and trajectory levels.                             |
+
+> **Note**
+> In the current benchmark implementation, hard admissibility masking is the direct mechanism that guarantees zero selected-action inadmissibility. The CMDP/Lagrangian cost-control component is retained as part of the tested framework and ablation study, but the present results show that it is secondary to hard masking rather than a replacement for it.
 
 <p align="center">
-  <img src="assets/cross_domain_portability.png" width="80%">
+  <img src="assets/cross_domain_portability.png" width="82%" alt="Cross-domain portability summary">
 </p>
 
-## Repository structure
+---
+
+## Repository Structure
 
 ```text
 laadan-ac/
@@ -94,6 +133,8 @@ laadan-ac/
     └── safety_failure_analysis/
 ```
 
+---
+
 ## Installation
 
 Create a Python environment and install the dependencies:
@@ -111,7 +152,10 @@ Check that the main scripts compile:
 ```bash
 python -m py_compile scripts/*.py
 ```
-## Reproducibility environment
+
+---
+
+## Reproducibility Environment
 
 The released experiments were run in a Kaggle GPU notebook environment with the following recorded software and hardware setup:
 
@@ -124,11 +168,13 @@ GPU: Tesla T4
 
 Small numerical differences *may* occur if the experiments are rerun under a *different* PyTorch, CUDA, GPU, or CPU environment.
 
+---
+
 ## Data
 
 This repository contains the two processed Markov decision process folders used in the released experiments.
 
-### ICU-Sepsis benchmark
+### ICU-Sepsis Benchmark
 
 The main experiment uses the released ICU-Sepsis benchmark Markov decision process. The expected files are:
 
@@ -164,7 +210,9 @@ data/eicu_demo_mdp/
 
 The released experiments use the processed `data/eicu_demo_mdp/` files above.
 
-## Using the code
+---
+
+## Usage
 
 The repository is organised around the final experiments and outputs used in the manuscript. The `results/` folder contains training histories, metric files, selected checkpoints, and diagnostic outputs for:
 
@@ -177,24 +225,26 @@ results/lagrangian_frontier/
 results/safety_failure_analysis/
 ```
 
-The main scripts are:
+### Main Scripts
 
-| Script | Purpose |
-|---|---|
-| `scripts/benchmark.py` | Loads tabular Markov decision process files and performs exact finite-horizon evaluation |
-| `scripts/models.py` | Defines Behaviour Cloning, Conservative Q and actor-critic networks |
-| `scripts/trainers.py` | Implements Behaviour Cloning, CQL-regularised fitted-Q, Vanilla Offline Actor-Critic and LAADAN-AC training |
-| `scripts/run_experiments.py` | Runs the main training and evaluation pipeline |
-| `scripts/pick_final_models.py` | Selects final checkpoints from completed runs |
-| `scripts/test_final_models.py` | Reloads selected checkpoints and recomputes final metrics |
-| `scripts/lagrangian_frontier.py` | Runs component ablations and no-mask Lagrangian frontier experiments |
-| `scripts/safety_failure_analysis.py` | Generates state-, action-, value- and trajectory-level safety diagnostics |
-| `scripts/build_eicu_demo_mdp.py` | Documents the construction of the eICU-CRD Demo Markov decision process |
-| `scripts/plots.py` | Shared plotting utilities used by experiment scripts |
+| Script                               | Purpose                                                                                                      |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `scripts/benchmark.py`               | Loads tabular Markov decision process files and performs exact finite-horizon evaluation.                    |
+| `scripts/models.py`                  | Defines Behaviour Cloning, Conservative Q and actor-critic networks.                                         |
+| `scripts/trainers.py`                | Implements Behaviour Cloning, CQL-regularised fitted-Q, Vanilla Offline Actor-Critic and LAADAN-AC training. |
+| `scripts/run_experiments.py`         | Runs the main training and evaluation pipeline.                                                              |
+| `scripts/pick_final_models.py`       | Selects final checkpoints from completed runs.                                                               |
+| `scripts/test_final_models.py`       | Reloads selected checkpoints and recomputes final metrics.                                                   |
+| `scripts/lagrangian_frontier.py`     | Runs component ablations and no-mask Lagrangian frontier experiments.                                        |
+| `scripts/safety_failure_analysis.py` | Generates state-, action-, value- and trajectory-level safety diagnostics.                                   |
+| `scripts/build_eicu_demo_mdp.py`     | Documents the construction of the eICU-CRD Demo Markov decision process.                                     |
+| `scripts/plots.py`                   | Shared plotting utilities used by experiment scripts.                                                        |
 
-### Example usage
+---
 
-Run the main ICU-Sepsis experiment:
+## Example Commands
+
+### Run the main ICU-Sepsis experiment
 
 ```bash
 DATA_DIR="data/icu_sepsis"
@@ -205,7 +255,7 @@ python -u scripts/run_experiments.py \
   --device auto
 ```
 
-Select and verify the final ICU-Sepsis checkpoints:
+### Select and verify the final ICU-Sepsis checkpoints
 
 ```bash
 python -u scripts/pick_final_models.py \
@@ -220,7 +270,7 @@ python -u scripts/test_final_models.py \
   --output-json results/icu_sepsis_main/final_models/test_summary.json
 ```
 
-Run the same pipeline on the processed eICU-CRD Demo MDP:
+### Run the same pipeline on the processed eICU-CRD Demo MDP
 
 ```bash
 DATA_DIR="data/eicu_demo_mdp"
@@ -242,7 +292,7 @@ python -u scripts/test_final_models.py \
   --output-json results/eicu_demo_main/final_models/test_summary.json
 ```
 
-Run the component-ablation and no-mask Lagrangian frontier analysis:
+### Run the component-ablation and no-mask Lagrangian frontier analysis
 
 ```bash
 python -u scripts/lagrangian_frontier.py \
@@ -251,7 +301,7 @@ python -u scripts/lagrangian_frontier.py \
   --device auto
 ```
 
-Run the safety-failure diagnostics from the selected ICU-Sepsis checkpoints:
+### Run the safety-failure diagnostics from the selected ICU-Sepsis checkpoints
 
 ```bash
 python -u scripts/safety_failure_analysis.py \
@@ -261,6 +311,8 @@ python -u scripts/safety_failure_analysis.py \
   --output-dir results/safety_failure_analysis \
   --device auto
 ```
+
+### Inspect command-line options
 
 Use `--help` to inspect the available command-line options for each script:
 
@@ -272,9 +324,13 @@ python scripts/lagrangian_frontier.py --help
 python scripts/safety_failure_analysis.py --help
 ```
 
-## Saved checkpoints
+---
 
-The released `results/` folders include `.pt` checkpoint files for the trained models. These checkpoint files are stored with Git LFS. Before cloning the repository, install Git LFS:
+## Saved Checkpoints
+
+The released `results/` folders include `.pt` checkpoint files for the trained models. These checkpoint files are stored with Git LFS.
+
+Before cloning the repository, install Git LFS:
 
 ```bash
 git lfs install
@@ -285,7 +341,9 @@ git lfs pull
 
 Including checkpoints allows the final metrics and safety-failure diagnostics to be reloaded directly from the repository.
 
-## Figures included in this repository
+---
+
+## Figures
 
 The README uses four summary figures stored in `assets/`:
 
@@ -299,16 +357,22 @@ assets/safety_failure_analysis.png
 These figures summarise the architecture, cross-domain portability check, component ablation and safety-failure analysis. The reproducibility record is stored in the corresponding data, script and result folders.
 
 <p align="center">
-  <img src="assets/component_ablation.png" width="80%">
+  <img src="assets/component_ablation.png" width="82%" alt="Component ablation summary">
 </p>
 
 <p align="center">
-  <img src="assets/safety_failure_analysis.png" width="80%">
+  <img src="assets/safety_failure_analysis.png" width="82%" alt="Safety-failure analysis summary">
 </p>
 
-## *Important*
+---
 
-*This repository is a **benchmark research** implementation. It is **not** a clinical decision-support system and must not be used to guide patient treatment. The experiments evaluate return, admissibility, and expert alignment under **fixed benchmark Markov decision processes**.*
+## Important
+
+> This repository is a **benchmark research implementation**.
+> It is **not** a clinical decision-support system and must not be used to guide patient treatment.
+> The experiments evaluate return, admissibility, and expert alignment under **fixed benchmark Markov decision processes**.
+
+---
 
 ## Citation
 
@@ -327,6 +391,17 @@ If you use this repository, code, saved checkpoints, experiment scripts, or LAAD
 
 The accompanying manuscript was submitted to ICaTAS 2026 on 1 June 2026. Until acceptance or publication, please cite the repository as research software.
 
-## Contact and contributions
+---
+
+## Contact and Contributions
 
 For questions, reproducibility issues, or suggested improvements, please open a GitHub issue.
+
+---
+
+<div align="center">
+
+**[Back to top](#top)**
+
+</div>
+
