@@ -7,7 +7,7 @@
 **Beyond Survival in Admissible Offline Treatment-Policy Learning**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Python](https://img.shields.io/badge/Python-3.x-blue.svg)
+![Python](https://img.shields.io/badge/Python-3.12.12-blue.svg)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.10.0%2Bcu128-ee4c2c.svg)
 ![Research Software](https://img.shields.io/badge/Research%20Software-LAADAN--AC-1f6feb.svg)
 ![Manuscript](https://img.shields.io/badge/Manuscript-Submitted%20to%20ICaTAS%202026-6f42c1.svg)
