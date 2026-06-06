@@ -12,7 +12,7 @@
 ![Research Software](https://img.shields.io/badge/Research%20Software-LAADAN--AC-1f6feb.svg)
 ![Manuscript](https://img.shields.io/badge/Manuscript-Submitted%20to%20ICaTAS%202026-6f42c1.svg)
 
-**Riya Basak**, **Manal Helal**
+[**Riya Basak**](https://github.com/AnnyaB), [**Manal Helal**](https://github.com/mhelal)
 
 [Code](https://github.com/AnnyaB/laadan-ac) • [Overview](#overview) • [Main Findings](#main-findings) • [Installation](#installation) • [Data](#data) • [Usage](#usage) • [Citation](#citation)
 
