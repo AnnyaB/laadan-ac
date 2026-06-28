@@ -1,0 +1,10 @@
+{
+  "num_states": 716,
+  "num_actions": 25,
+  "feature_dim": 47,
+  "death_state": 713,
+  "survival_state": 714,
+  "horizon": 50,
+  "use_one_hot_states": false,
+  "state_representation": "standardized_cluster_centres"
+}

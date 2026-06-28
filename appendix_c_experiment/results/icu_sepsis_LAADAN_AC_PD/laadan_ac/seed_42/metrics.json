@@ -1,0 +1,16 @@
+{
+  "avg_return": 0.7931352853775024,
+  "survival_rate": 0.7931352853775024,
+  "mortality_rate": 0.20686471462249756,
+  "avg_length": 8.639327049255371,
+  "inadmissibility_rate": 0.0,
+  "expert_argmax_match": 0.9482990503311157,
+  "mean_kl_to_expert": 3.95802640914917,
+  "policy_entropy": -0.0,
+  "mean_action_deviation_from_expert": 1.4309388399124146,
+  "soft_survival_rate": 0.7911602854728699,
+  "soft_inadmissibility_rate": 0.0,
+  "soft_avg_return": 0.7911602854728699,
+  "soft_policy_entropy": 0.1370237171649933,
+  "soft_mean_kl_to_expert": 0.48592883348464966
+}

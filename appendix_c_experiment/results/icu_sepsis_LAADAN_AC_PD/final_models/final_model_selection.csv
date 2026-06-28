@@ -1,0 +1,6 @@
+agent_dir,agent_name,best_seed,selection_rule,survival_rate,inadmissibility_rate,soft_inadmissibility_rate,avg_return,cost_budget,lagrange,lambda_inad,lambda_support,lambda_smooth,lambda_uncertainty
+bc,Behavior Cloning,seed_43,highest_survival,0.7880703806877136,0.0,0.007534426645849472,0.7880703806877136,,,,,,
+cql,Conservative Q-Learning,seed_43,highest_survival,0.7852136492729187,0.0008706539719872855,,0.7852136492729187,,,,,,
+voac,Vanilla Offline Actor-Critic,seed_44,highest_survival,0.8044760823249817,0.4075235395544109,0.8533653985460647,0.8044760823249817,,,,,,
+laadan_ac,LAADAN-AC,seed_43,highest_survival,0.7940747141838074,0.0,0.0,0.7940747141838074,,,,,,
+laadan_ac_pd_nomask,LAADAN-AC-PD / LAADAN-AC-RC,seed_44,constrained,0.7876849174499512,0.0,2.850577776718886e-14,0.7876849174499512,0.0001,0.0,0.0,0.045758684992790226,0.0,0.0
