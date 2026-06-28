@@ -1,0 +1,1101 @@
+{
+  "data_dir": "/kaggle/input/datasets/annyab/icu-sepsis-ias/data/icu_sepsis",
+  "results_dir": "results_icu_rc_ablations",
+  "final_models_dir": "results_icu_rc_ablations/final_ablation_models",
+  "horizon": 50,
+  "device": "cpu",
+  "variants": [
+    {
+      "variant": "full_rc",
+      "variant_dir": "results_icu_rc_ablations/final_ablation_models/full_rc",
+      "checkpoint_path": "results_icu_rc_ablations/final_ablation_models/full_rc/model.pt",
+      "config_path": "results_icu_rc_ablations/full_rc/variant_config.json",
+      "policy_rule": "certified risk-adjusted greedy policy",
+      "saved_metrics": {
+        "avg_return": 0.7888521552085876,
+        "survival_rate": 0.7888521552085876,
+        "mortality_rate": 0.21114784479141235,
+        "avg_length": 8.946576118469238,
+        "inadmissibility_rate": 0.0,
+        "expert_argmax_match": 0.9179800152778625,
+        "mean_kl_to_expert": 3.992866039276123,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 1.4505975246429443,
+        "soft_survival_rate": 0.7856481075286865,
+        "soft_inadmissibility_rate": 2.098050068366349e-18,
+        "soft_avg_return": 0.7856481075286865,
+        "soft_policy_entropy": 0.051831137388944626,
+        "soft_mean_kl_to_expert": 1.1963162422180176,
+        "lagrange": 0.0,
+        "lambda_inad": 0.0,
+        "lambda_support": 0.025080092132091517,
+        "lambda_smooth": 0.0,
+        "lambda_uncertainty": 0.0,
+        "cost_budget": 0.0001,
+        "support_budget": 0.25,
+        "smooth_budget": 1.0,
+        "uncertainty_budget": 0.25,
+        "uses_action_mask": false,
+        "use_certified_nudging": true,
+        "barrier_weight": 25.0,
+        "support_weight": 1.0,
+        "rho_cost": 1.0,
+        "rho_reward": 1.0
+      },
+      "recomputed_metrics": {
+        "avg_return": 0.7888521552085876,
+        "survival_rate": 0.7888521552085876,
+        "mortality_rate": 0.21114784479141235,
+        "avg_length": 8.946576118469238,
+        "inadmissibility_rate": 0.0,
+        "expert_argmax_match": 0.9179800152778625,
+        "mean_kl_to_expert": 3.992866039276123,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 1.4505975246429443,
+        "soft_survival_rate": 0.7856480479240417,
+        "soft_inadmissibility_rate": 2.098049322724653e-18,
+        "soft_avg_return": 0.7856480479240417,
+        "soft_policy_entropy": 0.051831137388944626,
+        "lambda_inad": 0.0,
+        "lambda_support": 0.025080092132091517,
+        "lambda_smooth": 0.0,
+        "lambda_uncertainty": 0.0,
+        "use_certified_nudging": true,
+        "uses_action_mask": false
+      },
+      "saved_vs_recomputed": {
+        "avg_return": {
+          "saved": 0.7888521552085876,
+          "recomputed": 0.7888521552085876,
+          "abs_diff": 0.0
+        },
+        "survival_rate": {
+          "saved": 0.7888521552085876,
+          "recomputed": 0.7888521552085876,
+          "abs_diff": 0.0
+        },
+        "mortality_rate": {
+          "saved": 0.21114784479141235,
+          "recomputed": 0.21114784479141235,
+          "abs_diff": 0.0
+        },
+        "avg_length": {
+          "saved": 8.946576118469238,
+          "recomputed": 8.946576118469238,
+          "abs_diff": 0.0
+        },
+        "inadmissibility_rate": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "expert_argmax_match": {
+          "saved": 0.9179800152778625,
+          "recomputed": 0.9179800152778625,
+          "abs_diff": 0.0
+        },
+        "mean_kl_to_expert": {
+          "saved": 3.992866039276123,
+          "recomputed": 3.992866039276123,
+          "abs_diff": 0.0
+        },
+        "policy_entropy": {
+          "saved": -0.0,
+          "recomputed": -0.0,
+          "abs_diff": 0.0
+        },
+        "mean_action_deviation_from_expert": {
+          "saved": 1.4505975246429443,
+          "recomputed": 1.4505975246429443,
+          "abs_diff": 0.0
+        },
+        "soft_survival_rate": {
+          "saved": 0.7856481075286865,
+          "recomputed": 0.7856480479240417,
+          "abs_diff": 5.960464477539063e-08
+        },
+        "soft_inadmissibility_rate": {
+          "saved": 2.098050068366349e-18,
+          "recomputed": 2.098049322724653e-18,
+          "abs_diff": 7.45641696051349e-25
+        },
+        "soft_avg_return": {
+          "saved": 0.7856481075286865,
+          "recomputed": 0.7856480479240417,
+          "abs_diff": 5.960464477539063e-08
+        },
+        "soft_policy_entropy": {
+          "saved": 0.051831137388944626,
+          "recomputed": 0.051831137388944626,
+          "abs_diff": 0.0
+        },
+        "lambda_inad": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "lambda_support": {
+          "saved": 0.025080092132091517,
+          "recomputed": 0.025080092132091517,
+          "abs_diff": 0.0
+        },
+        "lambda_smooth": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "lambda_uncertainty": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "use_certified_nudging": {
+          "saved": 1.0,
+          "recomputed": 1.0,
+          "abs_diff": 0.0
+        },
+        "uses_action_mask": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        }
+      }
+    },
+    {
+      "variant": "no_lambda_updates",
+      "variant_dir": "results_icu_rc_ablations/final_ablation_models/no_lambda_updates",
+      "checkpoint_path": "results_icu_rc_ablations/final_ablation_models/no_lambda_updates/model.pt",
+      "config_path": "results_icu_rc_ablations/no_lambda_updates/variant_config.json",
+      "policy_rule": "certified risk-adjusted greedy policy",
+      "saved_metrics": {
+        "avg_return": 0.7877354621887207,
+        "survival_rate": 0.7877354621887207,
+        "mortality_rate": 0.2122645378112793,
+        "avg_length": 8.957240104675293,
+        "inadmissibility_rate": 0.0,
+        "expert_argmax_match": 0.9207668304443359,
+        "mean_kl_to_expert": 3.9954285621643066,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 1.4509234428405762,
+        "soft_survival_rate": 0.7847264409065247,
+        "soft_inadmissibility_rate": 9.104430694227077e-18,
+        "soft_avg_return": 0.7847264409065247,
+        "soft_policy_entropy": 0.045059967786073685,
+        "soft_mean_kl_to_expert": 1.195993185043335,
+        "lagrange": 0.0,
+        "lambda_inad": 0.0,
+        "lambda_support": 0.0,
+        "lambda_smooth": 0.0,
+        "lambda_uncertainty": 0.0,
+        "cost_budget": 0.0001,
+        "support_budget": 0.25,
+        "smooth_budget": 1.0,
+        "uncertainty_budget": 0.25,
+        "uses_action_mask": false,
+        "use_certified_nudging": true,
+        "barrier_weight": 25.0,
+        "support_weight": 1.0,
+        "rho_cost": 1.0,
+        "rho_reward": 1.0
+      },
+      "recomputed_metrics": {
+        "avg_return": 0.7877354621887207,
+        "survival_rate": 0.7877354621887207,
+        "mortality_rate": 0.2122645378112793,
+        "avg_length": 8.957240104675293,
+        "inadmissibility_rate": 0.0,
+        "expert_argmax_match": 0.9207668304443359,
+        "mean_kl_to_expert": 3.9954285621643066,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 1.4509234428405762,
+        "soft_survival_rate": 0.7847264409065247,
+        "soft_inadmissibility_rate": 9.104447310070187e-18,
+        "soft_avg_return": 0.7847264409065247,
+        "soft_policy_entropy": 0.045059964060783386,
+        "lambda_inad": 0.0,
+        "lambda_support": 0.0,
+        "lambda_smooth": 0.0,
+        "lambda_uncertainty": 0.0,
+        "use_certified_nudging": true,
+        "uses_action_mask": false
+      },
+      "saved_vs_recomputed": {
+        "avg_return": {
+          "saved": 0.7877354621887207,
+          "recomputed": 0.7877354621887207,
+          "abs_diff": 0.0
+        },
+        "survival_rate": {
+          "saved": 0.7877354621887207,
+          "recomputed": 0.7877354621887207,
+          "abs_diff": 0.0
+        },
+        "mortality_rate": {
+          "saved": 0.2122645378112793,
+          "recomputed": 0.2122645378112793,
+          "abs_diff": 0.0
+        },
+        "avg_length": {
+          "saved": 8.957240104675293,
+          "recomputed": 8.957240104675293,
+          "abs_diff": 0.0
+        },
+        "inadmissibility_rate": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "expert_argmax_match": {
+          "saved": 0.9207668304443359,
+          "recomputed": 0.9207668304443359,
+          "abs_diff": 0.0
+        },
+        "mean_kl_to_expert": {
+          "saved": 3.9954285621643066,
+          "recomputed": 3.9954285621643066,
+          "abs_diff": 0.0
+        },
+        "policy_entropy": {
+          "saved": -0.0,
+          "recomputed": -0.0,
+          "abs_diff": 0.0
+        },
+        "mean_action_deviation_from_expert": {
+          "saved": 1.4509234428405762,
+          "recomputed": 1.4509234428405762,
+          "abs_diff": 0.0
+        },
+        "soft_survival_rate": {
+          "saved": 0.7847264409065247,
+          "recomputed": 0.7847264409065247,
+          "abs_diff": 0.0
+        },
+        "soft_inadmissibility_rate": {
+          "saved": 9.104430694227077e-18,
+          "recomputed": 9.104447310070187e-18,
+          "abs_diff": 1.6615843110392782e-23
+        },
+        "soft_avg_return": {
+          "saved": 0.7847264409065247,
+          "recomputed": 0.7847264409065247,
+          "abs_diff": 0.0
+        },
+        "soft_policy_entropy": {
+          "saved": 0.045059967786073685,
+          "recomputed": 0.045059964060783386,
+          "abs_diff": 3.725290298461914e-09
+        },
+        "lambda_inad": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "lambda_support": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "lambda_smooth": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "lambda_uncertainty": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "use_certified_nudging": {
+          "saved": 1.0,
+          "recomputed": 1.0,
+          "abs_diff": 0.0
+        },
+        "uses_action_mask": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        }
+      }
+    },
+    {
+      "variant": "no_barrier",
+      "variant_dir": "results_icu_rc_ablations/final_ablation_models/no_barrier",
+      "checkpoint_path": "results_icu_rc_ablations/final_ablation_models/no_barrier/model.pt",
+      "config_path": "results_icu_rc_ablations/no_barrier/variant_config.json",
+      "policy_rule": "certified risk-adjusted greedy policy",
+      "saved_metrics": {
+        "avg_return": 0.7884432077407837,
+        "survival_rate": 0.7884432077407837,
+        "mortality_rate": 0.2115567922592163,
+        "avg_length": 8.928899765014648,
+        "inadmissibility_rate": 0.0,
+        "expert_argmax_match": 0.9199500679969788,
+        "mean_kl_to_expert": 3.990463972091675,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 1.446071982383728,
+        "soft_survival_rate": 0.7856500744819641,
+        "soft_inadmissibility_rate": 5.328142132721716e-08,
+        "soft_avg_return": 0.7856500744819641,
+        "soft_policy_entropy": 0.05145126208662987,
+        "soft_mean_kl_to_expert": 1.1960442066192627,
+        "lagrange": 0.0,
+        "lambda_inad": 0.0,
+        "lambda_support": 0.025081911563873294,
+        "lambda_smooth": 0.0,
+        "lambda_uncertainty": 0.0,
+        "cost_budget": 0.0001,
+        "support_budget": 0.25,
+        "smooth_budget": 1.0,
+        "uncertainty_budget": 0.25,
+        "uses_action_mask": false,
+        "use_certified_nudging": true,
+        "barrier_weight": 0.0,
+        "support_weight": 1.0,
+        "rho_cost": 1.0,
+        "rho_reward": 1.0
+      },
+      "recomputed_metrics": {
+        "avg_return": 0.7884432077407837,
+        "survival_rate": 0.7884432077407837,
+        "mortality_rate": 0.2115567922592163,
+        "avg_length": 8.928899765014648,
+        "inadmissibility_rate": 0.0,
+        "expert_argmax_match": 0.9199500679969788,
+        "mean_kl_to_expert": 3.990463972091675,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 1.446071982383728,
+        "soft_survival_rate": 0.7856500148773193,
+        "soft_inadmissibility_rate": 5.328149819881048e-08,
+        "soft_avg_return": 0.7856500148773193,
+        "soft_policy_entropy": 0.05145126208662987,
+        "lambda_inad": 0.0,
+        "lambda_support": 0.025081911563873294,
+        "lambda_smooth": 0.0,
+        "lambda_uncertainty": 0.0,
+        "use_certified_nudging": true,
+        "uses_action_mask": false
+      },
+      "saved_vs_recomputed": {
+        "avg_return": {
+          "saved": 0.7884432077407837,
+          "recomputed": 0.7884432077407837,
+          "abs_diff": 0.0
+        },
+        "survival_rate": {
+          "saved": 0.7884432077407837,
+          "recomputed": 0.7884432077407837,
+          "abs_diff": 0.0
+        },
+        "mortality_rate": {
+          "saved": 0.2115567922592163,
+          "recomputed": 0.2115567922592163,
+          "abs_diff": 0.0
+        },
+        "avg_length": {
+          "saved": 8.928899765014648,
+          "recomputed": 8.928899765014648,
+          "abs_diff": 0.0
+        },
+        "inadmissibility_rate": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "expert_argmax_match": {
+          "saved": 0.9199500679969788,
+          "recomputed": 0.9199500679969788,
+          "abs_diff": 0.0
+        },
+        "mean_kl_to_expert": {
+          "saved": 3.990463972091675,
+          "recomputed": 3.990463972091675,
+          "abs_diff": 0.0
+        },
+        "policy_entropy": {
+          "saved": -0.0,
+          "recomputed": -0.0,
+          "abs_diff": 0.0
+        },
+        "mean_action_deviation_from_expert": {
+          "saved": 1.446071982383728,
+          "recomputed": 1.446071982383728,
+          "abs_diff": 0.0
+        },
+        "soft_survival_rate": {
+          "saved": 0.7856500744819641,
+          "recomputed": 0.7856500148773193,
+          "abs_diff": 5.960464477539063e-08
+        },
+        "soft_inadmissibility_rate": {
+          "saved": 5.328142132721716e-08,
+          "recomputed": 5.328149819881048e-08,
+          "abs_diff": 7.687159331382638e-14
+        },
+        "soft_avg_return": {
+          "saved": 0.7856500744819641,
+          "recomputed": 0.7856500148773193,
+          "abs_diff": 5.960464477539063e-08
+        },
+        "soft_policy_entropy": {
+          "saved": 0.05145126208662987,
+          "recomputed": 0.05145126208662987,
+          "abs_diff": 0.0
+        },
+        "lambda_inad": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "lambda_support": {
+          "saved": 0.025081911563873294,
+          "recomputed": 0.025081911563873294,
+          "abs_diff": 0.0
+        },
+        "lambda_smooth": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "lambda_uncertainty": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "use_certified_nudging": {
+          "saved": 1.0,
+          "recomputed": 1.0,
+          "abs_diff": 0.0
+        },
+        "uses_action_mask": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        }
+      }
+    },
+    {
+      "variant": "no_certified_nudging",
+      "variant_dir": "results_icu_rc_ablations/final_ablation_models/no_certified_nudging",
+      "checkpoint_path": "results_icu_rc_ablations/final_ablation_models/no_certified_nudging/model.pt",
+      "config_path": "results_icu_rc_ablations/no_certified_nudging/variant_config.json",
+      "policy_rule": "uncertified risk-adjusted greedy policy",
+      "saved_metrics": {
+        "avg_return": 0.7874858975410461,
+        "survival_rate": 0.7874858975410461,
+        "mortality_rate": 0.21251410245895386,
+        "avg_length": 8.809441566467285,
+        "inadmissibility_rate": 0.0,
+        "expert_argmax_match": 0.9394099712371826,
+        "mean_kl_to_expert": 3.960355281829834,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 1.4309253692626953,
+        "soft_survival_rate": 0.7860182523727417,
+        "soft_inadmissibility_rate": 1.3526206362381488e-18,
+        "soft_avg_return": 0.7860182523727417,
+        "soft_policy_entropy": 0.06238986551761627,
+        "soft_mean_kl_to_expert": 1.1528346538543701,
+        "lagrange": 0.0,
+        "lambda_inad": 0.0,
+        "lambda_support": 0.021146668314933774,
+        "lambda_smooth": 0.0,
+        "lambda_uncertainty": 0.0,
+        "cost_budget": 0.0001,
+        "support_budget": 0.25,
+        "smooth_budget": 1.0,
+        "uncertainty_budget": 0.25,
+        "uses_action_mask": false,
+        "use_certified_nudging": false,
+        "barrier_weight": 25.0,
+        "support_weight": 1.0,
+        "rho_cost": 1.0,
+        "rho_reward": 1.0
+      },
+      "recomputed_metrics": {
+        "avg_return": 0.7874858975410461,
+        "survival_rate": 0.7874858975410461,
+        "mortality_rate": 0.21251410245895386,
+        "avg_length": 8.809441566467285,
+        "inadmissibility_rate": 0.0,
+        "expert_argmax_match": 0.9394099712371826,
+        "mean_kl_to_expert": 3.960355281829834,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 1.4309253692626953,
+        "soft_survival_rate": 0.7860183119773865,
+        "soft_inadmissibility_rate": 1.352620074648013e-18,
+        "soft_avg_return": 0.7860183119773865,
+        "soft_policy_entropy": 0.06238986551761627,
+        "lambda_inad": 0.0,
+        "lambda_support": 0.021146668314933774,
+        "lambda_smooth": 0.0,
+        "lambda_uncertainty": 0.0,
+        "use_certified_nudging": false,
+        "uses_action_mask": false
+      },
+      "saved_vs_recomputed": {
+        "avg_return": {
+          "saved": 0.7874858975410461,
+          "recomputed": 0.7874858975410461,
+          "abs_diff": 0.0
+        },
+        "survival_rate": {
+          "saved": 0.7874858975410461,
+          "recomputed": 0.7874858975410461,
+          "abs_diff": 0.0
+        },
+        "mortality_rate": {
+          "saved": 0.21251410245895386,
+          "recomputed": 0.21251410245895386,
+          "abs_diff": 0.0
+        },
+        "avg_length": {
+          "saved": 8.809441566467285,
+          "recomputed": 8.809441566467285,
+          "abs_diff": 0.0
+        },
+        "inadmissibility_rate": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "expert_argmax_match": {
+          "saved": 0.9394099712371826,
+          "recomputed": 0.9394099712371826,
+          "abs_diff": 0.0
+        },
+        "mean_kl_to_expert": {
+          "saved": 3.960355281829834,
+          "recomputed": 3.960355281829834,
+          "abs_diff": 0.0
+        },
+        "policy_entropy": {
+          "saved": -0.0,
+          "recomputed": -0.0,
+          "abs_diff": 0.0
+        },
+        "mean_action_deviation_from_expert": {
+          "saved": 1.4309253692626953,
+          "recomputed": 1.4309253692626953,
+          "abs_diff": 0.0
+        },
+        "soft_survival_rate": {
+          "saved": 0.7860182523727417,
+          "recomputed": 0.7860183119773865,
+          "abs_diff": 5.960464477539063e-08
+        },
+        "soft_inadmissibility_rate": {
+          "saved": 1.3526206362381488e-18,
+          "recomputed": 1.352620074648013e-18,
+          "abs_diff": 5.6159013581955065e-25
+        },
+        "soft_avg_return": {
+          "saved": 0.7860182523727417,
+          "recomputed": 0.7860183119773865,
+          "abs_diff": 5.960464477539063e-08
+        },
+        "soft_policy_entropy": {
+          "saved": 0.06238986551761627,
+          "recomputed": 0.06238986551761627,
+          "abs_diff": 0.0
+        },
+        "lambda_inad": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "lambda_support": {
+          "saved": 0.021146668314933774,
+          "recomputed": 0.021146668314933774,
+          "abs_diff": 0.0
+        },
+        "lambda_smooth": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "lambda_uncertainty": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "use_certified_nudging": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "uses_action_mask": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        }
+      }
+    },
+    {
+      "variant": "no_support_lambda",
+      "variant_dir": "results_icu_rc_ablations/final_ablation_models/no_support_lambda",
+      "checkpoint_path": "results_icu_rc_ablations/final_ablation_models/no_support_lambda/model.pt",
+      "config_path": "results_icu_rc_ablations/no_support_lambda/variant_config.json",
+      "policy_rule": "certified risk-adjusted greedy policy",
+      "saved_metrics": {
+        "avg_return": 0.7876945734024048,
+        "survival_rate": 0.7876945734024048,
+        "mortality_rate": 0.21230542659759521,
+        "avg_length": 8.895956993103027,
+        "inadmissibility_rate": 0.0,
+        "expert_argmax_match": 0.9468095302581787,
+        "mean_kl_to_expert": 3.9526619911193848,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 1.3872319459915161,
+        "soft_survival_rate": 0.7855592370033264,
+        "soft_inadmissibility_rate": 2.3080991427154745e-15,
+        "soft_avg_return": 0.7855592370033264,
+        "soft_policy_entropy": 0.043377604335546494,
+        "soft_mean_kl_to_expert": 1.1736955642700195,
+        "lagrange": 0.0,
+        "lambda_inad": 0.0,
+        "lambda_support": 0.0,
+        "lambda_smooth": 0.0,
+        "lambda_uncertainty": 0.0,
+        "cost_budget": 0.0001,
+        "support_budget": 0.25,
+        "smooth_budget": 1.0,
+        "uncertainty_budget": 0.25,
+        "uses_action_mask": false,
+        "use_certified_nudging": true,
+        "barrier_weight": 25.0,
+        "support_weight": 1.0,
+        "rho_cost": 1.0,
+        "rho_reward": 1.0
+      },
+      "recomputed_metrics": {
+        "avg_return": 0.7876945734024048,
+        "survival_rate": 0.7876945734024048,
+        "mortality_rate": 0.21230542659759521,
+        "avg_length": 8.895956993103027,
+        "inadmissibility_rate": 0.0,
+        "expert_argmax_match": 0.9468095302581787,
+        "mean_kl_to_expert": 3.9526619911193848,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 1.3872319459915161,
+        "soft_survival_rate": 0.7855592966079712,
+        "soft_inadmissibility_rate": 2.308089852484371e-15,
+        "soft_avg_return": 0.7855592966079712,
+        "soft_policy_entropy": 0.043377600610256195,
+        "lambda_inad": 0.0,
+        "lambda_support": 0.0,
+        "lambda_smooth": 0.0,
+        "lambda_uncertainty": 0.0,
+        "use_certified_nudging": true,
+        "uses_action_mask": false
+      },
+      "saved_vs_recomputed": {
+        "avg_return": {
+          "saved": 0.7876945734024048,
+          "recomputed": 0.7876945734024048,
+          "abs_diff": 0.0
+        },
+        "survival_rate": {
+          "saved": 0.7876945734024048,
+          "recomputed": 0.7876945734024048,
+          "abs_diff": 0.0
+        },
+        "mortality_rate": {
+          "saved": 0.21230542659759521,
+          "recomputed": 0.21230542659759521,
+          "abs_diff": 0.0
+        },
+        "avg_length": {
+          "saved": 8.895956993103027,
+          "recomputed": 8.895956993103027,
+          "abs_diff": 0.0
+        },
+        "inadmissibility_rate": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "expert_argmax_match": {
+          "saved": 0.9468095302581787,
+          "recomputed": 0.9468095302581787,
+          "abs_diff": 0.0
+        },
+        "mean_kl_to_expert": {
+          "saved": 3.9526619911193848,
+          "recomputed": 3.9526619911193848,
+          "abs_diff": 0.0
+        },
+        "policy_entropy": {
+          "saved": -0.0,
+          "recomputed": -0.0,
+          "abs_diff": 0.0
+        },
+        "mean_action_deviation_from_expert": {
+          "saved": 1.3872319459915161,
+          "recomputed": 1.3872319459915161,
+          "abs_diff": 0.0
+        },
+        "soft_survival_rate": {
+          "saved": 0.7855592370033264,
+          "recomputed": 0.7855592966079712,
+          "abs_diff": 5.960464477539063e-08
+        },
+        "soft_inadmissibility_rate": {
+          "saved": 2.3080991427154745e-15,
+          "recomputed": 2.308089852484371e-15,
+          "abs_diff": 9.290231103412641e-21
+        },
+        "soft_avg_return": {
+          "saved": 0.7855592370033264,
+          "recomputed": 0.7855592966079712,
+          "abs_diff": 5.960464477539063e-08
+        },
+        "soft_policy_entropy": {
+          "saved": 0.043377604335546494,
+          "recomputed": 0.043377600610256195,
+          "abs_diff": 3.725290298461914e-09
+        },
+        "lambda_inad": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "lambda_support": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "lambda_smooth": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "lambda_uncertainty": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "use_certified_nudging": {
+          "saved": 1.0,
+          "recomputed": 1.0,
+          "abs_diff": 0.0
+        },
+        "uses_action_mask": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        }
+      }
+    },
+    {
+      "variant": "no_cost_ucb",
+      "variant_dir": "results_icu_rc_ablations/final_ablation_models/no_cost_ucb",
+      "checkpoint_path": "results_icu_rc_ablations/final_ablation_models/no_cost_ucb/model.pt",
+      "config_path": "results_icu_rc_ablations/no_cost_ucb/variant_config.json",
+      "policy_rule": "certified risk-adjusted greedy policy",
+      "saved_metrics": {
+        "avg_return": 0.7874318361282349,
+        "survival_rate": 0.7874318361282349,
+        "mortality_rate": 0.21256816387176514,
+        "avg_length": 8.944543838500977,
+        "inadmissibility_rate": 0.0,
+        "expert_argmax_match": 0.9442148208618164,
+        "mean_kl_to_expert": 3.9544601440429688,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 1.3812018632888794,
+        "soft_survival_rate": 0.7855579257011414,
+        "soft_inadmissibility_rate": 9.323565583789658e-16,
+        "soft_avg_return": 0.7855579257011414,
+        "soft_policy_entropy": 0.040159739553928375,
+        "soft_mean_kl_to_expert": 1.1877477169036865,
+        "lagrange": 0.0,
+        "lambda_inad": 0.0,
+        "lambda_support": 0.03696210753917695,
+        "lambda_smooth": 0.0,
+        "lambda_uncertainty": 0.0,
+        "cost_budget": 0.0001,
+        "support_budget": 0.25,
+        "smooth_budget": 1.0,
+        "uncertainty_budget": 0.25,
+        "uses_action_mask": false,
+        "use_certified_nudging": true,
+        "barrier_weight": 25.0,
+        "support_weight": 1.0,
+        "rho_cost": 0.0,
+        "rho_reward": 1.0
+      },
+      "recomputed_metrics": {
+        "avg_return": 0.7874318361282349,
+        "survival_rate": 0.7874318361282349,
+        "mortality_rate": 0.21256816387176514,
+        "avg_length": 8.944543838500977,
+        "inadmissibility_rate": 0.0,
+        "expert_argmax_match": 0.9442148208618164,
+        "mean_kl_to_expert": 3.9544601440429688,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 1.3812018632888794,
+        "soft_survival_rate": 0.7855579257011414,
+        "soft_inadmissibility_rate": 9.32351280338802e-16,
+        "soft_avg_return": 0.7855579257011414,
+        "soft_policy_entropy": 0.04015973210334778,
+        "lambda_inad": 0.0,
+        "lambda_support": 0.03696210753917695,
+        "lambda_smooth": 0.0,
+        "lambda_uncertainty": 0.0,
+        "use_certified_nudging": true,
+        "uses_action_mask": false
+      },
+      "saved_vs_recomputed": {
+        "avg_return": {
+          "saved": 0.7874318361282349,
+          "recomputed": 0.7874318361282349,
+          "abs_diff": 0.0
+        },
+        "survival_rate": {
+          "saved": 0.7874318361282349,
+          "recomputed": 0.7874318361282349,
+          "abs_diff": 0.0
+        },
+        "mortality_rate": {
+          "saved": 0.21256816387176514,
+          "recomputed": 0.21256816387176514,
+          "abs_diff": 0.0
+        },
+        "avg_length": {
+          "saved": 8.944543838500977,
+          "recomputed": 8.944543838500977,
+          "abs_diff": 0.0
+        },
+        "inadmissibility_rate": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "expert_argmax_match": {
+          "saved": 0.9442148208618164,
+          "recomputed": 0.9442148208618164,
+          "abs_diff": 0.0
+        },
+        "mean_kl_to_expert": {
+          "saved": 3.9544601440429688,
+          "recomputed": 3.9544601440429688,
+          "abs_diff": 0.0
+        },
+        "policy_entropy": {
+          "saved": -0.0,
+          "recomputed": -0.0,
+          "abs_diff": 0.0
+        },
+        "mean_action_deviation_from_expert": {
+          "saved": 1.3812018632888794,
+          "recomputed": 1.3812018632888794,
+          "abs_diff": 0.0
+        },
+        "soft_survival_rate": {
+          "saved": 0.7855579257011414,
+          "recomputed": 0.7855579257011414,
+          "abs_diff": 0.0
+        },
+        "soft_inadmissibility_rate": {
+          "saved": 9.323565583789658e-16,
+          "recomputed": 9.32351280338802e-16,
+          "abs_diff": 5.2780401638632886e-21
+        },
+        "soft_avg_return": {
+          "saved": 0.7855579257011414,
+          "recomputed": 0.7855579257011414,
+          "abs_diff": 0.0
+        },
+        "soft_policy_entropy": {
+          "saved": 0.040159739553928375,
+          "recomputed": 0.04015973210334778,
+          "abs_diff": 7.450580596923828e-09
+        },
+        "lambda_inad": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "lambda_support": {
+          "saved": 0.03696210753917695,
+          "recomputed": 0.03696210753917695,
+          "abs_diff": 0.0
+        },
+        "lambda_smooth": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "lambda_uncertainty": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "use_certified_nudging": {
+          "saved": 1.0,
+          "recomputed": 1.0,
+          "abs_diff": 0.0
+        },
+        "uses_action_mask": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        }
+      }
+    },
+    {
+      "variant": "lambda_only_no_mask",
+      "variant_dir": "results_icu_rc_ablations/final_ablation_models/lambda_only_no_mask",
+      "checkpoint_path": "results_icu_rc_ablations/final_ablation_models/lambda_only_no_mask/model.pt",
+      "config_path": "results_icu_rc_ablations/lambda_only_no_mask/variant_config.json",
+      "policy_rule": "uncertified risk-adjusted greedy policy",
+      "saved_metrics": {
+        "avg_return": 0.7781670689582825,
+        "survival_rate": 0.7781670689582825,
+        "mortality_rate": 0.22183293104171753,
+        "avg_length": 9.114463806152344,
+        "inadmissibility_rate": 0.0012992256448287511,
+        "expert_argmax_match": 0.8759850263595581,
+        "mean_kl_to_expert": 4.078955173492432,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 1.6524003744125366,
+        "soft_survival_rate": 0.7782610058784485,
+        "soft_inadmissibility_rate": 0.0013172711614969556,
+        "soft_avg_return": 0.7782610654830933,
+        "soft_policy_entropy": 0.038495954126119614,
+        "soft_mean_kl_to_expert": 2.1264195442199707,
+        "lagrange": 0.18933958467134923,
+        "lambda_inad": 0.18933958467134923,
+        "lambda_support": 0.0,
+        "lambda_smooth": 0.0,
+        "lambda_uncertainty": 0.0,
+        "cost_budget": 0.0001,
+        "support_budget": 0.25,
+        "smooth_budget": 1.0,
+        "uncertainty_budget": 0.25,
+        "uses_action_mask": false,
+        "use_certified_nudging": false,
+        "barrier_weight": 0.0,
+        "support_weight": 0.0,
+        "rho_cost": 1.0,
+        "rho_reward": 1.0
+      },
+      "recomputed_metrics": {
+        "avg_return": 0.7781670689582825,
+        "survival_rate": 0.7781670689582825,
+        "mortality_rate": 0.22183293104171753,
+        "avg_length": 9.114463806152344,
+        "inadmissibility_rate": 0.0012992256448287511,
+        "expert_argmax_match": 0.8759850263595581,
+        "mean_kl_to_expert": 4.078955173492432,
+        "policy_entropy": -0.0,
+        "mean_action_deviation_from_expert": 1.6524003744125366,
+        "soft_survival_rate": 0.7782610058784485,
+        "soft_inadmissibility_rate": 0.0013172710592178859,
+        "soft_avg_return": 0.7782610654830933,
+        "soft_policy_entropy": 0.03849594667553902,
+        "lambda_inad": 0.18933958467134923,
+        "lambda_support": 0.0,
+        "lambda_smooth": 0.0,
+        "lambda_uncertainty": 0.0,
+        "use_certified_nudging": false,
+        "uses_action_mask": false
+      },
+      "saved_vs_recomputed": {
+        "avg_return": {
+          "saved": 0.7781670689582825,
+          "recomputed": 0.7781670689582825,
+          "abs_diff": 0.0
+        },
+        "survival_rate": {
+          "saved": 0.7781670689582825,
+          "recomputed": 0.7781670689582825,
+          "abs_diff": 0.0
+        },
+        "mortality_rate": {
+          "saved": 0.22183293104171753,
+          "recomputed": 0.22183293104171753,
+          "abs_diff": 0.0
+        },
+        "avg_length": {
+          "saved": 9.114463806152344,
+          "recomputed": 9.114463806152344,
+          "abs_diff": 0.0
+        },
+        "inadmissibility_rate": {
+          "saved": 0.0012992256448287511,
+          "recomputed": 0.0012992256448287511,
+          "abs_diff": 0.0
+        },
+        "expert_argmax_match": {
+          "saved": 0.8759850263595581,
+          "recomputed": 0.8759850263595581,
+          "abs_diff": 0.0
+        },
+        "mean_kl_to_expert": {
+          "saved": 4.078955173492432,
+          "recomputed": 4.078955173492432,
+          "abs_diff": 0.0
+        },
+        "policy_entropy": {
+          "saved": -0.0,
+          "recomputed": -0.0,
+          "abs_diff": 0.0
+        },
+        "mean_action_deviation_from_expert": {
+          "saved": 1.6524003744125366,
+          "recomputed": 1.6524003744125366,
+          "abs_diff": 0.0
+        },
+        "soft_survival_rate": {
+          "saved": 0.7782610058784485,
+          "recomputed": 0.7782610058784485,
+          "abs_diff": 0.0
+        },
+        "soft_inadmissibility_rate": {
+          "saved": 0.0013172711614969556,
+          "recomputed": 0.0013172710592178859,
+          "abs_diff": 1.0227906976217893e-10
+        },
+        "soft_avg_return": {
+          "saved": 0.7782610654830933,
+          "recomputed": 0.7782610654830933,
+          "abs_diff": 0.0
+        },
+        "soft_policy_entropy": {
+          "saved": 0.038495954126119614,
+          "recomputed": 0.03849594667553902,
+          "abs_diff": 7.450580596923828e-09
+        },
+        "lambda_inad": {
+          "saved": 0.18933958467134923,
+          "recomputed": 0.18933958467134923,
+          "abs_diff": 0.0
+        },
+        "lambda_support": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "lambda_smooth": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "lambda_uncertainty": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "use_certified_nudging": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        },
+        "uses_action_mask": {
+          "saved": 0.0,
+          "recomputed": 0.0,
+          "abs_diff": 0.0
+        }
+      }
+    }
+  ]
+}
