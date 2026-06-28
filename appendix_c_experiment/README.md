@@ -10,8 +10,17 @@ This experiment is not intended to replace the main masked LAADAN-AC result. It 
 
 ```text
 appendix_c_experiment/
+├── README.md
 ├── code/
-│   └── .gitkeep
+│   ├── models.py
+│   ├── trainers.py
+│   ├── run_experiments.py
+│   ├── pick_final_models.py
+│   ├── test_final_models.py
+│   ├── run_rc_ablations.py
+│   ├── test_rc_ablation_models.py
+│   ├── plot_rc_ablations.py
+│   └── select_appendix_c_final_models.py
 └── results/
     ├── icu_sepsis_LAADAN_AC_PD/
     ├── eicu_LAADAN_AC_PD/
