@@ -14,7 +14,8 @@
 
 [**Riya Basak**](https://github.com/AnnyaB), [**Manal Helal**](https://github.com/mhelal)
 
-[Code](https://github.com/AnnyaB/laadan-ac) • [Overview](#overview) • [Main Findings](#main-findings) • [Installation](#installation) • [Data](#data) • [Usage](#usage) • [Citation](#citation)
+[Code](https://github.com/AnnyaB/laadan-ac) • [Overview](#overview) • [Main Findings](#main-findings) • [Appendix C Experiment](#appendix-c-experiment) • [Installation](#installation) • [Data](#data) • [Usage](#usage) • [Citation](#citation)
+
 
 </div>
 
@@ -66,7 +67,8 @@ Ablations, a no-mask Lagrangian frontier, and safety-failure diagnostics show th
 | Relaxed LAADAN-AC               | Lower soft regularisation improves selected-checkpoint return on ICU-Sepsis and eICU-CRD Demo while retaining zero inadmissibility.                 |
 | eICU-CRD Demo portability check | The same pipeline can be reused under a shifted MDP when transition dynamics, expert policy, and admissibility masks are available.                 |
 | Component ablation              | Hard masking provides the direct admissibility guarantee; conservative and expert-guided regularisation shape the policy within the admissible set. |
-| No-mask Lagrangian frontier     | Lagrangian cost control alone does not replace masked admissible action selection in this benchmark.                                                |
+| No-mask Lagrangian frontier     | Lagrangian cost control alone does not replace masked admissible action selection in this benchmark. |
+| Appendix C no-mask PD/RC diagnostic | A separate no-mask PD/RC diagnostic tests adaptive primal-dual cost pressure, robust cost-aware scoring, and certified action selection when the original hard action mask is removed. |
 | Safety-failure analysis         | VOAC's return advantage is associated with unsupported action selection at state, action, value, and trajectory levels.                             |
 
 > **Note**
@@ -75,6 +77,15 @@ Ablations, a no-mask Lagrangian frontier, and safety-failure diagnostics show th
 <p align="center">
   <img src="assets/cross_domain_portability.png" width="82%" alt="Cross-domain portability summary">
 </p>
+
+---
+## Appendix C Experiment
+
+An additional no-mask PD/RC diagnostic is included in [`appendix_c_experiment/`](appendix_c_experiment/README.md).
+
+This appendix experiment tests whether adaptive Lagrangian cost control remains informative when the original hard admissibility mask is removed from actor optimisation. It separates primal-dual cost pressure, robust risk-adjusted action scoring, and deterministic certified action selection.
+
+See the full reproducibility notes, code layout, and saved outputs in [`appendix_c_experiment/README.md`](appendix_c_experiment/README.md).
 
 ---
 
@@ -385,11 +396,11 @@ If you use this repository, code, saved checkpoints, experiment scripts, or LAAD
   year         = {2026},
   month        = jun,
   url          = {https://github.com/AnnyaB/laadan-ac},
-  note         = {Research code repository accompanying a manuscript submitted to ICaTAS 2026 on 1 June 2026}
+  note         = {Research code repository accompanying a manuscript submitted to ICaTAS 2026 in June 2026}
 }
 ```
 
-The accompanying manuscript was submitted to ICaTAS 2026 on 1 June 2026. Until acceptance or publication, please cite the repository as research software.
+The accompanying manuscript was submitted to ICaTAS 2026 in June 2026. Until acceptance or publication, please cite the repository as research software.
 
 ---
 
