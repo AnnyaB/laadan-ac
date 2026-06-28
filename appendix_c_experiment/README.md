@@ -8,18 +8,20 @@ This experiment is not intended to replace the main masked LAADAN-AC result. It 
 
 ## Structure
 
+```text
 appendix_c_experiment/
 ├── code/
-│   └── experiment scripts for the Appendix C diagnostic
+│   └── .gitkeep
 └── results/
     ├── icu_sepsis_LAADAN_AC_PD/
     ├── eicu_LAADAN_AC_PD/
     ├── icu_rc_ablations/
     └── eicu_rc_ablations/
+```
 
 ## Notes
 
-- code/ is reserved for the Appendix C no-mask PD/RC diagnostic scripts. This pull request adds the reproducibility README and saved result outputs; scripts can be added in a follow-up commit.
-- results/ contains the corresponding saved outputs.
+- `code/` is reserved for the Appendix C no-mask PD/RC diagnostic scripts. Scripts can be added in a follow-up commit.
+- `results/` contains the corresponding saved outputs.
 - This diagnostic is for benchmark research and reproducibility only.
 - It is not a clinical decision-support system and must not be used to guide patient treatment.
