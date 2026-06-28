@@ -393,8 +393,7 @@ If you use this repository, code, saved checkpoints, experiment scripts, or LAAD
   title        = {{LAADAN-AC}: Beyond Survival in Admissible Offline Treatment-Policy Learning},
   year         = {2026},
   month        = jun,
-  url          = {https://github.com/AnnyaB/laadan-ac},
-  note         = {Research code repository accompanying a manuscript submitted to ICaTAS 2026 in June 2026}
+  url          = {https://github.com/AnnyaB/laadan-ac}
 }
 ```
 
