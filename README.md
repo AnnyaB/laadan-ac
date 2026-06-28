@@ -79,11 +79,16 @@ Ablations, a no-mask Lagrangian frontier, and safety-failure diagnostics show th
 </p>
 
 ---
+
 ## Appendix C Experiment
 
-An additional no-mask PD/RC diagnostic is included in [`appendix_c_experiment/`](appendix_c_experiment/README.md).
+An additional no-mask PD/RC diagnostic is included in appendix c experiment. 
 
 This appendix experiment tests whether adaptive Lagrangian cost control remains informative when the original hard admissibility mask is removed from actor optimisation. It separates primal-dual cost pressure, robust risk-adjusted action scoring, and deterministic certified action selection.
+
+The Appendix C experiment is auxiliary: it does not replace the main masked LAADAN-AC result. It supports the interpretation that reliable selected-action admissibility requires an explicit feasible-action mechanism, either hard masking or cost-checked action selection.
+
+See the full reproducibility notes, code layout, and saved outputs in [`appendix_c_experiment/README.md`](appendix_c_experiment/README.md).
 
 ---
 
@@ -133,6 +138,23 @@ laadan-ac/
 │   ├── lagrangian_frontier.py
 │   ├── safety_failure_analysis.py
 │   └── plots.py
+├── appendix_c_experiment/
+│   ├── README.md
+│   ├── code/
+│   │   ├── models.py
+│   │   ├── trainers.py
+│   │   ├── run_experiments.py
+│   │   ├── pick_final_models.py
+│   │   ├── test_final_models.py
+│   │   ├── run_rc_ablations.py
+│   │   ├── test_rc_ablation_models.py
+│   │   ├── plot_rc_ablations.py
+│   │   └── select_appendix_c_final_models.py
+│   └── results/
+│       ├── icu_sepsis_LAADAN_AC_PD/
+│       ├── eicu_LAADAN_AC_PD/
+│       ├── icu_rc_ablations/
+│       └── eicu_rc_ablations/
 └── results/
     ├── icu_sepsis_main/
     ├── icu_sepsis_relaxed/
