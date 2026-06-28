@@ -48,13 +48,14 @@ The method is evaluated on the **ICU-Sepsis** benchmark and on a constructed **e
 
 *Offline reinforcement learning* offers a way to study *sepsis* treatment policies without online patient experimentation, but high estimated survival can be misleading when a policy selects poorly supported or inadmissible actions.
 
-*LAADAN-AC* learns within a benchmark-defined admissible action interface by combining hard action masking, twin reward critics, conservative critic regularisation, expert-policy regularisation, a state-action smoothness proxy, and Lagrangian cost control.
+*LAADAN-AC* introduces an admissibility-aware offline actor-critic framework that learns within a benchmark-defined admissible action interface. The framework combines hard action masking, twin reward critics, conservative critic regularisation, expert-policy regularisation, a state-action smoothness proxy, and a constrained Markov decision process (CMDP) adaptive cost-control term based on Lagrangian relaxation.
 
-We evaluate the framework on the *ICU-Sepsis benchmark* using five random seeds and exact finite-horizon Markov decision process evaluation, then test portability on a constructed *eICU Collaborative Research Database Demo* Markov decision process.
+The framework is evaluated on the *ICU-Sepsis benchmark* using five random seeds and exact finite-horizon Markov decision process (MDP) evaluation, then tested for portability on a constructed *eICU Collaborative Research Database Demo* MDP.
 
-On ICU-Sepsis, *LAADAN-AC* achieves competitive survival/return with zero selected-action inadmissibility and the strongest expert alignment among the main methods. A *relaxed LAADAN-AC* variant raises selected-checkpoint return on both ICU-Sepsis and eICU-CRD Demo while retaining zero inadmissibility.
+The repository also includes relaxed-model experiments, component ablations, no-mask cost-control analyses, Appendix C PD/RC diagnostics, and safety-failure analyses. Together, these experiments examine not only estimated return, but also selected-action admissibility, expert alignment, and policy behaviour near or outside the benchmark admissible set.
 
-Ablations, a no-mask Lagrangian frontier, and safety-failure diagnostics show that hard masking supplies the direct admissibility guarantee, while conservative and expert-guided regularisation shape the policy learned inside the admissible set.
+The results support the interpretation that hard masking provides the direct selected-action admissibility guarantee, while conservative regularisation, expert-guided policy shaping, and adaptive cost-control terms influence how the policy behaves within or near the admissible action interface. This repository provides a reproducible benchmark framework for evaluating return, admissibility, and expert alignment together.
+
 
 ---
 
