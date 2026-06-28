@@ -85,8 +85,6 @@ An additional no-mask PD/RC diagnostic is included in [`appendix_c_experiment/`]
 
 This appendix experiment tests whether adaptive Lagrangian cost control remains informative when the original hard admissibility mask is removed from actor optimisation. It separates primal-dual cost pressure, robust risk-adjusted action scoring, and deterministic certified action selection.
 
-See the full reproducibility notes, code layout, and saved outputs in [`appendix_c_experiment/README.md`](appendix_c_experiment/README.md).
-
 ---
 
 ## Repository Structure
