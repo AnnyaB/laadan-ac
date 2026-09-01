@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Integrity checks for camera-ready LAADAN-AC results."""
+"""Integrity checks for fixed-schedule LAADAN-AC results."""
 from __future__ import annotations
 
 import argparse
@@ -19,7 +19,7 @@ def load_json(path):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--root", default="results/camera_ready_2026/icu_sepsis")
+    p.add_argument("--root", default="results/fixed_schedule_2026/icu_sepsis")
     args = p.parse_args()
     root = Path(args.root)
 
@@ -64,7 +64,7 @@ def main():
             assert prov["checkpoint_epoch"] == 1000
             assert prov["benchmark_evaluation_used_for_model_selection"] is False
 
-    print("PASS: camera-ready result integrity checks completed successfully.")
+    print("PASS: fixed-schedule result integrity checks completed successfully.")
 
 
 if __name__ == "__main__":

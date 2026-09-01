@@ -1,2 +1,0 @@
-origin	https://github.com/AnnyaB/laadan-ac.git (fetch)
-origin	DISABLED (push)

@@ -1,3 +1,0 @@
-?? KAGGLE_README_camera_ready.md
-?? camera_ready_2026/
-?? results/camera_ready_2026/

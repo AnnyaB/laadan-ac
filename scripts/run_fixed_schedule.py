@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
-"""Camera-ready confirmatory experiments for LAADAN-AC.
+"""Fixed-schedule experiments for LAADAN-AC.
 
-This runner is non-destructive: it imports the reviewed implementation and writes
-all new outputs under a separate camera-ready results root.
+This runner imports the baseline implementation and writes results under a
+separate fixed-schedule result root.
 
-Reviewer-driven protocol change
--------------------------------
-The reviewed trainers select the best checkpoint from periodic benchmark evaluation.
-For the confirmatory analysis we set ``eval_every > epochs``. Because each trainer
-still evaluates at ``epoch == epochs``, exactly one benchmark evaluation occurs per
-run and the only eligible saved checkpoint is the pre-specified final epoch.
+Fixed-checkpoint protocol
+-------------------------
+The baseline trainers save and restore the best checkpoint whenever benchmark
+evaluation is performed. To prevent benchmark metrics from selecting the
+reported checkpoint in these runs, ``eval_every`` is set larger than the
+training horizon. The trainer still evaluates at the predetermined final epoch,
+so epoch 1000 is the only checkpoint eligible for headline reporting.
+
+This is an implementation choice for the fixed-schedule analysis; it should not
+be interpreted as a general requirement that intermediate diagnostic evaluation
+is invalid.
 """
 
 from __future__ import annotations
@@ -120,7 +125,7 @@ def write_csv(path: Path, rows: List[Dict]) -> None:
 def final_epoch_config(config: Dict) -> Dict:
     cfg = deepcopy(config)
     cfg["epochs"] = EPOCHS
-    # Reviewed trainers evaluate on `epoch % eval_every == 0 or epoch == epochs`.
+    # Baseline trainers evaluate on `epoch % eval_every == 0 or epoch == epochs`.
     # eval_every > epochs => only the pre-specified final epoch is evaluated.
     cfg["eval_every"] = FINAL_ONLY_EVAL_EVERY
     return cfg
@@ -356,7 +361,7 @@ def run_dataset(data_dir: Path, output_dir: Path, dataset_name: str,
         "voac": final_epoch_config(base["voac"]),
         "laadan_ac": final_epoch_config(base["laadan_ac"]),
     }
-    dump_json(output_dir / "confirmatory_config.json", {
+    dump_json(output_dir / "fixed_schedule_config.json", {
         "seeds": SEEDS,
         "epochs": EPOCHS,
         "checkpoint_rule": "final_epoch",
@@ -448,7 +453,7 @@ def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--icu-data", default="data/icu_sepsis")
     p.add_argument("--eicu-data", default="data/eicu_demo_mdp")
-    p.add_argument("--output", default="results/camera_ready_2026")
+    p.add_argument("--output", default="results/fixed_schedule_2026")
     p.add_argument("--device", choices=["cuda", "cpu", "auto"], default="auto")
     p.add_argument("--datasets", choices=["icu", "both"], default="icu")
     p.add_argument("--ablations", choices=["none", "core", "full"], default="core")
