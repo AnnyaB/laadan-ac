@@ -10,7 +10,7 @@
 ![Python](https://img.shields.io/badge/Python-3.12.12-blue.svg)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.10.0%2Bcu128-ee4c2c.svg)
 ![Research Software](https://img.shields.io/badge/Research%20Software-LAADAN--AC-1f6feb.svg)
-![Manuscript](https://img.shields.io/badge/Manuscript-Submitted%20to%20ICaTAS%202026-6f42c1.svg)
+![Manuscript](https://img.shields.io/badge/Manuscript-Accepted%20to%20ICaTAS%202026-6f42c1.svg)
 
 [**Riya Basak**](https://github.com/AnnyaB), [**Manal Helal**](https://github.com/mhelal)
 
