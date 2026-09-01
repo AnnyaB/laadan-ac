@@ -1,0 +1,23 @@
+{
+  "avg_return": 0.7951722741127014,
+  "survival_rate": 0.7951722741127014,
+  "mortality_rate": 0.20482772588729858,
+  "avg_length": 6.9563751220703125,
+  "inadmissibility_rate": 0.0,
+  "expert_argmax_match": 0.7512493133544922,
+  "mean_kl_to_expert": 4.591792583465576,
+  "policy_entropy": -0.0,
+  "mean_action_deviation_from_expert": 2.518066644668579,
+  "soft_survival_rate": 0.794980525970459,
+  "soft_inadmissibility_rate": 0.0,
+  "soft_avg_return": 0.794980525970459,
+  "soft_policy_entropy": 0.013077881187200546,
+  "soft_mean_kl_to_expert": 2.4268221855163574,
+  "trajectory_mean_action_jump": 1.564058616848059,
+  "trajectory_normalised_action_jump": 0.06516910903533579,
+  "variant_folder": "mask_only",
+  "variant_name": "Masking-only actor-critic",
+  "uses_action_mask": true,
+  "uses_lagrangian": false,
+  "cost_budget": 0.0
+}

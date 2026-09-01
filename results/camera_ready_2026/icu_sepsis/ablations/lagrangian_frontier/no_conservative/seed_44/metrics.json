@@ -1,0 +1,23 @@
+{
+  "avg_return": 0.8066883087158203,
+  "survival_rate": 0.8066883087158203,
+  "mortality_rate": 0.1933116912841797,
+  "avg_length": 7.009891033172607,
+  "inadmissibility_rate": 0.0,
+  "expert_argmax_match": 0.744041919708252,
+  "mean_kl_to_expert": 4.620388507843018,
+  "policy_entropy": -0.0,
+  "mean_action_deviation_from_expert": 2.371687889099121,
+  "soft_survival_rate": 0.8052656054496765,
+  "soft_inadmissibility_rate": 0.0,
+  "soft_avg_return": 0.8052656054496765,
+  "soft_policy_entropy": 0.2997792065143585,
+  "soft_mean_kl_to_expert": 0.26890861988067627,
+  "trajectory_mean_action_jump": 2.063802188893393,
+  "trajectory_normalised_action_jump": 0.08599175787055803,
+  "variant_folder": "no_conservative",
+  "variant_name": "LAADAN without conservative critic",
+  "uses_action_mask": true,
+  "uses_lagrangian": true,
+  "cost_budget": 0.0
+}

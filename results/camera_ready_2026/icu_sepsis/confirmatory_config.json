@@ -1,0 +1,63 @@
+{
+  "checkpoint_rule": "final_epoch",
+  "configs": {
+    "bc": {
+      "dropout": 0.1,
+      "entropy_bonus": 0.0,
+      "epochs": 1000,
+      "eval_every": 1001,
+      "hidden_dim": 128,
+      "latent_dim": 128,
+      "lr": 0.001
+    },
+    "cql": {
+      "cql_alpha": 0.5,
+      "dropout": 0.1,
+      "epochs": 1000,
+      "eval_every": 1001,
+      "gamma": 1.0,
+      "hidden_dim": 128,
+      "latent_dim": 128,
+      "lr": 0.001,
+      "tau": 0.02
+    },
+    "laadan_ac": {
+      "actor_lr": 0.0005,
+      "conservative_alpha": 0.5,
+      "cost_budget": 0.0,
+      "critic_lr": 0.001,
+      "dropout": 0.1,
+      "entropy_coef": 0.001,
+      "epochs": 1000,
+      "eval_every": 1001,
+      "expert_kl_weight": 0.005,
+      "gamma": 1.0,
+      "hidden_dim": 128,
+      "lagrange_init": 0.0,
+      "lagrange_lr": 0.0002,
+      "latent_dim": 128,
+      "smoothness_weight": 0.001,
+      "tau": 0.01
+    },
+    "voac": {
+      "actor_lr": 0.001,
+      "critic_lr": 0.001,
+      "dropout": 0.1,
+      "entropy_coef": 0.02,
+      "epochs": 1000,
+      "eval_every": 1001,
+      "gamma": 1.0,
+      "hidden_dim": 128,
+      "latent_dim": 128,
+      "tau": 0.02
+    }
+  },
+  "epochs": 1000,
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ]
+}
