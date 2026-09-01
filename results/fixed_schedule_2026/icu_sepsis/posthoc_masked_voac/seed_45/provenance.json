@@ -16,7 +16,7 @@
   "mask_applied_at_evaluation": true,
   "mask_applied_during_training": false,
   "parameters_updated_during_posthoc_evaluation": false,
-  "seed": 42,
-  "source_voac_checkpoint": "results/camera_ready_2026/icu_sepsis/main_fixed_schedule/voac/seed_42/model.pt",
+  "seed": 45,
+  "source_voac_checkpoint": "results/fixed_schedule_2026/icu_sepsis/main_fixed_schedule/voac/seed_45/model.pt",
   "source_voac_training_rule": "final_epoch"
 }
