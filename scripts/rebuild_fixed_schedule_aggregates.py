@@ -23,11 +23,7 @@ SCRIPTS_DIR = REPO_ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from run_fixed_schedule import (  # noqa: E402
-    SEEDS,
-    dump_json,
-    recursive_sha256_manifest,
-)
+from run_fixed_schedule import SEEDS, dump_json, recursive_sha256_manifest  # noqa: E402
 from trainers import mean_ci95  # noqa: E402
 
 METHODS = [
@@ -71,25 +67,14 @@ def write_csv(path: Path, rows: List[Dict]) -> None:
         writer.writerows(rows)
 
 
-def aggregate(groups: Dict[str, List[Dict[str, float]]]) -> Dict:
-    summary = {}
-    for method, seed_metrics in groups.items():
-        common = set.intersection(*(set(metrics) for metrics in seed_metrics))
-        summary[method] = {
-            metric: mean_ci95([metrics[metric] for metrics in seed_metrics])
-            for metric in sorted(common)
-        }
-        for payload in summary[method].values():
-            values = [metrics[next(k for k, v in summary[method].items() if v is payload)] for metrics in seed_metrics]
-            payload["min"] = float(np.min(values))
-            payload["max"] = float(np.max(values))
-    return summary
-
-
 def aggregate_clean(groups: Dict[str, List[Dict[str, float]]]) -> Dict:
     """Aggregate with the same fields used by the released trainer summaries."""
     summary = {}
     for method, seed_metrics in groups.items():
+        if len(seed_metrics) != len(SEEDS):
+            raise RuntimeError(
+                f"{method}: expected {len(SEEDS)} seed metric dictionaries, found {len(seed_metrics)}"
+            )
         common = sorted(set.intersection(*(set(metrics) for metrics in seed_metrics)))
         summary[method] = {}
         for metric in common:
@@ -105,11 +90,19 @@ def paired_summary(
     laadan_by_seed: Dict[int, Dict[str, float]],
     posthoc_by_seed: Dict[int, Dict[str, float]],
 ) -> Dict:
-    if set(laadan_by_seed) != set(posthoc_by_seed) != set(SEEDS):
-        raise RuntimeError("Paired seed sets are inconsistent")
+    expected = set(SEEDS)
+    if set(laadan_by_seed) != expected or set(posthoc_by_seed) != expected:
+        raise RuntimeError(
+            f"Paired seed sets are inconsistent: LAADAN={sorted(laadan_by_seed)}, "
+            f"posthoc={sorted(posthoc_by_seed)}, expected={sorted(expected)}"
+        )
     common = sorted(
         set.intersection(
-            *(set(metrics) for metrics in list(laadan_by_seed.values()) + list(posthoc_by_seed.values()))
+            *(
+                set(metrics)
+                for metrics in list(laadan_by_seed.values())
+                + list(posthoc_by_seed.values())
+            )
         )
     )
     metrics = {}
@@ -138,10 +131,18 @@ def rebuild(dataset_root: Path, data_dir: Path | None) -> None:
 
     for seed in SEEDS:
         for method_name, folder in METHODS:
-            path = dataset_root / "main_fixed_schedule" / folder / f"seed_{seed}" / "metrics.json"
+            path = (
+                dataset_root
+                / "main_fixed_schedule"
+                / folder
+                / f"seed_{seed}"
+                / "metrics.json"
+            )
             if not path.is_file():
                 raise FileNotFoundError(path)
             metrics = numeric_metrics(load_json(path))
+            if not metrics:
+                raise RuntimeError(f"No numeric metrics found in {path}")
             groups[method_name].append(metrics)
             rows.append({"method": method_name, "seed": int(seed), **metrics})
             if method_name == "LAADAN-AC":
@@ -151,6 +152,8 @@ def rebuild(dataset_root: Path, data_dir: Path | None) -> None:
         if not path.is_file():
             raise FileNotFoundError(path)
         metrics = numeric_metrics(load_json(path))
+        if not metrics:
+            raise RuntimeError(f"No numeric metrics found in {path}")
         groups[POSTHOC_NAME].append(metrics)
         rows.append({"method": POSTHOC_NAME, "seed": int(seed), **metrics})
         posthoc_by_seed[int(seed)] = metrics
@@ -168,9 +171,7 @@ def rebuild(dataset_root: Path, data_dir: Path | None) -> None:
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--root", default="results/fixed_schedule_2026/icu_sepsis"
-    )
+    parser.add_argument("--root", default="results/fixed_schedule_2026/icu_sepsis")
     parser.add_argument("--data-dir", default="data/icu_sepsis")
     parser.add_argument(
         "--skip-data-manifest",
