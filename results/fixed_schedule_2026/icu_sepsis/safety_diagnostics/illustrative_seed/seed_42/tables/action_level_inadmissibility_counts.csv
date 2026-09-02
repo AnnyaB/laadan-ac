@@ -1,0 +1,126 @@
+model,action,selected_count,inadmissible_selected_count,inadmissible_selected_rate
+Behavior Cloning,0,236,0,0.0
+Behavior Cloning,1,0,0,0.0
+Behavior Cloning,2,0,0,0.0
+Behavior Cloning,3,0,0,0.0
+Behavior Cloning,4,0,0,0.0
+Behavior Cloning,5,161,0,0.0
+Behavior Cloning,6,0,0,0.0
+Behavior Cloning,7,0,0,0.0
+Behavior Cloning,8,0,0,0.0
+Behavior Cloning,9,0,0,0.0
+Behavior Cloning,10,96,0,0.0
+Behavior Cloning,11,0,0,0.0
+Behavior Cloning,12,1,0,0.0
+Behavior Cloning,13,0,0,0.0
+Behavior Cloning,14,0,0,0.0
+Behavior Cloning,15,85,0,0.0
+Behavior Cloning,16,0,0,0.0
+Behavior Cloning,17,2,0,0.0
+Behavior Cloning,18,0,0,0.0
+Behavior Cloning,19,0,0,0.0
+Behavior Cloning,20,104,0,0.0
+Behavior Cloning,21,0,0,0.0
+Behavior Cloning,22,3,0,0.0
+Behavior Cloning,23,3,0,0.0
+Behavior Cloning,24,23,0,0.0
+Conservative Q-Learning,0,233,0,0.0
+Conservative Q-Learning,1,0,0,0.0
+Conservative Q-Learning,2,0,0,0.0
+Conservative Q-Learning,3,0,0,0.0
+Conservative Q-Learning,4,0,0,0.0
+Conservative Q-Learning,5,76,0,0.0
+Conservative Q-Learning,6,0,0,0.0
+Conservative Q-Learning,7,0,0,0.0
+Conservative Q-Learning,8,0,0,0.0
+Conservative Q-Learning,9,0,0,0.0
+Conservative Q-Learning,10,133,0,0.0
+Conservative Q-Learning,11,0,0,0.0
+Conservative Q-Learning,12,0,0,0.0
+Conservative Q-Learning,13,0,0,0.0
+Conservative Q-Learning,14,0,0,0.0
+Conservative Q-Learning,15,62,0,0.0
+Conservative Q-Learning,16,0,0,0.0
+Conservative Q-Learning,17,0,0,0.0
+Conservative Q-Learning,18,0,0,0.0
+Conservative Q-Learning,19,0,0,0.0
+Conservative Q-Learning,20,183,0,0.0
+Conservative Q-Learning,21,0,0,0.0
+Conservative Q-Learning,22,1,0,0.0
+Conservative Q-Learning,23,0,0,0.0
+Conservative Q-Learning,24,26,0,0.0
+Vanilla Offline Actor-Critic,0,0,0,0.0
+Vanilla Offline Actor-Critic,1,0,0,0.0
+Vanilla Offline Actor-Critic,2,0,0,0.0
+Vanilla Offline Actor-Critic,3,0,0,0.0
+Vanilla Offline Actor-Critic,4,0,0,0.0
+Vanilla Offline Actor-Critic,5,19,19,1.0
+Vanilla Offline Actor-Critic,6,0,0,0.0
+Vanilla Offline Actor-Critic,7,0,0,0.0
+Vanilla Offline Actor-Critic,8,0,0,0.0
+Vanilla Offline Actor-Critic,9,0,0,0.0
+Vanilla Offline Actor-Critic,10,53,52,0.9811320754716981
+Vanilla Offline Actor-Critic,11,0,0,0.0
+Vanilla Offline Actor-Critic,12,0,0,0.0
+Vanilla Offline Actor-Critic,13,0,0,0.0
+Vanilla Offline Actor-Critic,14,0,0,0.0
+Vanilla Offline Actor-Critic,15,105,102,0.9714285714285714
+Vanilla Offline Actor-Critic,16,0,0,0.0
+Vanilla Offline Actor-Critic,17,0,0,0.0
+Vanilla Offline Actor-Critic,18,1,1,1.0
+Vanilla Offline Actor-Critic,19,0,0,0.0
+Vanilla Offline Actor-Critic,20,523,114,0.2179732313575526
+Vanilla Offline Actor-Critic,21,0,0,0.0
+Vanilla Offline Actor-Critic,22,0,0,0.0
+Vanilla Offline Actor-Critic,23,13,13,1.0
+Vanilla Offline Actor-Critic,24,0,0,0.0
+LAADAN-AC,0,236,0,0.0
+LAADAN-AC,1,0,0,0.0
+LAADAN-AC,2,0,0,0.0
+LAADAN-AC,3,0,0,0.0
+LAADAN-AC,4,0,0,0.0
+LAADAN-AC,5,179,0,0.0
+LAADAN-AC,6,0,0,0.0
+LAADAN-AC,7,0,0,0.0
+LAADAN-AC,8,0,0,0.0
+LAADAN-AC,9,0,0,0.0
+LAADAN-AC,10,103,0,0.0
+LAADAN-AC,11,0,0,0.0
+LAADAN-AC,12,0,0,0.0
+LAADAN-AC,13,0,0,0.0
+LAADAN-AC,14,0,0,0.0
+LAADAN-AC,15,61,0,0.0
+LAADAN-AC,16,0,0,0.0
+LAADAN-AC,17,0,0,0.0
+LAADAN-AC,18,0,0,0.0
+LAADAN-AC,19,0,0,0.0
+LAADAN-AC,20,111,0,0.0
+LAADAN-AC,21,0,0,0.0
+LAADAN-AC,22,1,0,0.0
+LAADAN-AC,23,0,0,0.0
+LAADAN-AC,24,23,0,0.0
+Post-hoc Masked VOAC,0,229,0,0.0
+Post-hoc Masked VOAC,1,3,0,0.0
+Post-hoc Masked VOAC,2,2,0,0.0
+Post-hoc Masked VOAC,3,0,0,0.0
+Post-hoc Masked VOAC,4,0,0,0.0
+Post-hoc Masked VOAC,5,3,0,0.0
+Post-hoc Masked VOAC,6,0,0,0.0
+Post-hoc Masked VOAC,7,0,0,0.0
+Post-hoc Masked VOAC,8,0,0,0.0
+Post-hoc Masked VOAC,9,1,0,0.0
+Post-hoc Masked VOAC,10,19,0,0.0
+Post-hoc Masked VOAC,11,0,0,0.0
+Post-hoc Masked VOAC,12,0,0,0.0
+Post-hoc Masked VOAC,13,1,0,0.0
+Post-hoc Masked VOAC,14,1,0,0.0
+Post-hoc Masked VOAC,15,29,0,0.0
+Post-hoc Masked VOAC,16,0,0,0.0
+Post-hoc Masked VOAC,17,1,0,0.0
+Post-hoc Masked VOAC,18,0,0,0.0
+Post-hoc Masked VOAC,19,1,0,0.0
+Post-hoc Masked VOAC,20,409,0,0.0
+Post-hoc Masked VOAC,21,0,0,0.0
+Post-hoc Masked VOAC,22,2,0,0.0
+Post-hoc Masked VOAC,23,2,0,0.0
+Post-hoc Masked VOAC,24,11,0,0.0

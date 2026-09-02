@@ -1,0 +1,23 @@
+{
+  "avg_return": 0.7894945740699768,
+  "survival_rate": 0.7894945740699768,
+  "mortality_rate": 0.2105054259300232,
+  "avg_length": 8.390668869018555,
+  "inadmissibility_rate": 0.0,
+  "expert_argmax_match": 0.921439528465271,
+  "mean_kl_to_expert": 4.006643295288086,
+  "policy_entropy": -0.0,
+  "mean_action_deviation_from_expert": 1.5484421253204346,
+  "soft_survival_rate": 0.7894303798675537,
+  "soft_inadmissibility_rate": 0.0,
+  "soft_avg_return": 0.7894303798675537,
+  "soft_policy_entropy": 0.015184532850980759,
+  "soft_mean_kl_to_expert": 2.394275665283203,
+  "trajectory_mean_action_jump": 3.0178594878529217,
+  "trajectory_normalised_action_jump": 0.12574414532720507,
+  "variant_folder": "no_expert_kl",
+  "variant_name": "LAADAN without expert KL",
+  "uses_action_mask": true,
+  "uses_lagrangian": true,
+  "cost_budget": 0.0
+}

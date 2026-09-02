@@ -1,0 +1,11 @@
+{
+  "avg_return": 0.7372021675109863,
+  "survival_rate": 0.7372021675109863,
+  "mortality_rate": 0.26279783248901367,
+  "avg_length": 25.30523681640625,
+  "inadmissibility_rate": 0.0017473185121150364,
+  "expert_argmax_match": 0.9883066415786743,
+  "mean_kl_to_expert": 1.0697314739227295,
+  "policy_entropy": -0.0,
+  "mean_action_deviation_from_expert": 0.6103265881538391
+}

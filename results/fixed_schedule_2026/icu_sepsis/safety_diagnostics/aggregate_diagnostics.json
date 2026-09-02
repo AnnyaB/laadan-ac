@@ -1,0 +1,58 @@
+{
+  "laadan_mean_soft_inadmissible_probability_mass": {
+    "ci95_half": 0.0,
+    "ci95_high": 0.0,
+    "ci95_low": 0.0,
+    "mean": 0.0,
+    "n": 5,
+    "std": 0.0
+  },
+  "laadan_mean_state_inadmissibility": {
+    "ci95_half": 0.0,
+    "ci95_high": 0.0,
+    "ci95_low": 0.0,
+    "mean": 0.0,
+    "n": 5,
+    "std": 0.0
+  },
+  "posthoc_mask_intervention_rate": {
+    "ci95_half": 0.001738746416117477,
+    "ci95_high": 0.4247079340911875,
+    "ci95_low": 0.42123044125895254,
+    "mean": 0.42296918767507,
+    "n": 5,
+    "std": 0.0014005602240896309
+  },
+  "posthoc_mean_state_inadmissibility": {
+    "ci95_half": 0.0,
+    "ci95_high": 0.0,
+    "ci95_low": 0.0,
+    "mean": 0.0,
+    "n": 5,
+    "std": 0.0
+  },
+  "voac_fraction_states_with_inadmissible_greedy_action": {
+    "ci95_half": 0.001738746416117477,
+    "ci95_high": 0.4247079340911875,
+    "ci95_low": 0.42123044125895254,
+    "mean": 0.42296918767507,
+    "n": 5,
+    "std": 0.0014005602240896309
+  },
+  "voac_mean_soft_inadmissible_probability_mass": {
+    "ci95_half": 0.001459232355934569,
+    "ci95_high": 0.8646844799194837,
+    "ci95_low": 0.8617660152076145,
+    "mean": 0.8632252475635491,
+    "n": 5,
+    "std": 0.0011754116508778333
+  },
+  "voac_mean_state_inadmissibility": {
+    "ci95_half": 0.001738746416117477,
+    "ci95_high": 0.4247079340911875,
+    "ci95_low": 0.42123044125895254,
+    "mean": 0.42296918767507,
+    "n": 5,
+    "std": 0.0014005602240896309
+  }
+}

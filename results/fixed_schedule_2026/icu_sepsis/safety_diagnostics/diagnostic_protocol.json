@@ -1,0 +1,25 @@
+{
+  "benchmark_evaluation_used_for_checkpoint_selection": false,
+  "checkpoint_rule": "pre-specified final epoch",
+  "illustrative_outputs": {
+    "action_confusion": "results/fixed_schedule_2026/icu_sepsis/safety_diagnostics/illustrative_seed/seed_42/tables/expert_voac_laadan_action_confusion.csv",
+    "action_counts": "results/fixed_schedule_2026/icu_sepsis/safety_diagnostics/illustrative_seed/seed_42/tables/action_level_inadmissibility_counts.csv",
+    "feature_distribution": "results/fixed_schedule_2026/icu_sepsis/safety_diagnostics/illustrative_seed/seed_42/tables/safe_vs_unsafe_feature_distribution.csv",
+    "figure": "results/fixed_schedule_2026/icu_sepsis/safety_diagnostics/illustrative_seed/seed_42/figures/safety_failure_fixed_checkpoint.png",
+    "q_values": "results/fixed_schedule_2026/icu_sepsis/safety_diagnostics/illustrative_seed/seed_42/tables/representative_state_q_values.csv",
+    "state_level": "results/fixed_schedule_2026/icu_sepsis/safety_diagnostics/illustrative_seed/seed_42/tables/state_level_inadmissibility.csv",
+    "timepoint": "results/fixed_schedule_2026/icu_sepsis/safety_diagnostics/illustrative_seed/seed_42/tables/trajectory_timepoint_inadmissibility.csv",
+    "trajectory": "results/fixed_schedule_2026/icu_sepsis/safety_diagnostics/illustrative_seed/seed_42/tables/sample_trajectory_voac_vs_laadan.csv"
+  },
+  "illustrative_seed": 42,
+  "illustrative_seed_selection_rule": "predeclared; not selected by performance or appearance",
+  "num_trajectory_samples": 2000,
+  "quantitative_summary": "all five fixed-schedule epoch-1000 seeds",
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ]
+}

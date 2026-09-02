@@ -1,5 +1,8 @@
 {
   "expertPolicy.csv": "b3a633426392550f78df3572546623f423013fc3d25c41dccaa23e1b181baed5",
+  "extras/admissibleActions.txt": "607f4e1eeee4f33a2124fb4a1beefd82fc264a3b608d41d13f810166aa203165",
+  "extras/sofaScores.csv": "dc625a566541904f78df8103d6c5ec934bf4c129cf1cc5d43759eecc28578b5f",
+  "extras/stateClusterCenters.csv": "09803430a4d95568bb3bc693877ce1fa8b7420cd4634e0d6b1b5ea7ff852a868",
   "initialStateDistribution.csv": "6164da470c585876bf5aa73c93699ee6deabdb9d0c40304bb5b9400dafcb6fcd",
   "rewardFunction.csv": "6e7b919c12d00697eeb638b86ca787b21277425ca282ef4ecf037ca7a30638a6",
   "transitionFunction.csv": "f802c197b563d0a23f71239e5285030ab99f453df30931a235ccfd9696cd84ca"

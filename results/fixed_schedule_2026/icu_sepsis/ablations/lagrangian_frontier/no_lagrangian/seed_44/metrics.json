@@ -1,0 +1,23 @@
+{
+  "avg_return": 0.7929214835166931,
+  "survival_rate": 0.7929214835166931,
+  "mortality_rate": 0.20707851648330688,
+  "avg_length": 8.656820297241211,
+  "inadmissibility_rate": 0.0,
+  "expert_argmax_match": 0.9568036794662476,
+  "mean_kl_to_expert": 3.9509267807006836,
+  "policy_entropy": -0.0,
+  "mean_action_deviation_from_expert": 1.4353523254394531,
+  "soft_survival_rate": 0.7913529872894287,
+  "soft_inadmissibility_rate": 0.0,
+  "soft_avg_return": 0.7913529872894287,
+  "soft_policy_entropy": 0.14018622040748596,
+  "soft_mean_kl_to_expert": 0.4769212007522583,
+  "trajectory_mean_action_jump": 3.11957685284302,
+  "trajectory_normalised_action_jump": 0.12998236886845918,
+  "variant_folder": "no_lagrangian",
+  "variant_name": "LAADAN without Lagrangian cost control",
+  "uses_action_mask": true,
+  "uses_lagrangian": false,
+  "cost_budget": 0.0
+}

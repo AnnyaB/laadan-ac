@@ -1,0 +1,19 @@
+{
+  "avg_length": 47.77199935913086,
+  "avg_return": 0.04798941686749458,
+  "expert_argmax_match": 0.043308794498443604,
+  "inadmissibility_rate": 0.0,
+  "max_inadmissible_probability_mass_before_mask": 0.9793754797428846,
+  "mean_action_deviation_from_expert": 8.203462600708008,
+  "mean_inadmissible_probability_mass_before_mask": 0.7768096080118266,
+  "mean_kl_to_expert": 17.232873916625977,
+  "mortality_rate": 0.9520105831325054,
+  "policy_entropy": -0.0,
+  "soft_avg_return": 0.4377511739730835,
+  "soft_inadmissibility_rate": 0.0,
+  "soft_mean_kl_to_expert": 1.5737988948822021,
+  "soft_policy_entropy": 1.5908939838409424,
+  "soft_survival_rate": 0.4377511739730835,
+  "state_mask_intervention_rate": 0.7,
+  "survival_rate": 0.04798941686749458
+}
