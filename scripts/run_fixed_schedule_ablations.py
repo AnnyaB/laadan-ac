@@ -6,6 +6,10 @@ already frozen BC/CQL/VOAC/LAADAN headline runs are not retrained. By default it
 runs only the four leave-one-out variants that were not part of the initial core
 reviewer-response experiment, then rebuilds the complete seven-variant aggregate
 files from metrics saved on disk.
+
+The full LAADAN-AC row is taken directly from the already frozen main
+``main_fixed_schedule/laadan_ac`` runs. It is not redundantly retrained as an
+"ablation" variant.
 """
 from __future__ import annotations
 
@@ -38,10 +42,15 @@ from run_fixed_schedule import (  # noqa: E402
 from trainers import mean_ci95  # noqa: E402
 
 DEFAULT_NEW_VARIANTS = ("no_expert_kl", "no_smoothness", "no_lagrangian", "no_mask")
-DISPLAY_NAME_BY_FOLDER = {
-    variant["folder"]: variant["name"] for variant in ablation_variants("full")
+PERTURBATION_VARIANTS = {
+    variant["folder"]: variant
+    for variant in ablation_variants("full")
+    if variant["folder"] != "full_laadan_ac"
 }
-FULL_FOLDERS = tuple(DISPLAY_NAME_BY_FOLDER)
+DISPLAY_NAME_BY_FOLDER = {
+    folder: variant["name"] for folder, variant in PERTURBATION_VARIANTS.items()
+}
+PERTURBATION_FOLDERS = tuple(DISPLAY_NAME_BY_FOLDER)
 
 
 def load_json(path: Path):
@@ -75,24 +84,24 @@ def choose_device(requested: str) -> str:
 
 
 def existing_seed_dirs(ablation_root: Path, folder: str) -> List[int]:
-    seeds = []
-    for seed in SEEDS:
-        if (ablation_root / folder / f"seed_{seed}" / "metrics.json").is_file():
-            seeds.append(seed)
-    return seeds
+    return [
+        seed
+        for seed in SEEDS
+        if (ablation_root / folder / f"seed_{seed}" / "metrics.json").is_file()
+    ]
 
 
 def run_requested_variants(
     benchmark,
     output_root: Path,
     requested_folders: List[str],
-    device: str,
     overwrite: bool,
 ) -> None:
-    full_variants = {variant["folder"]: variant for variant in ablation_variants("full")}
-    unknown = sorted(set(requested_folders) - set(full_variants))
+    unknown = sorted(set(requested_folders) - set(PERTURBATION_VARIANTS))
     if unknown:
-        raise ValueError(f"Unknown ablation folders: {unknown}")
+        raise ValueError(
+            "Unknown/non-perturbation ablation folders: " + ", ".join(unknown)
+        )
 
     ablation_root = output_root / "ablations" / "lagrangian_frontier"
     selected = []
@@ -106,7 +115,7 @@ def run_requested_variants(
                 f"Partial existing result for {folder}: seeds {present}. "
                 "Refusing to mix partial reruns; inspect/remove that folder or use --overwrite intentionally."
             )
-        selected.append(full_variants[folder])
+        selected.append(PERTURBATION_VARIANTS[folder])
 
     if not selected:
         print("[INFO] No ablation training required.")
@@ -124,12 +133,38 @@ def run_requested_variants(
             validate_final_only_history(run)
 
 
+def numeric_metrics(metrics: Dict) -> Dict[str, float]:
+    return {
+        key: float(value)
+        for key, value in metrics.items()
+        if key != "convergence_epoch_95"
+        and isinstance(value, (int, float, np.integer, np.floating, bool))
+        and np.isfinite(float(value))
+    }
+
+
 def rebuild_aggregates(output_root: Path) -> None:
     ablation_root = output_root / "ablations" / "lagrangian_frontier"
     rows: List[Dict] = []
-    grouped_values: Dict[str, List[Dict[str, float]]] = {}
+    grouped_values: Dict[str, List[Dict[str, float]]] = {"Full LAADAN-AC": []}
 
-    for folder in FULL_FOLDERS:
+    # The full row is the same fixed-schedule LAADAN-AC model used in the main
+    # comparison; reusing these exact files avoids an unnecessary duplicate run.
+    for seed in SEEDS:
+        metrics_path = (
+            output_root
+            / "main_fixed_schedule"
+            / "laadan_ac"
+            / f"seed_{seed}"
+            / "metrics.json"
+        )
+        if not metrics_path.is_file():
+            raise FileNotFoundError(f"Missing frozen full LAADAN metrics: {metrics_path}")
+        numeric = numeric_metrics(load_json(metrics_path))
+        grouped_values["Full LAADAN-AC"].append(numeric)
+        rows.append({"method": "Full LAADAN-AC", "seed": int(seed), **numeric})
+
+    for folder in PERTURBATION_FOLDERS:
         display_name = DISPLAY_NAME_BY_FOLDER[folder]
         grouped_values[display_name] = []
         for seed in SEEDS:
@@ -138,14 +173,7 @@ def rebuild_aggregates(output_root: Path) -> None:
                 raise FileNotFoundError(
                     f"Full ablation suite incomplete: missing {metrics_path}"
                 )
-            metrics = load_json(metrics_path)
-            numeric = {
-                key: float(value)
-                for key, value in metrics.items()
-                if key != "convergence_epoch_95"
-                and isinstance(value, (int, float, np.integer, np.floating, bool))
-                and np.isfinite(float(value))
-            }
+            numeric = numeric_metrics(load_json(metrics_path))
             grouped_values[display_name].append(numeric)
             rows.append({"method": display_name, "seed": int(seed), **numeric})
 
@@ -173,14 +201,14 @@ def parse_args():
         "--variants",
         default=",".join(DEFAULT_NEW_VARIANTS),
         help=(
-            "Comma-separated folder names. Defaults to the four missing leave-one-out variants: "
+            "Comma-separated perturbation folder names. Defaults to the four missing leave-one-out variants: "
             + ",".join(DEFAULT_NEW_VARIANTS)
         ),
     )
     parser.add_argument(
         "--overwrite",
         action="store_true",
-        help="Intentionally rerun and replace a complete existing variant. Off by default.",
+        help="Intentionally rerun and replace a complete existing perturbation. Off by default.",
     )
     return parser.parse_args()
 
@@ -198,7 +226,6 @@ def main():
         benchmark,
         output_root,
         requested_folders=requested,
-        device=device,
         overwrite=args.overwrite,
     )
     rebuild_aggregates(output_root)
