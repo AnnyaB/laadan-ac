@@ -29,7 +29,7 @@ import sys
 from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, Iterable, List
+from typing import Dict, List
 
 import numpy as np
 import torch
@@ -189,21 +189,16 @@ def attach_provenance(
 
 
 def aggregate_runs(run_groups: Dict[str, List[Dict]]) -> Dict:
-    """Aggregate only scientifically interpretable metrics.
-
-    ``convergence_epoch_95`` is intentionally excluded because the fixed-schedule
-    protocol evaluates benchmark return only at epoch 1000, so no intermediate
-    benchmark-evaluation curve exists from which convergence can be estimated.
-    """
+    """Aggregate metrics that remain interpretable under final-only evaluation."""
     result: Dict[str, Dict] = {}
     for name, runs in run_groups.items():
         cleaned = []
         for run in runs:
             copy_run = dict(run)
             copy_run["metrics"] = {
-                k: v
-                for k, v in run["metrics"].items()
-                if k != "convergence_epoch_95"
+                key: value
+                for key, value in run["metrics"].items()
+                if key != "convergence_epoch_95"
             }
             cleaned.append(copy_run)
         summary = aggregate_seed_metrics(cleaned)
@@ -486,18 +481,16 @@ def run_dataset(
             },
         )
 
-    summary = aggregate_runs(groups)
-    dump_json(output_dir / "aggregate" / "main_summary.json", summary)
+    dump_json(output_dir / "aggregate" / "main_summary.json", aggregate_runs(groups))
     write_csv(output_dir / "aggregate" / "per_seed_metrics.csv", raw_seed_rows(groups))
-
-    paired = paired_summary(
-        groups["LAADAN-AC"],
-        groups["Post-hoc Masked VOAC"],
-        "LAADAN-AC",
-        "Post-hoc Masked VOAC",
-    )
     dump_json(
-        output_dir / "aggregate" / "paired_laadan_minus_posthoc_voac.json", paired
+        output_dir / "aggregate" / "paired_laadan_minus_posthoc_voac.json",
+        paired_summary(
+            groups["LAADAN-AC"],
+            groups["Post-hoc Masked VOAC"],
+            "LAADAN-AC",
+            "Post-hoc Masked VOAC",
+        ),
     )
 
     if run_ablations != "none":
@@ -532,7 +525,16 @@ def parse_args():
     parser.add_argument("--device", choices=["cuda", "cpu", "auto"], default="auto")
     parser.add_argument("--datasets", choices=["icu", "eicu", "both"], default="icu")
     parser.add_argument(
-        "--ablations", choices=["none", "core", "full"], default="core"
+        "--icu-ablations",
+        choices=["none", "core", "full"],
+        default="full",
+        help="Ablation suite for ICU-Sepsis. Full leave-one-out is the final-paper protocol.",
+    )
+    parser.add_argument(
+        "--eicu-ablations",
+        choices=["none", "core", "full"],
+        default="none",
+        help="Ablation suite for eICU portability check; none is recommended.",
     )
     return parser.parse_args()
 
@@ -556,18 +558,16 @@ def main():
             out / "icu_sepsis",
             "ICU-Sepsis",
             device,
-            args.ablations,
+            args.icu_ablations,
         )
 
     if args.datasets in {"eicu", "both"}:
-        # eICU is an exploratory cross-source portability check. By default we
-        # recommend no eICU ablations; callers can explicitly request them.
         run_dataset(
             Path(args.eicu_data),
             out / "eicu_demo",
             "eICU-CRD Demo",
             device,
-            args.ablations,
+            args.eicu_ablations,
         )
 
 
