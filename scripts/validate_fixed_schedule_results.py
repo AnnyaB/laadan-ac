@@ -27,16 +27,24 @@ EXPECTED_METHOD_NAMES = {
     "Post-hoc Masked VOAC",
     "LAADAN-AC",
 }
-FULL_ABLATION_FOLDERS = {
-    "full_laadan_ac",
-    "mask_only",
-    "no_conservative",
+CORE_ABLATION_METHODS = {
+    "Full LAADAN-AC",
+    "Masking-only actor-critic",
+    "LAADAN without conservative critic",
+}
+FULL_ABLATION_METHODS = CORE_ABLATION_METHODS | {
+    "LAADAN without expert KL",
+    "LAADAN without smoothness proxy",
+    "LAADAN without Lagrangian cost control",
+    "LAADAN without action mask",
+}
+CORE_PERTURBATION_FOLDERS = {"mask_only", "no_conservative"}
+FULL_PERTURBATION_FOLDERS = CORE_PERTURBATION_FOLDERS | {
     "no_expert_kl",
     "no_smoothness",
     "no_lagrangian",
     "no_mask",
 }
-CORE_ABLATION_FOLDERS = {"full_laadan_ac", "mask_only", "no_conservative"}
 T_CRIT_95 = {
     2: 12.706,
     3: 4.303,
@@ -251,11 +259,13 @@ def validate_ablations(root: Path, expected_level: str) -> None:
         raise AssertionError("Missing fixed-schedule ablation aggregate artifacts")
 
     rows = load_csv(csv_path)
-    folders = FULL_ABLATION_FOLDERS if expected_level == "full" else CORE_ABLATION_FOLDERS
+    expected_methods = (
+        FULL_ABLATION_METHODS if expected_level == "full" else CORE_ABLATION_METHODS
+    )
     method_names = {row["method"] for row in rows}
-    if len(method_names) != len(folders):
+    if method_names != expected_methods:
         raise AssertionError(
-            f"Expected {len(folders)} ablation methods for {expected_level}, found {len(method_names)}"
+            f"Expected ablation methods {sorted(expected_methods)}, found {sorted(method_names)}"
         )
     for method in sorted(method_names):
         method_rows = [row for row in rows if row["method"] == method]
@@ -265,8 +275,34 @@ def validate_ablations(root: Path, expected_level: str) -> None:
         for row in method_rows:
             numeric_row(row)
 
+    # The full LAADAN row must be exactly the frozen main LAADAN seed metrics,
+    # not a separately retrained duplicate.
+    main_laadan = {
+        int(row["seed"]): numeric_row(row)
+        for row in load_csv(root / "aggregate" / "per_seed_metrics.csv")
+        if row["method"] == "LAADAN-AC"
+    }
+    ablation_full = {
+        int(row["seed"]): numeric_row(row)
+        for row in rows
+        if row["method"] == "Full LAADAN-AC"
+    }
+    for seed in SEEDS:
+        common = set(main_laadan[seed]) & set(ablation_full[seed])
+        for metric in common:
+            assert_close(
+                ablation_full[seed][metric],
+                main_laadan[seed][metric],
+                f"full-ablation-reuse/seed_{seed}/{metric}",
+            )
+
+    perturbation_folders = (
+        FULL_PERTURBATION_FOLDERS
+        if expected_level == "full"
+        else CORE_PERTURBATION_FOLDERS
+    )
     ablation_root = root / "ablations" / "lagrangian_frontier"
-    for folder in sorted(folders):
+    for folder in sorted(perturbation_folders):
         for seed in SEEDS:
             seed_dir = ablation_root / folder / f"seed_{seed}"
             for filename in ("history.csv", "metrics.json", "model.pt"):
