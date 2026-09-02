@@ -12,11 +12,11 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-import math
 import sys
 from pathlib import Path
 from typing import Dict, List
 
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
@@ -26,15 +26,15 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 from benchmark import ICUSepsisOfflineBenchmark  # noqa: E402
-from models import ConservativeQNet, BehaviorCloningNet, OfflineActorCriticNet  # noqa: E402
+from models import BehaviorCloningNet, ConservativeQNet, OfflineActorCriticNet  # noqa: E402
 from safety_failure_analysis import (  # noqa: E402
     build_policies,
     get_benchmark_array,
     get_config_block,
     get_terminal_mask,
     load_checkpoint,
+    pca_two_components,
     per_state_inadmissibility,
-    plot_four_panel_figure,
     representative_unsafe_states,
     write_action_tables,
     write_feature_distribution_table,
@@ -45,6 +45,23 @@ from safety_failure_analysis import (  # noqa: E402
 from trainers import mean_ci95  # noqa: E402
 
 SEEDS = (42, 43, 44, 45, 46)
+PLOT_DPI = 600
+
+plt.rcParams.update(
+    {
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Arial", "Helvetica", "DejaVu Sans"],
+        "font.size": 10.5,
+        "axes.titlesize": 11.0,
+        "axes.labelsize": 10.5,
+        "xtick.labelsize": 9.0,
+        "ytick.labelsize": 9.0,
+        "legend.fontsize": 8.8,
+        "axes.linewidth": 0.9,
+        "savefig.facecolor": "white",
+        "figure.facecolor": "white",
+    }
+)
 
 
 def choose_device(requested: str) -> str:
@@ -187,6 +204,162 @@ def aggregate_seed_rows(rows: List[Dict]) -> Dict:
     }
 
 
+def clean_axis(ax):
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.grid(axis="y", linestyle=(0, (3, 3)), linewidth=0.7, alpha=0.42)
+    ax.set_axisbelow(True)
+
+
+def panel_label(ax, label: str):
+    ax.text(
+        -0.12,
+        1.08,
+        label,
+        transform=ax.transAxes,
+        fontsize=12.5,
+        fontweight="bold",
+        va="top",
+        ha="left",
+        clip_on=False,
+    )
+
+
+def plot_fixed_diagnostic_figure(
+    output_path: str,
+    benchmark,
+    policies: Dict,
+    representative_states: List[int],
+    trajectory_payload,
+    illustrative_seed: int,
+) -> None:
+    """Create a four-panel fixed-checkpoint diagnostic with no seed cherry-picking."""
+    mask = get_benchmark_array(benchmark, "admissible_mask")
+    features = get_benchmark_array(benchmark, "state_features")
+    terminal = get_terminal_mask(benchmark)
+    nonterminal = ~terminal
+
+    voac = policies["Vanilla Offline Actor-Critic"]
+    posthoc = policies["Post-hoc Masked VOAC"]
+    laadan = policies["LAADAN-AC"]
+
+    voac_cost = per_state_inadmissibility(voac["primary"], mask)
+    posthoc_cost = per_state_inadmissibility(posthoc["primary"], mask)
+    laadan_cost = per_state_inadmissibility(laadan["primary"], mask)
+
+    fig, axes = plt.subplots(2, 2, figsize=(12.8, 8.0))
+
+    # A: distribution over all non-terminal states.
+    order = np.argsort(voac_cost[nonterminal])[::-1]
+    voac_sorted = voac_cost[nonterminal][order]
+    post_sorted = posthoc_cost[nonterminal][order]
+    laadan_sorted = laadan_cost[nonterminal][order]
+    x = np.arange(len(voac_sorted))
+    axes[0, 0].plot(x, voac_sorted, linewidth=2.0, label="VOAC")
+    axes[0, 0].plot(x, post_sorted, linewidth=1.8, label="Post-hoc masked VOAC")
+    axes[0, 0].plot(x, laadan_sorted, linewidth=1.8, label="LAADAN-AC")
+    axes[0, 0].set_xlabel("Non-terminal states sorted by VOAC inadmissibility")
+    axes[0, 0].set_ylabel("Selected-action inadmissibility")
+    axes[0, 0].set_ylim(-0.03, 1.03)
+    axes[0, 0].legend(frameon=False, loc="upper right")
+    clean_axis(axes[0, 0])
+    panel_label(axes[0, 0], "A")
+
+    # B: state-space localization of VOAC violations.
+    coords = pca_two_components(features)
+    scatter = axes[0, 1].scatter(
+        coords[nonterminal, 0],
+        coords[nonterminal, 1],
+        c=voac_cost[nonterminal],
+        s=22,
+        alpha=0.9,
+        edgecolors="none",
+    )
+    axes[0, 1].set_xlabel("PC1")
+    axes[0, 1].set_ylabel("PC2")
+    axes[0, 1].set_title("VOAC violations across benchmark states")
+    fig.colorbar(scatter, ax=axes[0, 1], fraction=0.046, pad=0.04, label="VOAC inadmissibility")
+    clean_axis(axes[0, 1])
+    panel_label(axes[0, 1], "B")
+
+    # C: Q-value separation at a deterministic representative VOAC-failure state.
+    state_id = representative_states[0]
+    groups = []
+    labels = []
+    admissible = mask[state_id] > 0.5
+    for model_name, short in [
+        ("Vanilla Offline Actor-Critic", "VOAC"),
+        ("Conservative Q-Learning", "CQL"),
+        ("LAADAN-AC", "LAADAN")
+    ]:
+        payload = policies.get(model_name)
+        if payload is None or payload.get("q_values") is None:
+            continue
+        q = np.asarray(payload["q_values"])[state_id]
+        if np.any(admissible):
+            groups.append(q[admissible])
+            labels.append(f"{short}\nadm")
+        if np.any(~admissible):
+            groups.append(q[~admissible])
+            labels.append(f"{short}\ninad")
+    if groups:
+        axes[1, 0].boxplot(groups, tick_labels=labels, showfliers=False, widths=0.58)
+        axes[1, 0].set_ylabel("Q value")
+        axes[1, 0].set_title(f"Representative VOAC-failure state {state_id}")
+        clean_axis(axes[1, 0])
+    else:
+        axes[1, 0].text(0.5, 0.5, "Q-values unavailable", ha="center", va="center")
+        axes[1, 0].set_axis_off()
+    panel_label(axes[1, 0], "C")
+
+    # D: a reproducibly sampled trajectory initialized identically for both policies.
+    if trajectory_payload is not None:
+        _, voac_rows, laadan_rows = trajectory_payload
+        for name, rows in [("VOAC", voac_rows), ("LAADAN-AC", laadan_rows)]:
+            steps = [int(row["step"]) for row in rows]
+            actions = [int(row["action"]) for row in rows]
+            axes[1, 1].plot(steps, actions, marker="o", markersize=4, linewidth=1.7, label=name)
+            if name == "VOAC":
+                bad_steps = [int(row["step"]) for row in rows if int(row["admissible"]) == 0]
+                bad_actions = [int(row["action"]) for row in rows if int(row["admissible"]) == 0]
+                if bad_steps:
+                    axes[1, 1].scatter(
+                        bad_steps,
+                        bad_actions,
+                        marker="x",
+                        s=56,
+                        linewidth=1.5,
+                        label="VOAC inadmissible",
+                        zorder=5,
+                    )
+        axes[1, 1].set_xlabel("Trajectory step")
+        axes[1, 1].set_ylabel("Treatment-action bin")
+        axes[1, 1].set_title("Matched-initial-state sampled trajectory")
+        axes[1, 1].legend(frameon=False, loc="best")
+        clean_axis(axes[1, 1])
+    else:
+        axes[1, 1].text(0.5, 0.5, "Trajectory unavailable", ha="center", va="center")
+        axes[1, 1].set_axis_off()
+    panel_label(axes[1, 1], "D")
+
+    fig.suptitle(
+        f"Fixed-checkpoint safety-failure diagnostics — predeclared illustrative seed {illustrative_seed}",
+        fontsize=13.5,
+        fontweight="bold",
+        y=1.01,
+    )
+    fig.text(
+        0.5,
+        0.005,
+        "Qualitative panels use a predeclared seed only; five-seed quantitative diagnostics are saved separately and are not inferred from this illustration.",
+        ha="center",
+        fontsize=8.9,
+    )
+    fig.tight_layout(rect=[0, 0.03, 1, 0.97])
+    fig.savefig(output_path, dpi=PLOT_DPI, bbox_inches="tight", pad_inches=0.06)
+    plt.close(fig)
+
+
 def build_illustrative_outputs(
     benchmark,
     policies: Dict,
@@ -234,12 +407,13 @@ def build_illustrative_outputs(
         seed=seed,
         attempts=num_trajectories,
     )
-    plot_four_panel_figure(
+    plot_fixed_diagnostic_figure(
         outputs["figure"],
         benchmark,
         policies,
         representative_states,
         trajectory_payload,
+        illustrative_seed=seed,
     )
     return outputs
 
