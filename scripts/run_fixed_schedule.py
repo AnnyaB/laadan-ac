@@ -29,7 +29,7 @@ import sys
 from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, Iterable, List
 
 import numpy as np
 import torch
@@ -40,8 +40,8 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 from benchmark import ICUSepsisOfflineBenchmark  # noqa: E402
-from run_experiments import DEFAULT_CONFIG        # noqa: E402
-from trainers import (                            # noqa: E402
+from run_experiments import DEFAULT_CONFIG  # noqa: E402
+from trainers import (  # noqa: E402
     aggregate_seed_metrics,
     evaluate_policy_set,
     greedy_policy_from_logits,
@@ -55,7 +55,7 @@ from trainers import (                            # noqa: E402
     train_laadan_ac,
     train_voac,
 )
-from lagrangian_frontier import (                 # noqa: E402
+from lagrangian_frontier import (  # noqa: E402
     BASE_LAADAN_CONFIG,
     BudgetedLagrangianExperiment,
 )
@@ -67,10 +67,20 @@ FINAL_ONLY_EVAL_EVERY = EPOCHS + 1
 
 def sha256_file(path: Path) -> str:
     h = hashlib.sha256()
-    with path.open("rb") as f:
-        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def recursive_sha256_manifest(data_dir: Path) -> Dict[str, str]:
+    """Hash every input file recursively using paths relative to ``data_dir``."""
+    manifest: Dict[str, str] = {}
+    for path in sorted(p for p in data_dir.rglob("*") if p.is_file()):
+        manifest[path.relative_to(data_dir).as_posix()] = sha256_file(path)
+    if not manifest:
+        raise RuntimeError(f"No input files found under {data_dir}")
+    return manifest
 
 
 def git_sha() -> str:
@@ -102,24 +112,26 @@ def environment_manifest(device: str) -> Dict:
 
 def dump_json(path: Path, payload) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as f:
-        json.dump(payload, f, indent=2, sort_keys=True)
+    with path.open("w", encoding="utf-8") as handle:
+        json.dump(payload, handle, indent=2, sort_keys=True)
+        handle.write("\n")
 
 
 def write_csv(path: Path, rows: List[Dict]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     if not rows:
-        return
-    fields, seen = [], set()
+        raise ValueError(f"Refusing to write empty CSV: {path}")
+    fields: List[str] = []
+    seen = set()
     for row in rows:
         for key in row:
             if key not in seen:
                 seen.add(key)
                 fields.append(key)
-    with path.open("w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=fields)
-        w.writeheader()
-        w.writerows(rows)
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer.writeheader()
+        writer.writerows(rows)
 
 
 def final_epoch_config(config: Dict) -> Dict:
@@ -131,47 +143,85 @@ def final_epoch_config(config: Dict) -> Dict:
     return cfg
 
 
-def validate_final_only_history(run: Dict) -> None:
-    evaluated_epochs = []
+def evaluated_epochs(run: Dict) -> List[int]:
+    epochs: List[int] = []
     for row in run["history"]:
-        if "survival_rate" in row and np.isfinite(row["survival_rate"]):
-            evaluated_epochs.append(int(row["epoch"]))
-    if evaluated_epochs != [EPOCHS]:
+        value = row.get("survival_rate")
+        if value is not None and np.isfinite(value):
+            epochs.append(int(row["epoch"]))
+    return epochs
+
+
+def validate_final_only_history(run: Dict) -> None:
+    epochs = evaluated_epochs(run)
+    if epochs != [EPOCHS]:
         raise RuntimeError(
             f"Protocol violation for {run['name']} seed {run['seed']}: "
-            f"evaluator used at {evaluated_epochs}; expected [{EPOCHS}]."
+            f"benchmark evaluator used at {epochs}; expected [{EPOCHS}]."
         )
 
 
-def attach_provenance(run: Dict, result_root: Path, method_folder: str,
-                      dataset_name: str, config: Dict, env: Dict) -> None:
+def attach_provenance(
+    run: Dict,
+    result_root: Path,
+    method_folder: str,
+    dataset_name: str,
+    config: Dict,
+    env: Dict,
+) -> None:
     seed_dir = result_root / method_folder / f"seed_{run['seed']}"
-    dump_json(seed_dir / "provenance.json", {
-        "dataset": dataset_name,
-        "method": run["name"],
-        "seed": int(run["seed"]),
-        "training_epochs": EPOCHS,
-        "checkpoint_rule": "pre-specified final epoch",
-        "checkpoint_epoch": EPOCHS,
-        "benchmark_evaluation_used_for_model_selection": False,
-        "headline_seed_selection": False,
-        "config": config,
-        "environment": env,
-    })
+    dump_json(
+        seed_dir / "provenance.json",
+        {
+            "dataset": dataset_name,
+            "method": run["name"],
+            "seed": int(run["seed"]),
+            "training_epochs": EPOCHS,
+            "checkpoint_rule": "pre-specified final epoch",
+            "checkpoint_epoch": EPOCHS,
+            "benchmark_evaluation_used_for_model_selection": False,
+            "headline_seed_selection": False,
+            "evaluated_epochs": evaluated_epochs(run),
+            "config": config,
+            "environment": env,
+        },
+    )
 
 
 def aggregate_runs(run_groups: Dict[str, List[Dict]]) -> Dict:
-    return {name: aggregate_seed_metrics(runs) for name, runs in run_groups.items()}
+    """Aggregate only scientifically interpretable metrics.
+
+    ``convergence_epoch_95`` is intentionally excluded because the fixed-schedule
+    protocol evaluates benchmark return only at epoch 1000, so no intermediate
+    benchmark-evaluation curve exists from which convergence can be estimated.
+    """
+    result: Dict[str, Dict] = {}
+    for name, runs in run_groups.items():
+        cleaned = []
+        for run in runs:
+            copy_run = dict(run)
+            copy_run["metrics"] = {
+                k: v
+                for k, v in run["metrics"].items()
+                if k != "convergence_epoch_95"
+            }
+            cleaned.append(copy_run)
+        summary = aggregate_seed_metrics(cleaned)
+        summary.pop("convergence_epoch_95", None)
+        result[name] = summary
+    return result
 
 
 def raw_seed_rows(run_groups: Dict[str, List[Dict]]) -> List[Dict]:
-    rows = []
+    rows: List[Dict] = []
     for name, runs in run_groups.items():
         for run in runs:
             row = {"method": name, "seed": int(run["seed"])}
-            for k, v in run["metrics"].items():
-                if isinstance(v, (int, float, np.integer, np.floating, bool)):
-                    row[k] = float(v)
+            for key, value in run["metrics"].items():
+                if key == "convergence_epoch_95":
+                    continue
+                if isinstance(value, (int, float, np.integer, np.floating, bool)):
+                    row[key] = float(value)
             rows.append(row)
     return rows
 
@@ -227,18 +277,24 @@ def posthoc_masked_voac(benchmark, voac_run: Dict) -> Dict:
     }
 
 
-def paired_summary(a_runs: List[Dict], b_runs: List[Dict], a_name: str, b_name: str) -> Dict:
-    a = {int(r["seed"]): r for r in a_runs}
-    b = {int(r["seed"]): r for r in b_runs}
+def paired_summary(
+    a_runs: List[Dict], b_runs: List[Dict], a_name: str, b_name: str
+) -> Dict:
+    a = {int(run["seed"]): run for run in a_runs}
+    b = {int(run["seed"]): run for run in b_runs}
     if set(a) != set(b):
         raise RuntimeError(f"Paired seeds differ: {sorted(a)} vs {sorted(b)}")
 
     numeric_sets = []
-    for r in a_runs + b_runs:
-        numeric_sets.append({
-            k for k, v in r["metrics"].items()
-            if isinstance(v, (int, float, np.integer, np.floating))
-        })
+    for run in a_runs + b_runs:
+        numeric_sets.append(
+            {
+                key
+                for key, value in run["metrics"].items()
+                if key != "convergence_epoch_95"
+                and isinstance(value, (int, float, np.integer, np.floating))
+            }
+        )
     metric_names = sorted(set.intersection(*numeric_sets))
 
     out = {
@@ -248,12 +304,13 @@ def paired_summary(a_runs: List[Dict], b_runs: List[Dict], a_name: str, b_name: 
     }
     for metric in metric_names:
         diffs = [
-            float(a[s]["metrics"][metric]) - float(b[s]["metrics"][metric])
-            for s in sorted(a)
+            float(a[seed]["metrics"][metric])
+            - float(b[seed]["metrics"][metric])
+            for seed in sorted(a)
         ]
         out["metrics"][metric] = {
             "per_seed_difference": diffs,
-            **mean_ci95(diffs)
+            **mean_ci95(diffs),
         }
     return out
 
@@ -292,53 +349,60 @@ def ablation_variants(level: str) -> List[Dict]:
         },
     ]
     if level == "full":
-        variants.extend([
-            {
-                "name": "LAADAN without expert KL",
-                "folder": "no_expert_kl",
-                "use_action_mask": True,
-                "use_conservative": True,
-                "use_expert_kl": False,
-                "use_smoothness": True,
-                "use_lagrangian": True,
-                "train_cost_head": True,
-            },
-            {
-                "name": "LAADAN without smoothness proxy",
-                "folder": "no_smoothness",
-                "use_action_mask": True,
-                "use_conservative": True,
-                "use_expert_kl": True,
-                "use_smoothness": False,
-                "use_lagrangian": True,
-                "train_cost_head": True,
-            },
-            {
-                "name": "LAADAN without Lagrangian cost control",
-                "folder": "no_lagrangian",
-                "use_action_mask": True,
-                "use_conservative": True,
-                "use_expert_kl": True,
-                "use_smoothness": True,
-                "use_lagrangian": False,
-                "train_cost_head": True,
-            },
-            {
-                "name": "LAADAN without action mask",
-                "folder": "no_mask",
-                "use_action_mask": False,
-                "use_conservative": True,
-                "use_expert_kl": True,
-                "use_smoothness": True,
-                "use_lagrangian": True,
-                "train_cost_head": True,
-            },
-        ])
+        variants.extend(
+            [
+                {
+                    "name": "LAADAN without expert KL",
+                    "folder": "no_expert_kl",
+                    "use_action_mask": True,
+                    "use_conservative": True,
+                    "use_expert_kl": False,
+                    "use_smoothness": True,
+                    "use_lagrangian": True,
+                    "train_cost_head": True,
+                },
+                {
+                    "name": "LAADAN without smoothness proxy",
+                    "folder": "no_smoothness",
+                    "use_action_mask": True,
+                    "use_conservative": True,
+                    "use_expert_kl": True,
+                    "use_smoothness": False,
+                    "use_lagrangian": True,
+                    "train_cost_head": True,
+                },
+                {
+                    "name": "LAADAN without Lagrangian cost control",
+                    "folder": "no_lagrangian",
+                    "use_action_mask": True,
+                    "use_conservative": True,
+                    "use_expert_kl": True,
+                    "use_smoothness": True,
+                    "use_lagrangian": False,
+                    "train_cost_head": True,
+                },
+                {
+                    "name": "LAADAN without action mask",
+                    "folder": "no_mask",
+                    "use_action_mask": False,
+                    "use_conservative": True,
+                    "use_expert_kl": True,
+                    "use_smoothness": True,
+                    "use_lagrangian": True,
+                    "train_cost_head": True,
+                },
+            ]
+        )
     return variants
 
 
-def run_dataset(data_dir: Path, output_dir: Path, dataset_name: str,
-                device: str, run_ablations: str) -> None:
+def run_dataset(
+    data_dir: Path,
+    output_dir: Path,
+    dataset_name: str,
+    device: str,
+    run_ablations: str,
+) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     env = environment_manifest(device)
     dump_json(output_dir / "environment.json", env)
@@ -347,12 +411,7 @@ def run_dataset(data_dir: Path, output_dir: Path, dataset_name: str,
         str(data_dir), horizon=50, device=device, use_one_hot_states=False
     )
     benchmark.save_benchmark_description(str(output_dir / "benchmark_description.json"))
-
-    hashes = {}
-    for p in sorted(data_dir.glob("*")):
-        if p.is_file():
-            hashes[p.name] = sha256_file(p)
-    dump_json(output_dir / "data_sha256.json", hashes)
+    dump_json(output_dir / "data_sha256.json", recursive_sha256_manifest(data_dir))
 
     base = deepcopy(DEFAULT_CONFIG)
     main_cfg = {
@@ -361,12 +420,16 @@ def run_dataset(data_dir: Path, output_dir: Path, dataset_name: str,
         "voac": final_epoch_config(base["voac"]),
         "laadan_ac": final_epoch_config(base["laadan_ac"]),
     }
-    dump_json(output_dir / "fixed_schedule_config.json", {
-        "seeds": SEEDS,
-        "epochs": EPOCHS,
-        "checkpoint_rule": "final_epoch",
-        "configs": main_cfg,
-    })
+    dump_json(
+        output_dir / "fixed_schedule_config.json",
+        {
+            "seeds": SEEDS,
+            "epochs": EPOCHS,
+            "checkpoint_rule": "final_epoch",
+            "benchmark_evaluation_used_for_model_selection": False,
+            "configs": main_cfg,
+        },
+    )
 
     groups: Dict[str, List[Dict]] = {
         "Behavior Cloning": [],
@@ -382,10 +445,12 @@ def run_dataset(data_dir: Path, output_dir: Path, dataset_name: str,
         bc = train_behavior_cloning(benchmark, seed, str(main_root), main_cfg["bc"])
         cql = train_cql(benchmark, seed, str(main_root), main_cfg["cql"])
         voac = train_voac(benchmark, seed, str(main_root), main_cfg["voac"])
-        laadan = train_laadan_ac(benchmark, seed, str(main_root), main_cfg["laadan_ac"])
+        laadan = train_laadan_ac(
+            benchmark, seed, str(main_root), main_cfg["laadan_ac"]
+        )
 
-        for r in (bc, cql, voac, laadan):
-            validate_final_only_history(r)
+        for run in (bc, cql, voac, laadan):
+            validate_final_only_history(run)
 
         posthoc = posthoc_masked_voac(benchmark, voac)
 
@@ -398,20 +463,28 @@ def run_dataset(data_dir: Path, output_dir: Path, dataset_name: str,
         attach_provenance(bc, main_root, "bc", dataset_name, main_cfg["bc"], env)
         attach_provenance(cql, main_root, "cql", dataset_name, main_cfg["cql"], env)
         attach_provenance(voac, main_root, "voac", dataset_name, main_cfg["voac"], env)
-        attach_provenance(laadan, main_root, "laadan_ac", dataset_name, main_cfg["laadan_ac"], env)
+        attach_provenance(
+            laadan, main_root, "laadan_ac", dataset_name, main_cfg["laadan_ac"], env
+        )
 
-        ph_dir = output_dir / "posthoc_masked_voac" / f"seed_{seed}"
-        dump_json(ph_dir / "metrics.json", posthoc["metrics"])
-        dump_json(ph_dir / "provenance.json", {
-            "dataset": dataset_name,
-            "seed": seed,
-            "source_voac_checkpoint": str(main_root / "voac" / f"seed_{seed}" / "model.pt"),
-            "source_voac_training_rule": "final_epoch",
-            "mask_applied_during_training": False,
-            "mask_applied_at_evaluation": True,
-            "parameters_updated_during_posthoc_evaluation": False,
-            "environment": env,
-        })
+        posthoc_dir = output_dir / "posthoc_masked_voac" / f"seed_{seed}"
+        dump_json(posthoc_dir / "metrics.json", posthoc["metrics"])
+        dump_json(
+            posthoc_dir / "provenance.json",
+            {
+                "dataset": dataset_name,
+                "seed": seed,
+                "source_voac_checkpoint": str(
+                    main_root / "voac" / f"seed_{seed}" / "model.pt"
+                ),
+                "source_voac_training_rule": "pre-specified final epoch",
+                "source_voac_checkpoint_epoch": EPOCHS,
+                "mask_applied_during_training": False,
+                "mask_applied_at_evaluation": True,
+                "parameters_updated_during_posthoc_evaluation": False,
+                "environment": env,
+            },
+        )
 
     summary = aggregate_runs(groups)
     dump_json(output_dir / "aggregate" / "main_summary.json", summary)
@@ -423,14 +496,16 @@ def run_dataset(data_dir: Path, output_dir: Path, dataset_name: str,
         "LAADAN-AC",
         "Post-hoc Masked VOAC",
     )
-    dump_json(output_dir / "aggregate" / "paired_laadan_minus_posthoc_voac.json", paired)
+    dump_json(
+        output_dir / "aggregate" / "paired_laadan_minus_posthoc_voac.json", paired
+    )
 
     if run_ablations != "none":
-        abl_cfg = deepcopy(BASE_LAADAN_CONFIG)
-        abl_cfg["epochs"] = EPOCHS
-        abl_cfg["eval_every"] = FINAL_ONLY_EVAL_EVERY
+        ablation_cfg = deepcopy(BASE_LAADAN_CONFIG)
+        ablation_cfg["epochs"] = EPOCHS
+        ablation_cfg["eval_every"] = FINAL_ONLY_EVAL_EVERY
         experiment = BudgetedLagrangianExperiment(
-            benchmark, str(output_dir / "ablations"), abl_cfg
+            benchmark, str(output_dir / "ablations"), ablation_cfg
         )
         variants = ablation_variants(run_ablations)
         ablation_groups = experiment.run_variants(variants, SEEDS)
@@ -450,33 +525,43 @@ def run_dataset(data_dir: Path, output_dir: Path, dataset_name: str,
 
 
 def parse_args():
-    p = argparse.ArgumentParser()
-    p.add_argument("--icu-data", default="data/icu_sepsis")
-    p.add_argument("--eicu-data", default="data/eicu_demo_mdp")
-    p.add_argument("--output", default="results/fixed_schedule_2026")
-    p.add_argument("--device", choices=["cuda", "cpu", "auto"], default="auto")
-    p.add_argument("--datasets", choices=["icu", "both"], default="icu")
-    p.add_argument("--ablations", choices=["none", "core", "full"], default="core")
-    return p.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--icu-data", default="data/icu_sepsis")
+    parser.add_argument("--eicu-data", default="data/eicu_demo_mdp")
+    parser.add_argument("--output", default="results/fixed_schedule_2026")
+    parser.add_argument("--device", choices=["cuda", "cpu", "auto"], default="auto")
+    parser.add_argument("--datasets", choices=["icu", "eicu", "both"], default="icu")
+    parser.add_argument(
+        "--ablations", choices=["none", "core", "full"], default="core"
+    )
+    return parser.parse_args()
+
+
+def resolve_device(requested: str) -> str:
+    if requested == "auto":
+        return "cuda" if torch.cuda.is_available() else "cpu"
+    if requested == "cuda" and not torch.cuda.is_available():
+        raise RuntimeError("CUDA requested but unavailable.")
+    return requested
 
 
 def main():
     args = parse_args()
-    device = "cuda" if (args.device == "auto" and torch.cuda.is_available()) else args.device
-    if device == "auto":
-        device = "cpu"
-    if device == "cuda" and not torch.cuda.is_available():
-        raise RuntimeError("CUDA requested but unavailable.")
-
+    device = resolve_device(args.device)
     out = Path(args.output)
-    run_dataset(
-        Path(args.icu_data),
-        out / "icu_sepsis",
-        "ICU-Sepsis",
-        device,
-        args.ablations,
-    )
-    if args.datasets == "both":
+
+    if args.datasets in {"icu", "both"}:
+        run_dataset(
+            Path(args.icu_data),
+            out / "icu_sepsis",
+            "ICU-Sepsis",
+            device,
+            args.ablations,
+        )
+
+    if args.datasets in {"eicu", "both"}:
+        # eICU is an exploratory cross-source portability check. By default we
+        # recommend no eICU ablations; callers can explicitly request them.
         run_dataset(
             Path(args.eicu_data),
             out / "eicu_demo",
