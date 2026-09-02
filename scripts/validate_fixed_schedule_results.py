@@ -14,7 +14,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
-from typing import Dict, Iterable, List, Sequence
+from typing import Dict, List, Sequence
 
 import numpy as np
 
@@ -37,7 +37,17 @@ FULL_ABLATION_FOLDERS = {
     "no_mask",
 }
 CORE_ABLATION_FOLDERS = {"full_laadan_ac", "mask_only", "no_conservative"}
-T_CRIT_95 = {2: 12.706, 3: 4.303, 4: 3.182, 5: 2.776, 6: 2.571, 7: 2.447, 8: 2.365, 9: 2.306, 10: 2.262}
+T_CRIT_95 = {
+    2: 12.706,
+    3: 4.303,
+    4: 3.182,
+    5: 2.776,
+    6: 2.571,
+    7: 2.447,
+    8: 2.365,
+    9: 2.306,
+    10: 2.262,
+}
 
 
 def load_json(path: Path):
@@ -209,8 +219,12 @@ def validate_paired_summary(root: Path, grouped: Dict[str, List[Dict[str, str]]]
         raise AssertionError(f"Paired summary has wrong seeds: {saved['seeds']}")
 
     laadan = {int(row["seed"]): numeric_row(row) for row in grouped["LAADAN-AC"]}
-    posthoc = {int(row["seed"]): numeric_row(row) for row in grouped["Post-hoc Masked VOAC"]}
-    common_metrics = sorted(set.intersection(*(set(v) for v in list(laadan.values()) + list(posthoc.values()))))
+    posthoc = {
+        int(row["seed"]): numeric_row(row) for row in grouped["Post-hoc Masked VOAC"]
+    }
+    common_metrics = sorted(
+        set.intersection(*(set(v) for v in list(laadan.values()) + list(posthoc.values())))
+    )
 
     for metric in common_metrics:
         diffs = [laadan[seed][metric] - posthoc[seed][metric] for seed in SEEDS]
@@ -251,7 +265,6 @@ def validate_ablations(root: Path, expected_level: str) -> None:
         for row in method_rows:
             numeric_row(row)
 
-    # Verify expected seed directories independent of display names.
     ablation_root = root / "ablations" / "lagrangian_frontier"
     for folder in sorted(folders):
         for seed in SEEDS:
@@ -263,12 +276,18 @@ def validate_ablations(root: Path, expected_level: str) -> None:
 
 def validate_figures(root: Path, minimum_count: int = 5) -> None:
     figure_dir = root / "figures"
+    if not figure_dir.is_dir():
+        raise AssertionError(f"Missing figure directory: {figure_dir}")
     figures = sorted(figure_dir.glob("*.png"))
     if len(figures) < minimum_count:
         raise AssertionError(
             f"Expected at least {minimum_count} PNG figures in {figure_dir}, found {len(figures)}"
         )
-    non_png = [path for path in figure_dir.iterdir() if path.is_file() and path.suffix.lower() != ".png"]
+    non_png = [
+        path
+        for path in figure_dir.iterdir()
+        if path.is_file() and path.suffix.lower() != ".png"
+    ]
     if non_png:
         raise AssertionError(f"Unexpected non-PNG figures: {non_png}")
 
@@ -277,7 +296,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", default="results/fixed_schedule_2026/icu_sepsis")
     parser.add_argument("--data-dir", default="data/icu_sepsis")
-    parser.add_argument("--ablations", choices=["none", "core", "full"], default="core")
+    parser.add_argument("--ablations", choices=["none", "core", "full"], default="full")
     parser.add_argument("--skip-figures", action="store_true")
     return parser.parse_args()
 
