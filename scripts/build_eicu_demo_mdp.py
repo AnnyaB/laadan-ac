@@ -1,77 +1,42 @@
 
-# build_eicu_demo_mdp.py
-
-
-# This script converts the official eICU Collaborative Research Database Demo
-# into a small tabular Markov Decision Process (MDP) that follows the same file
-# layout as the ICU-Sepsis benchmark used in this experiment.
-
-
-#  note:
-# This script creates a small real-data cross-source portability task. It is not
-# intended to replace full external clinical validation. The aim is to test
-# whether the BC, CQL-inspired, VOAC, and LAADAN-AC pipeline can be reused on a
-# second ICU trajectory source with the same evaluation interface.
-
-# argparse is used to read command-line options.
 import argparse
 
-# json is used to save transparent metadata for reproducibility.
 import json
 
-# os is used to create folders and build file paths.
 import os
 
-# re is used for simple keyword-based treatment-action grouping.
 import re
 
-# sqlite3 is used to read the downloaded eICU demo SQLite database.
 import sqlite3
 
-# numpy is used for numerical arrays and probability matrices.
 import numpy as np
 
-# pandas is used for table loading, cleaning, grouping and CSV writing.
 import pandas as pd
 
-# scikit-learn is used only for standardisation and clustering of hourly states.
 from sklearn.cluster import MiniBatchKMeans
 from sklearn.preprocessing import StandardScaler
 
 
 class CSVTemplateWriter:
-    """
-    Writes MDP files in a format compatible with the existing project.
-    """
+
 
     def __init__(self, template_dir):
-        """
-        Store the template directory.
 
-        If the template directory is missing, the writer falls back to a simple
-        dense CSV format that is easy for the benchmark loader to parse.
-        """
         self.template_dir = template_dir
 
     def template_path(self, filename):
-        """
-        Build the full path to a template file.
-        """
+
         if self.template_dir is None:
             return None
         return os.path.join(self.template_dir, filename)
 
     def file_exists(self, filename):
-        """
-        Check whether a matching template file exists.
-        """
+
         path = self.template_path(filename)
         return path is not None and os.path.exists(path)
 
     def first_non_empty_line(self, path):
-        """
-        Return the first non-empty line in a text file.
-        """
+
         with open(path, "r", encoding="utf-8", errors="ignore") as handle:
             for line in handle:
                 stripped = line.strip()
@@ -80,45 +45,24 @@ class CSVTemplateWriter:
         return ""
 
     def has_header(self, path):
-        """
-        Estimate whether a CSV file has a header by checking the first line.
-        """
+
         first = self.first_non_empty_line(path)
         return any(character.isalpha() for character in first)
 
     def write_vector(self, path, values, template_filename=None, column_name="value"):
-        """
-        Write a one-dimensional numeric vector with no CSV header.
 
-        The existing benchmark loader reads this file with numpy.loadtxt, so
-        rewardFunction.csv and initialStateDistribution.csv must contain numbers
-        only. Header names such as "reward" or "probability" would make loading
-        fail.
-        """
         values = np.asarray(values, dtype=float).reshape(-1, 1)
         frame = pd.DataFrame(values)
         frame.to_csv(path, index=False, header=False)
 
     def write_matrix(self, path, matrix, template_filename=None):
-        """
-        Write a two-dimensional numeric matrix with no CSV header.
 
-        The existing benchmark loader reads expertPolicy.csv and
-        stateClusterCenters.csv with numpy.loadtxt, so these files must contain
-        numbers only.
-        """
         matrix = np.asarray(matrix, dtype=float)
         frame = pd.DataFrame(matrix)
         frame.to_csv(path, index=False, header=False)
 
     def transition_format(self):
-        """
-        Detect the transitionFunction.csv format used by the template.
 
-        Supported formats:
-        - sparse: columns contain state/action/next_state/probability values.
-        - dense: rows are state-action pairs and columns are next-state probabilities.
-        """
         if not self.file_exists("transitionFunction.csv"):
             return "dense"
 
@@ -135,12 +79,7 @@ class CSVTemplateWriter:
         return "dense"
 
     def write_transition(self, path, transition):
-        """
-        Write transition probabilities in the detected format.
 
-        transition has shape:
-        number of states × number of actions × number of states
-        """
         transition = np.asarray(transition, dtype=float)
         num_states, num_actions, _ = transition.shape
         fmt = self.transition_format()
@@ -168,15 +107,7 @@ class CSVTemplateWriter:
         frame.to_csv(path, index=False, header=False)
 
     def admissible_format(self):
-        """
-        Detect how admissibleActions.txt is written in the template.
 
-        Supported formats:
-        - colon_list: state: a,b,c
-        - csv_pairs: state,action pairs, one per line
-        - csv_list: state,action1,action2,...
-        - space_list: state action1 action2 ...
-        """
         if not self.file_exists("admissibleActions.txt"):
             return "space_list"
 
@@ -196,9 +127,7 @@ class CSVTemplateWriter:
         return "space_list"
 
     def write_admissible_actions(self, path, admissible_mask):
-        """
-        Write admissible actions in the detected template style.
-        """
+
         admissible_mask = np.asarray(admissible_mask, dtype=bool)
         num_states, _ = admissible_mask.shape
         fmt = self.admissible_format()
@@ -223,44 +152,20 @@ class CSVTemplateWriter:
 
 
 class EICUDemoMDPBuilder:
-    """
-    Converts eICU-CRD Demo clinical tables into a compact tabular MDP.
-
-    The design deliberately favours transparency over complexity:
-    - hourly ICU states are created from vital signs, selected labs and patient metadata;
-    - states are discretised using MiniBatchKMeans;
-    - clinician treatment records are mapped to a small set of treatment-intensity actions;
-    - expert policy and admissibility mask are estimated from empirical state-action support;
-    - terminal reward is based on hospital/unit discharge survival status.
-    """
 
     def __init__(self, args):
-        """
-        Store command-line arguments and initialise derived paths.
-        """
+
         self.args = args
         self.db_path = args.db_path
         self.output_dir = args.output_dir
         self.extras_dir = os.path.join(self.output_dir, "extras")
         self.writer = CSVTemplateWriter(args.template_dir)
 
-        # The first eICU adapter used five broad treatment categories. For the
-        # cross-domain portability experiment we default to an ICU-Sepsis-style
-        # 25-action grid, created from two clinically interpretable treatment axes.
-        # This gives the safe policies more than one supported action in many
-        # states, instead of collapsing all masked methods to the same action.
+
         self.action_names = self.build_action_names()
 
     def build_action_names(self):
-        """
-        Build the action-name dictionary used in the generated MDP.
 
-        The 25-action mode follows the same spirit as the ICU-Sepsis benchmark:
-        Each action is a combination of two discrete treatment dimensions.
-        The dimensions are not copied from ICU-Sepsis, because the eICU demo exposes
-        different treatment tables. Instead, they are estimated from real eICU
-        medication, infusion, treatment, and respiratory-care records.
-        """
         if int(self.args.action_grid) == 5:
             return {
                 0: "no_recorded_acute_treatment",
@@ -294,18 +199,7 @@ class EICUDemoMDPBuilder:
         return names
 
     def combine_action_axes(self, fluid_count, antibiotic_count, respiratory_count, vasopressor_count):
-        """
-        Converting hourly treatment counts into either 5 or 25 discrete actions.
 
-        In 25-action mode, the first axis describes haemodynamic support and the
-        second axis describes anti-infective/respiratory support. The action is:
-
-            action = 5 * haemodynamic_bin + support_bin
-
-        This is a real-data discretisation: all counts come from observed eICU
-        clinical records. It is still an approximation and should be described as
-        a portability MDP.
-        """
         fluid_count = int(fluid_count)
         antibiotic_count = int(antibiotic_count)
         respiratory_count = int(respiratory_count)
@@ -345,9 +239,7 @@ class EICUDemoMDPBuilder:
         return hemo_bin * 5 + support_bin
 
     def run(self):
-        """
-        Run the complete build pipeline.
-        """
+
         self.prepare_output_folders()
 
         print("[STEP 1] Loading patient outcomes...", flush=True)
@@ -379,34 +271,23 @@ class EICUDemoMDPBuilder:
         print("[DONE] Number of observed transitions:", mdp["num_observed_transitions"], flush=True)
 
     def prepare_output_folders(self):
-        """
-        Create output folders if they do not exist.
-        """
+
         os.makedirs(self.output_dir, exist_ok=True)
         os.makedirs(self.extras_dir, exist_ok=True)
 
     def connect(self):
-        """
-        Open a SQLite connection to the eICU demo database.
-        """
+
         if not os.path.exists(self.db_path):
             raise FileNotFoundError("Could not find SQLite database: " + self.db_path)
         return sqlite3.connect(self.db_path)
 
     def table_columns(self, connection, table_name):
-        """
-        Return all column names for a SQLite table.
-        """
+
         rows = connection.execute("PRAGMA table_info(" + table_name + ")").fetchall()
         return [row[1] for row in rows]
 
     def read_table(self, connection, table_name, preferred_columns=None):
-        """
-        Read a table using only the requested columns that actually exist.
 
-        This makes the script more robust to small schema differences between
-        eICU demo releases.
-        """
         columns = self.table_columns(connection, table_name)
 
         if preferred_columns is None:
@@ -421,12 +302,7 @@ class EICUDemoMDPBuilder:
         return pd.read_sql_query(sql, connection)
 
     def load_patients(self):
-        """
-        Load patient-level information and create a binary terminal outcome.
 
-        outcome = 1 means survival/alive discharge.
-        outcome = 0 means expired/death.
-        """
         with self.connect() as connection:
             patient = self.read_table(
                 connection,
@@ -468,9 +344,7 @@ class EICUDemoMDPBuilder:
         return patient
 
     def parse_age(self, value):
-        """
-        Convert eICU age strings into numeric values.
-        """
+
         if pd.isna(value):
             return np.nan
 
@@ -481,9 +355,7 @@ class EICUDemoMDPBuilder:
             return np.nan
 
     def infer_outcome(self, row):
-        """
-        Infer survival status from hospital or unit discharge status.
-        """
+
         fields = []
         for column in ["hospitaldischargestatus", "unitdischargestatus"]:
             if column in row and not pd.isna(row[column]):
@@ -500,12 +372,7 @@ class EICUDemoMDPBuilder:
         return np.nan
 
     def build_hourly_state_table(self, patients):
-        """
-        Build one state-feature row per patient-hour.
 
-        Vitals come from vitalperiodic. Selected labs are forward-filled within
-        each ICU stay, then merged onto the nearest patient-hour.
-        """
         with self.connect() as connection:
             vitals = self.read_table(
                 connection,
@@ -616,9 +483,7 @@ class EICUDemoMDPBuilder:
         return hourly
 
     def build_hourly_labs(self, labs):
-        """
-        Convert selected lab measurements into hourly wide features.
-        """
+
         if labs is None or len(labs) == 0:
             return None
 
@@ -687,17 +552,7 @@ class EICUDemoMDPBuilder:
         return merged
 
     def build_hourly_action_table(self, hourly_states):
-        """
-        Assign one treatment-action label to each patient-hour.
 
-        The improved default uses a 25-action ICU-Sepsis-style grid rather than
-        only five broad categories.
-
-        The 25-action grid keeps the task real-data-based while giving the agent
-        more supported choices:
-        - haemodynamic axis: none, low fluid, high fluid, vasopressor/cardiac, combined;
-        - support axis: none, antibiotic, respiratory, antibiotic+respiratory, high combined.
-        """
         base = hourly_states[["patientunitstayid", "hour"]].copy()
 
         action_events = self.load_action_events()
@@ -752,9 +607,7 @@ class EICUDemoMDPBuilder:
 
 
     def load_action_events(self):
-        """
-        Load medication, infusion and treatment records and map them to actions.
-        """
+
         frames = []
 
         with self.connect() as connection:
@@ -804,9 +657,7 @@ class EICUDemoMDPBuilder:
         return events
 
     def events_from_medication(self, medication):
-        """
-        Convert medication rows to action events.
-        """
+
         if medication is None or len(medication) == 0 or "drugname" not in medication.columns:
             return None
 
@@ -823,9 +674,7 @@ class EICUDemoMDPBuilder:
         return medication[["patientunitstayid", "hour", "action"]]
 
     def events_from_infusion(self, infusion):
-        """
-        Convert infusion rows to action events.
-        """
+
         if infusion is None or len(infusion) == 0 or "drugname" not in infusion.columns:
             return None
 
@@ -841,9 +690,7 @@ class EICUDemoMDPBuilder:
         return infusion[["patientunitstayid", "hour", "action"]]
 
     def events_from_treatment(self, treatment):
-        """
-        Convert treatment rows to action events.
-        """
+
         if treatment is None or len(treatment) == 0 or "treatmentstring" not in treatment.columns:
             return None
 
@@ -859,14 +706,7 @@ class EICUDemoMDPBuilder:
         return treatment[["patientunitstayid", "hour", "action"]]
 
     def read_respiratorycare_table(self, connection):
-        """
-        Read respiratory-care rows only when usable columns exist.
 
-        The eICU demo schema can differ from the full eICU schema. Some
-        releases do not expose respcarestatusoffset and airwaytype. In that
-        case, this function skips respiratorycare safely instead of stopping
-        the whole MDP build.
-        """
         columns = self.table_columns(connection, "respiratorycare")
 
         if "patientunitstayid" not in columns:
@@ -921,9 +761,7 @@ class EICUDemoMDPBuilder:
         return table[["patientunitstayid", "respiratory_offset", "respiratory_text"]]
 
     def events_from_respiratory(self, respiratory):
-        """
-        Convert respiratory-care rows to action events.
-        """
+
         if respiratory is None or len(respiratory) == 0:
             return None
 
@@ -949,9 +787,7 @@ class EICUDemoMDPBuilder:
         return respiratory[["patientunitstayid", "hour", "action"]]
 
     def classify_action_text(self, text):
-        """
-        Map a clinical text field to one of the five discrete action categories.
-        """
+
         if pd.isna(text):
             return 0
 
@@ -986,9 +822,7 @@ class EICUDemoMDPBuilder:
         return 0
 
     def merge_states_and_actions(self, hourly_states, hourly_actions, patients):
-        """
-        Merge hourly state features, action labels and terminal outcomes.
-        """
+
         records = hourly_states.merge(
             hourly_actions,
             on=["patientunitstayid", "hour"],
@@ -1006,9 +840,7 @@ class EICUDemoMDPBuilder:
         return records
 
     def feature_columns(self, records):
-        """
-        Return feature columns used for state clustering.
-        """
+
         excluded = {
             "patientunitstayid",
             "hour",
@@ -1019,9 +851,7 @@ class EICUDemoMDPBuilder:
         return [column for column in records.columns if column not in excluded]
 
     def cluster_states(self, records):
-        """
-        Standardise features and cluster patient-hours into discrete states.
-        """
+
         feature_columns = self.feature_columns(records)
         features = records[feature_columns].copy()
 
@@ -1051,9 +881,7 @@ class EICUDemoMDPBuilder:
         return records, centres_scaled
 
     def build_mdp_matrices(self, records, centres):
-        """
-        Estimate MDP matrices from clustered patient-hour records.
-        """
+
         num_nonterminal_states = int(centres.shape[0])
         death_state = num_nonterminal_states
         survival_state = num_nonterminal_states + 1
@@ -1128,12 +956,7 @@ class EICUDemoMDPBuilder:
         }
 
     def normalise_transitions(self, transition_counts):
-        """
-        Convert transition counts into transition probabilities.
 
-        Missing state-action rows are filled with self-loops so that every row is
-        a valid probability distribution.
-        """
         transition = transition_counts.copy()
         num_states, num_actions, _ = transition.shape
 
@@ -1148,9 +971,7 @@ class EICUDemoMDPBuilder:
         return transition
 
     def normalise_initial_distribution(self, initial_counts):
-        """
-        Convert initial-state counts into a probability distribution.
-        """
+
         total = initial_counts.sum()
         if total <= 0:
             initial_counts[0] = 1.0
@@ -1158,9 +979,7 @@ class EICUDemoMDPBuilder:
         return initial_counts / total
 
     def build_expert_policy(self, state_action_counts):
-        """
-        Estimate the expert policy from empirical clinician action frequencies.
-        """
+
         counts = state_action_counts.copy()
         num_states, num_actions = counts.shape
         expert = np.zeros((num_states, num_actions), dtype=float)
@@ -1175,16 +994,7 @@ class EICUDemoMDPBuilder:
         return expert
 
     def build_admissible_mask(self, state_action_counts):
-        """
-        Estimate admissible actions from empirical state-action support.
 
-        This version is less brittle than the first adapter. It marks actions as
-        admissible when they meet the minimum support threshold, but it also keeps
-        at least a small number of observed top actions per non-terminal state.
-        That makes the eICU portability MDP closer to ICU-Sepsis, where the mask
-        restricts unsafe actions but does not usually reduce every state to one
-        deterministic choice.
-        """
         counts = state_action_counts.copy()
         num_states, num_actions = counts.shape
         mask = np.zeros((num_states, num_actions), dtype=bool)
@@ -1215,9 +1025,7 @@ class EICUDemoMDPBuilder:
 
 
     def write_outputs(self, mdp):
-        """
-        Write all MDP files required by the existing training pipeline.
-        """
+
         transition_path = os.path.join(self.output_dir, "transitionFunction.csv")
         reward_path = os.path.join(self.output_dir, "rewardFunction.csv")
         initial_path = os.path.join(self.output_dir, "initialStateDistribution.csv")
@@ -1276,9 +1084,7 @@ class EICUDemoMDPBuilder:
 
 
 def parse_args():
-    """
-    Read command-line arguments.
-    """
+
     parser = argparse.ArgumentParser(
         description="Build a small ICU-Sepsis-style MDP from the eICU-CRD Demo SQLite database."
     )
@@ -1369,9 +1175,7 @@ def parse_args():
 
 
 def main():
-    """
-    Building the eICU demo portability MDP.
-    """
+
     args = parse_args()
 
     print("[INFO] Database:", args.db_path, flush=True)
@@ -1382,7 +1186,6 @@ def main():
     builder = EICUDemoMDPBuilder(args)
     builder.run()
 
-# Running main() only when this file is executed directly.
 if __name__ == "__main__":
     main()
 

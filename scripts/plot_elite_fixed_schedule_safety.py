@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 from __future__ import annotations
 
 import argparse
@@ -104,9 +104,6 @@ def main():
         constrained_layout=True,
     )
 
-    # ------------------------------------------------------------
-    # (a) State-level failure rate across all five fixed checkpoints
-    # ------------------------------------------------------------
     ax = axes[0, 0]
     state_metrics = [
         (
@@ -163,9 +160,6 @@ def main():
     ax.set_ylim(-1, 47)
     style_axis(ax)
 
-    # ------------------------------------------------------------
-    # (b) Action-level VOAC failures for predeclared seed 42
-    # ------------------------------------------------------------
     ax = axes[0, 1]
     voac_actions = actions[
         actions["model"] == "Vanilla Offline Actor-Critic"
@@ -205,9 +199,7 @@ def main():
     ax.legend(frameon=False, ncol=2, loc="upper left")
     style_axis(ax)
 
-    # ------------------------------------------------------------
-    # (c) Q-value separation at deterministic representative state
-    # ------------------------------------------------------------
+
     ax = axes[1, 0]
     representative_state = int(qvalues["state_id"].iloc[0])
     q = qvalues[
@@ -307,9 +299,6 @@ def main():
         loc="lower right",
     )
 
-    # ------------------------------------------------------------
-    # (d) Matched-initial-state trajectory for predeclared seed 42
-    # ------------------------------------------------------------
     ax = axes[1, 1]
 
     for model, color, label in [

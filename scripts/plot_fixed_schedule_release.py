@@ -1,9 +1,4 @@
-#!/usr/bin/env python3
-"""Generate the final 600-dpi fixed-schedule figures from frozen result files.
 
-No values are hard-coded. Every plotted point, bar, interval, and annotation is
-loaded from the released CSV/JSON result artifacts. Figures are saved as PNG only.
-"""
 from __future__ import annotations
 
 import argparse

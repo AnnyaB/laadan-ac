@@ -1,11 +1,18 @@
-#!/usr/bin/env python3
+
 from __future__ import annotations
+
 import argparse, csv, json, math
+
 from pathlib import Path
+
 from typing import Dict, List
+
 import numpy as np
+
 import matplotlib.pyplot as plt
+
 from matplotlib.lines import Line2D
+
 from matplotlib.patches import Patch
 
 plt.rcParams.update({

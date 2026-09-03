@@ -10,10 +10,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-# ---------------------------
-# Style
-# ---------------------------
-
 def set_pub_style():
     plt.rcParams.update({
         "font.family": "serif",
@@ -39,7 +35,6 @@ def set_pub_style():
     })
 
 
-# restrained, publication-like palette
 METHOD_COLORS = {
     "Behavior Cloning": "#B7C9DD",
     "CQL-regularised fitted-Q": "#6E9ED6",
@@ -57,9 +52,6 @@ METHOD_COLORS = {
 }
 
 
-# ---------------------------
-# I/O helpers
-# ---------------------------
 
 def load_json(path: Path):
     with open(path, "r", encoding="utf-8") as f:
@@ -94,9 +86,7 @@ def summary_arrays(summary, order, metric):
     return np.array(means, dtype=float), np.array(cis, dtype=float)
 
 
-# ---------------------------
-# Plotting helpers
-# ---------------------------
+
 
 def beautify_ax(ax):
     ax.grid(axis="y", zorder=0)
@@ -105,17 +95,7 @@ def beautify_ax(ax):
 
 
 def auto_ylim(vals, start_at_zero=True):
-    """
-    Robustly flatten arrays/lists of unequal lengths.
 
-    Inputs can contain:
-      - mean vectors
-      - CI vectors
-      - per-method seed lists
-
-    These are intentionally different lengths, so they must be
-    flattened independently before concatenation.
-    """
     pieces = []
 
     for value in vals:
@@ -141,7 +121,6 @@ def auto_ylim(vals, start_at_zero=True):
     ymin = 0.0 if start_at_zero else lo - pad
     ymax = hi + pad
 
-    # Avoid a degenerate zero-height axis.
     if ymax <= ymin:
         ymax = ymin + max(0.05, 0.05 * abs(ymin))
 
@@ -206,10 +185,6 @@ def savefig(fig, outpath: Path):
     plt.close(fig)
     print(f"PASS: {outpath}")
 
-
-# ---------------------------
-# Figure builders
-# ---------------------------
 
 def plot_main_icu(results_root: Path, outdir: Path):
     summary = load_json(results_root / "icu_sepsis" / "aggregate" / "main_summary.json")
@@ -332,10 +307,6 @@ def plot_eicu(results_root: Path, outdir: Path):
     )
     savefig(fig, outdir / "appendix" / "figA2_eicu_fixed_schedule_comparison.png")
 
-
-# ---------------------------
-# Main
-# ---------------------------
 
 def main():
     parser = argparse.ArgumentParser()

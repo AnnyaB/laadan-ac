@@ -1,11 +1,4 @@
-#!/usr/bin/env python3
-"""Freeze a machine-verifiable LAADAN-AC fixed-schedule result release.
 
-This script does not train models or alter metrics. It validates the already
-produced experiment tree, extracts paper-facing summaries from the frozen JSON
-and CSV artifacts, and writes a cryptographic manifest of every released file.
-Run it only after training, diagnostics, plotting, and validation have completed.
-"""
 from __future__ import annotations
 
 import argparse

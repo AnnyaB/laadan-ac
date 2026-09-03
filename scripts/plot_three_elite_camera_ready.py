@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 
 from __future__ import annotations
 
@@ -12,15 +12,9 @@ import pandas as pd
 from PIL import Image
 
 
-# ============================================================
-# Visual system
-# Inspired by the restrained Dreamweaver / LeWM figure language:
-# clear blue/red accents, light grids, black edges, compact panels.
-# ============================================================
-
-BLUE = "#4A90D9"        # LeWM-style blue
-RED = "#E84A3C"         # LeWM-style warm red
-ORANGE = "#F28E2B"      # Dreamweaver-style orange accent
+BLUE = "#4A90D9"
+RED = "#E84A3C"
+ORANGE = "#F28E2B"
 PURPLE = "#8F63C7"
 INK = "#202020"
 MID_GREY = "#AFAFAF"
@@ -57,10 +51,6 @@ plt.rcParams.update({
     "ps.fonttype": 42,
 })
 
-
-# ============================================================
-# Utilities
-# ============================================================
 
 def load_json(path: Path):
     with path.open("r", encoding="utf-8") as f:
@@ -135,9 +125,6 @@ def save_figure(fig, path: Path):
     )
 
 
-# ============================================================
-# Result mappings
-# ============================================================
 
 METHODS = [
     ("Behavior Cloning", "BC"),
@@ -160,18 +147,6 @@ def summary_value(summary, method, metric, percent=False):
 
     return mean, ci
 
-
-# ============================================================
-# FIGURE A1
-# ICU versus eICU
-#
-# Cleaner Dreamweaver-like grouped comparison:
-# - blue = ICU-Sepsis
-# - warm red = eICU
-# - compact panel titles
-# - no giant title
-# - restrained legend
-# ============================================================
 
 def plot_cross_source(root: Path, out: Path):
 
@@ -328,21 +303,6 @@ def plot_cross_source(root: Path, out: Path):
     save_figure(fig, out)
 
 
-# ============================================================
-# FIGURE B1
-# Policy-distribution diagnostics
-#
-# Replace ugly tall bars with clean seed-strip panels.
-#
-# Each panel:
-# - one red dot per real seed
-# - blue mean line
-# - pale blue 95% CI band
-# - metric-specific x-scale
-# - explicit mean value
-#
-# No misleading giant empty 0–100 y-axis.
-# ============================================================
 
 def plot_policy_diagnostics(root: Path, out: Path):
 
@@ -401,8 +361,6 @@ def plot_policy_diagnostics(root: Path, out: Path):
 
         span = float(values.max() - values.min())
 
-        # Keep the zoom scientifically readable while avoiding
-        # absurdly wide empty axes.
         padding = max(
             0.40,
             span * 2.2,
@@ -424,7 +382,6 @@ def plot_policy_diagnostics(root: Path, out: Path):
             lo = max(0.0, centre - 0.45)
             hi = min(100.0, centre + 0.45)
 
-        # 95% CI band for seed mean
         ax.axvspan(
             mean - ci,
             mean + ci,
@@ -507,19 +464,6 @@ def plot_policy_diagnostics(root: Path, out: Path):
     save_figure(fig, out)
 
 
-# ============================================================
-# FIGURE 3
-# Paired LAADAN vs post-hoc masked VOAC
-#
-# Dreamweaver-like 2 × 2 panel composition.
-#
-# - post-hoc = warm red
-# - LAADAN = clean blue
-# - thin gray lines = exact paired seed
-# - larger diamonds = mean
-# - error bars = 95% CI across seeds
-# ============================================================
-
 def plot_paired(root: Path, out: Path):
 
     csv_path = (
@@ -594,7 +538,6 @@ def plot_paired(root: Path, out: Path):
         y0 = post[metric].astype(float).to_numpy()
         y1 = laadan[metric].astype(float).to_numpy()
 
-        # Individual paired seeds
         for idx in range(5):
             ax.plot(
                 [0, 1],
@@ -605,7 +548,6 @@ def plot_paired(root: Path, out: Path):
                 zorder=1,
             )
 
-        # Seed points
         ax.scatter(
             np.zeros(5),
             y0,
@@ -626,7 +568,6 @@ def plot_paired(root: Path, out: Path):
             zorder=4,
         )
 
-        # Means + seed CIs
         mean0, ci0 = mean_ci95(y0)
         mean1, ci1 = mean_ci95(y1)
 
@@ -722,7 +663,7 @@ def plot_paired(root: Path, out: Path):
 
         style_axis(ax)
 
-    # Small elegant legend.
+
     legend_handles = [
         plt.Line2D(
             [],
@@ -775,9 +716,6 @@ def plot_paired(root: Path, out: Path):
     save_figure(fig, out)
 
 
-# ============================================================
-# Main
-# ============================================================
 
 def parse_args():
     parser = argparse.ArgumentParser()
