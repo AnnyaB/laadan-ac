@@ -30,7 +30,7 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 from benchmark import ICUSepsisOfflineBenchmark  # noqa: E402
-from lagrangian_frontier import BASE_LAADAN_CONFIG, BudgetedLagrangianExperiment  # noqa: E402
+from ablation_engine import BASE_LAADAN_CONFIG, BudgetedLagrangianExperiment  # noqa: E402
 from run_fixed_schedule import (  # noqa: E402
     EPOCHS,
     FINAL_ONLY_EVAL_EVERY,
