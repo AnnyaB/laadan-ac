@@ -1,3 +1,5 @@
+<a id="top"></a>
+
 <div align="center">
 
 # LAADAN-AC
@@ -108,7 +110,7 @@ The experiments were run with Python 3.12.13, NumPy 2.0.2, PyTorch 2.10.0+cu128,
 The repository includes the processed MDP files used by the released experiments.
 
 | Dataset | States | Actions | Feature dim. | Role |
-|---|---:|---:|---:|---|
+|---|---:|---:|---:|---:|
 | ICU-Sepsis | 716 | 25 | 47 | Main benchmark |
 | eICU-CRD Demo MDP | 202 | 25 | 22 | Exploratory cross-source portability |
 
@@ -193,3 +195,9 @@ The citation metadata is also available in [`CITATION.bib`](CITATION.bib) and [`
 ## Contact
 
 For questions about the code or reproducibility, please open a GitHub issue.
+
+<br>
+
+<p align="center">
+  <a href="#top"><b>↑ Back to top</b></a>
+</p>
