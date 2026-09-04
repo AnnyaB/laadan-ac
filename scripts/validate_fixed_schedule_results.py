@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
-"""Integrity checks for LAADAN-AC fixed-schedule experiment releases.
-
-The validator recomputes aggregate summaries from per-seed files, verifies the
-pre-specified final-checkpoint protocol, checks paired-seed correspondence,
-validates the recursive data manifest, and confirms that expected artifacts are
-present without relying on manuscript tables or README numbers.
-"""
+"""Validate fixed-schedule artifacts, aggregates, and checkpoint-level reproducibility invariants."""
 from __future__ import annotations
 
 import argparse

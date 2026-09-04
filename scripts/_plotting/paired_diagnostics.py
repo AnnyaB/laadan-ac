@@ -1,3 +1,5 @@
+"""Render the paired, cross-source, and policy-diagnostic camera-ready figures."""
+
 
 
 from __future__ import annotations

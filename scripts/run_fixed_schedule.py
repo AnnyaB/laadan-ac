@@ -1,21 +1,5 @@
 #!/usr/bin/env python3
-"""Fixed-schedule experiments for LAADAN-AC.
-
-This runner imports the baseline implementation and writes results under a
-separate fixed-schedule result root.
-
-Fixed-checkpoint protocol
--------------------------
-The baseline trainers save and restore the best checkpoint whenever benchmark
-evaluation is performed. To prevent benchmark metrics from selecting the
-reported checkpoint in these runs, ``eval_every`` is set larger than the
-training horizon. The trainer still evaluates at the predetermined final epoch,
-so epoch 1000 is the only checkpoint eligible for headline reporting.
-
-This is an implementation choice for the fixed-schedule analysis; it should not
-be interpreted as a general requirement that intermediate diagnostic evaluation
-is invalid.
-"""
+"""Run the predetermined fixed-schedule protocol without evaluator-based model selection."""
 
 from __future__ import annotations
 

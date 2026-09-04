@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""Shared LAADAN-AC ablation engine used by the fixed-schedule experiments."""
+
 from __future__ import annotations
 
 import os

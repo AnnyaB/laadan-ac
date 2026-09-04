@@ -1,3 +1,5 @@
+"""Freeze validated fixed-schedule artifacts and record release provenance."""
+
 
 from __future__ import annotations
 

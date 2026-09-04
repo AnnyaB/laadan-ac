@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
+"""Fixed experiment configurations used by the camera-ready schedule."""
+
 from __future__ import annotations
 
 DEFAULT_CONFIG = {
-    
+
     # Finite evaluation horizon used by the benchmark dynamic-programming
     # evaluator and Monte Carlo simulator.
     "horizon": 50,
 
     # Whether to use exact one-hot state IDs or released cluster-centre features.
     # False means: use the benchmark's continuous state-centre representation.
-    "use_one_hot_states": False, 
- 
+    "use_one_hot_states": False,
+
 
     # Random seeds used for multi-seed reporting.
     "seeds": [42, 43, 44, 45, 46],
@@ -24,8 +26,8 @@ DEFAULT_CONFIG = {
         "hidden_dim": 128,       # first hidden layer width
         "latent_dim": 128,       # latent representation width
         "eval_every": 10,        # evaluate every 10 epochs
-        "entropy_bonus": 0.0,    # optional entropy encouragement, because entropy_bonus = 0.0, 
-                                 # it simply learns to copy the expert action labels as closely as possible. 
+        "entropy_bonus": 0.0,    # optional entropy encouragement, because entropy_bonus = 0.0,
+                                 # it simply learns to copy the expert action labels as closely as possible.
                                  # It is not being encouraged to explore or stay soft.
     },
 
@@ -44,9 +46,9 @@ DEFAULT_CONFIG = {
         "tau": 0.02,             # target network moves 2% toward main network each update
     },
 
- 
+
     # VOAC ablation config
-   
+
     "voac": {
         "epochs": 1000,
         "actor_lr": 1e-3,        # actor optimiser learning rate
@@ -60,7 +62,7 @@ DEFAULT_CONFIG = {
         "entropy_coef": 0.02,    # encourages a softer/spread-out policy
     },
 
-  
+
     # LAADAN-AC proposed model config
 
     "laadan_ac": {
@@ -81,8 +83,8 @@ DEFAULT_CONFIG = {
         "lagrange_lr": 0.0002,       # update rate for Lagrange multiplier
         "lagrange_init": 0.0,        # Lagrange multiplier starts at zero
     },
-    
-    # LAADAN-AC uses actor-critic learning but adds safety mechanisms: masking, conservative critics, 
+
+    # LAADAN-AC uses actor-critic learning but adds safety mechanisms: masking, conservative critics,
     # expert regularisation, smoothness cost and a Lagrangian cost penalty.
 
     # Hyperparameter sensitivity study for LAADAN-AC.
@@ -92,5 +94,5 @@ DEFAULT_CONFIG = {
         "expert_kl_weight": [0.002, 0.005, 0.010],
         "smoothness_weight": [0.0005, 0.001, 0.002],
     },
-    
+
 }

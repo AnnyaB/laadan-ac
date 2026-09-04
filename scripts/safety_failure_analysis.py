@@ -1,3 +1,5 @@
+"""Utilities for state-, action-, value-, and trajectory-level policy diagnostics."""
+
 # safety_failure_analysis.py
 
 # This script performs the safety-failure analysis for the
@@ -1109,7 +1111,7 @@ def main():
     print("[DONE] Safety-failure analysis saved to:", output_dir, flush=True)
     for key in sorted(files.keys()):
         print("[FILE]", key + ":", files[key], flush=True)
-        
+
 # Running the script only when this file is executed directly.
 if __name__ == "__main__":
     main()

@@ -1,3 +1,5 @@
+"""Neural policy and value models used by the offline-RL baselines and LAADAN-AC."""
+
 
 import torch
 

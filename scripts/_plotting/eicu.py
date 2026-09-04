@@ -1,3 +1,5 @@
+"""Render the final eICU fixed-schedule comparison figure."""
+
 from __future__ import annotations
 
 import argparse

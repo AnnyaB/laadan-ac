@@ -1,3 +1,5 @@
+"""Render the fixed-schedule safety-diagnostic figure from frozen tables."""
+
 
 from __future__ import annotations
 

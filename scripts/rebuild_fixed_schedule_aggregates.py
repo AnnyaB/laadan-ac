@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
-"""Rebuild fixed-schedule aggregate artifacts from saved per-seed metrics only.
-
-Use this after a result-tree cleanup or protocol-metadata correction. It never
-retrains models and never invokes the benchmark evaluator. The script removes the
-non-interpretable ``convergence_epoch_95`` field from final-only runs, recomputes
-five-seed summaries, recomputes the paired LAADAN-minus-post-hoc comparison, and
-optionally refreshes the recursive data hash manifest.
-"""
+"""Rebuild aggregate metrics from frozen per-seed fixed-schedule outputs."""
 from __future__ import annotations
 
 import argparse

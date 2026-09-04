@@ -1,16 +1,5 @@
 #!/usr/bin/env python3
-"""Complete the ICU-Sepsis fixed-schedule leave-one-out ablation suite.
-
-This script is intentionally separate from the main fixed-schedule runner so the
-already frozen BC/CQL/VOAC/LAADAN headline runs are not retrained. By default it
-runs only the four leave-one-out variants that were not part of the initial core
-reviewer-response experiment, then rebuilds the complete seven-variant aggregate
-files from metrics saved on disk.
-
-The full LAADAN-AC row is taken directly from the already frozen main
-``main_fixed_schedule/laadan_ac`` runs. It is not redundantly retrained as an
-"ablation" variant.
-"""
+"""Run fixed-schedule LAADAN-AC component ablations at the predetermined final checkpoint."""
 from __future__ import annotations
 
 import argparse

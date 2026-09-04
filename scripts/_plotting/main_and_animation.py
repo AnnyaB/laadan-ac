@@ -1,3 +1,5 @@
+"""Render the final ICU comparison, ablation figure, and trajectory animation."""
+
 
 from __future__ import annotations
 
@@ -12,19 +14,19 @@ import numpy as np
 import pandas as pd
 
 COLORS = {
-    "bc": "#C2DDF8",             
-    "cql": "#5EA3EF",            
-    "voac": "#D55745",          
-    "posthoc": "#EF8733",       
-    "laadan": "#0000F5",         
+    "bc": "#C2DDF8",
+    "cql": "#5EA3EF",
+    "voac": "#D55745",
+    "posthoc": "#EF8733",
+    "laadan": "#0000F5",
     "mask_only": "#EF8733",
     "no_mask": "#D55745",
     "no_conservative": "#C62F7C",
-    "no_expert_kl": "#9352D5",  
-    "no_smoothness": "#EC5F59",  
-    "no_lagrangian": "#377E21", 
-    "icu": "#20469B",          
-    "eicu": "#72C580",          
+    "no_expert_kl": "#9352D5",
+    "no_smoothness": "#EC5F59",
+    "no_lagrangian": "#377E21",
+    "icu": "#20469B",
+    "eicu": "#72C580",
     "gray": "#6B6B6B",
     "light_gray": "#D9D9D9",
 }

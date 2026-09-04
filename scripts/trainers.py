@@ -1,3 +1,5 @@
+"""Training and evaluation utilities for BC, CQL, VOAC, and LAADAN-AC."""
+
 
 # trainers.py
 
@@ -30,11 +32,11 @@ from models import BehaviorCloningNet, ConservativeQNet, OfflineActorCriticNet, 
 
 
 def ensure_dir(path):
-    
+
     """
     Creating a folder if it does not already exist.
     """
-    
+
     # Checking whether the target folder already exists.
     if not os.path.exists(path):
         # If not, create it.
@@ -57,10 +59,10 @@ _T_CRIT_95 = {
 
 
 def mean_ci95(values):
-    
+
     """
     Returning mean, sample standard deviation, and 95% t-based confidence interval.
-    
+
     """
     # Converting the input to a NumPy array of floats. for instance, [0.792, 0.793, 0.794]
     values = np.asarray(values, dtype=float)
@@ -100,15 +102,15 @@ def mean_ci95(values):
 
     # Computing sample standard deviation with ddof=1 for an unbiased
     # sample-based estimate.
-    std = float(np.std(values, ddof=1)) 
-    
+    std = float(np.std(values, ddof=1))
+
     # Look up the t critical value; if n is outside the small dictionary, use
     # 1.96 as a reasonable large-sample approximation.
     t_crit = _T_CRIT_95.get(n, 1.96)
 
     # Computing the half-width of the 95% confidence interval.
     ci95_half = float(t_crit * std / np.sqrt(n))
-    
+
 
     # Returning the full summary dictionary.
     return {
@@ -121,34 +123,34 @@ def mean_ci95(values):
     }
 
 
-def plain_softmax_from_logits(logits): 
-    
+def plain_softmax_from_logits(logits):
+
     """
     Standard softmax with no admissibility masking. Used when the policy is allowed to place probability mass over all actions.
     """
-    
+
     # Converting raw action logits to probabilities over actions.
     return torch.softmax(logits, dim=1)
 
 
-def plain_log_softmax_from_logits(logits): 
-    
-    # gives log-probabilities instead of probabilities. 
+def plain_log_softmax_from_logits(logits):
+
+    # gives log-probabilities instead of probabilities.
     # Because they are more numerically stable for:
     # entropy
     # KL divergence
     # policy losses
-    
+
     # Converting raw logits to log-probabilities.
     return torch.log_softmax(logits, dim=1)
 
 
 def masked_softmax_from_logits(logits, admissible_mask):
-    
+
     """
     Softmax after hiding inadmissible actions with a large negative logit.
     """
-    
+
     # Creating a tensor with a very large negative value matching the logits shape.
     large_negative = torch.full_like(logits, -1e9) # -1,000,000,000
 
@@ -160,11 +162,11 @@ def masked_softmax_from_logits(logits, admissible_mask):
     return torch.softmax(masked, dim=1) # So LAADAN-AC cannot select blocked actions through the masked policy.
 
 
-def masked_log_softmax_from_logits(logits, admissible_mask): 
-    
+def masked_log_softmax_from_logits(logits, admissible_mask):
+
     """
     Log-softmax after hiding inadmissible actions with a large negative logit.
-    
+
     """
     # Creating the same large negative tensor used to suppress forbidden actions.
     large_negative = torch.full_like(logits, -1e9)
@@ -177,33 +179,33 @@ def masked_log_softmax_from_logits(logits, admissible_mask):
 
 
 def greedy_policy_from_logits(logits):
-    
+
     """
     Deterministic one-hot policy from raw logits.
 
     This chooses the single highest-logit action in each state.
     """
     # Finding the index of the largest logit in each row.
-    best = torch.argmax(logits, dim=1) 
+    best = torch.argmax(logits, dim=1)
 
     # Creating a zero matrix with the same shape as the logits.
     policy = torch.zeros_like(logits) # [0, 0, 0, 0, ...]
 
     # Writing a 1.0 into the best-action column for each row.
-    policy.scatter_(1, best.unsqueeze(1), 1.0) 
+    policy.scatter_(1, best.unsqueeze(1), 1.0)
 
     # Returning the resulting one-hot deterministic policy.
     return policy
 
 
-def masked_greedy_policy_from_logits(logits, admissible_mask): 
-    
+def masked_greedy_policy_from_logits(logits, admissible_mask):
+
     """
     Deterministic one-hot policy from logits after admissibility masking.
 
     This ensures the greedy action is selected only from admissible actions.
     """
-    
+
     # Building the large negative filler used to suppress forbidden actions.
     large_negative = torch.full_like(logits, -1e9)
 
@@ -224,7 +226,7 @@ def masked_greedy_policy_from_logits(logits, admissible_mask):
 
 
 def weighted_policy_kl(logits, target_policy, admissible_mask=None):
-    
+
     # Choosing either masked or unmasked log-probabilities depending on whether
     # The action space should be restricted.
     if admissible_mask is None:
@@ -242,38 +244,38 @@ def weighted_policy_kl(logits, target_policy, admissible_mask=None):
     kl = torch.sum(target * (torch.log(target + 1e-8) - log_probs), dim=1)
 
     # Returning the mean KL over all states.
-    return torch.mean(kl) 
+    return torch.mean(kl)
 
 
-def cql_regularizer(q_values, expert_policy, admissible_mask=None): 
-    
+def cql_regularizer(q_values, expert_policy, admissible_mask=None):
+
     """
     Conservative Q-Learning like penalty used for this experiment.
     """
     # If no mask is provided, applying logsumexp over all actions.
     if admissible_mask is None:
         conservative_term = torch.logsumexp(q_values, dim=1)
-        
-             
+
+
     else:
         # Otherwise hide inadmissible actions before logsumexp.
         masked = torch.where(admissible_mask > 0.5, q_values, torch.full_like(q_values, -1e9))
-        
-        conservative_term = torch.logsumexp(masked, dim=1) 
-        
+
+        conservative_term = torch.logsumexp(masked, dim=1)
+
 
     # Computing the value of expert-supported actions under the current Q-values.
-    data_term = torch.sum(expert_policy * q_values, dim=1) 
+    data_term = torch.sum(expert_policy * q_values, dim=1)
 
     # Returning the mean conservative penalty.
     return torch.mean(conservative_term - data_term)
 
 
-def masked_action_mse(pred, target, action_mask=None): 
-    
+def masked_action_mse(pred, target, action_mask=None):
+
     """
     Mean squared error over all actions or over a masked subset.
-    
+
     """
     # Computing elementwise squared error.
     squared = (pred - target) ** 2
@@ -293,7 +295,7 @@ def masked_action_mse(pred, target, action_mask=None):
 
 
 def save_history_csv(path, rows):
-    
+
     """
     Writing a list of dictionaries to CSV, allowing rows to have different keys.
 
@@ -326,7 +328,7 @@ def save_history_csv(path, rows):
 
 
 def summarize_history(history):
-    
+
     """
     Creating a compact summary from a history whose rows may have different keys.
 
@@ -367,11 +369,11 @@ def summarize_history(history):
     return summary
 
 
-def epoch_to_fraction_of_best(history, metric_name, fraction=0.95): 
-    
+def epoch_to_fraction_of_best(history, metric_name, fraction=0.95):
+
     """
     Finding the first epoch that reaches a fraction of the best value.
-    
+
     """
     # Collecting all finite (epoch, value) pairs for the requested metric.
     metric_pairs = []
@@ -400,12 +402,12 @@ def epoch_to_fraction_of_best(history, metric_name, fraction=0.95):
 
 
 def save_model_run(seed_dir, model, history, metrics):
-    
+
     """
     Saving the trained model, CSV history, and metrics JSON for one seed.
 
     """
-    
+
     # Making sure the output folder exists.
     ensure_dir(seed_dir)
 
@@ -420,14 +422,14 @@ def save_model_run(seed_dir, model, history, metrics):
         json.dump(metrics, handle, indent=2)
 
 
-@torch.no_grad()  
+@torch.no_grad()
 def evaluate_policy_set(benchmark, policy, soft_policy=None):
-    
+
     """
     Evaluating the primary policy and optionally a secondary soft policy.
 
     """
-    
+
     # Evaluating the primary policy exactly on the benchmark.
     metrics = benchmark.exact_policy_evaluation(policy)
 
@@ -448,20 +450,20 @@ def evaluate_policy_set(benchmark, policy, soft_policy=None):
 
 @torch.no_grad()
 def policy_numpy(tensor_policy):
-    
+
     """
     Converting a PyTorch policy tensor to a NumPy array.
 
     """
-    return tensor_policy.detach().cpu().numpy() 
+    return tensor_policy.detach().cpu().numpy()
 
 
 def train_behavior_cloning(benchmark, seed, results_dir, config):
-    
+
     """
     Training the clinician-imitation baseline.
     """
-    
+
     # Setting Python, NumPy, and Torch seeds for reproducibility.
     benchmark.set_seed(seed)
 
@@ -486,16 +488,16 @@ def train_behavior_cloning(benchmark, seed, results_dir, config):
     )
 
     # Reading high-level training settings from the configuration.
-    epochs = int(config.get("epochs", 300))  
+    epochs = int(config.get("epochs", 300))
     eval_every = int(config.get("eval_every", 10))
 
     # Shortcut references to benchmark tensors.
-    x = benchmark.state_features_t   
-    target = benchmark.expert_safe_t 
+    x = benchmark.state_features_t
+    target = benchmark.expert_safe_t
 
     # Preparing per-epoch logging structures.
     history = []
-    best_survival = -1.0 
+    best_survival = -1.0
     best_state = None
     best_metrics = None
 
@@ -505,9 +507,9 @@ def train_behavior_cloning(benchmark, seed, results_dir, config):
     # Main epoch loop.
     for epoch in range(1, epochs + 1):
         # Putting the model in training mode so dropout is active as intended.
-        model.train() 
+        model.train()
 
-        # Clearing old gradients. affects in a detrimental way if not resulting in slow convergence. 
+        # Clearing old gradients. affects in a detrimental way if not resulting in slow convergence.
         optimizer.zero_grad()
 
         # Forward pass: get policy logits for every state.
@@ -524,17 +526,17 @@ def train_behavior_cloning(benchmark, seed, results_dir, config):
 
         # Computing average policy entropy.
         entropy = -torch.mean(torch.sum(probs * log_probs, dim=1))
-        
+
 
         # Total loss:
         # imitation loss minus optional entropy bonus.
-        loss = kl_loss - float(config.get("entropy_bonus", 0.0)) * entropy 
+        loss = kl_loss - float(config.get("entropy_bonus", 0.0)) * entropy
 
         # Backpropagate.
         loss.backward() # Which weights caused the loss, and how should they change?
 
         # Updating parameters.
-        optimizer.step() 
+        optimizer.step()
 
         # Starting the row with always-available training values. Save the current epoch’s training values.
         row = {
@@ -546,12 +548,12 @@ def train_behavior_cloning(benchmark, seed, results_dir, config):
 
         # Running evaluation at the chosen interval or at the final epoch.
         if epoch % eval_every == 0 or epoch == epochs:   # Evaluate every 10 epochs and at the final epoch.
-            
+
             # Switching to evaluation mode so dropout is disabled.
             model.eval()
 
             with torch.no_grad():  # No gradient tracking during evaluation.
-                
+
                 # Recomputing logits for evaluation.
                 logits_eval = model(x)
 
@@ -560,8 +562,8 @@ def train_behavior_cloning(benchmark, seed, results_dir, config):
 
                 # Also keeping the soft policy for auxiliary analysis.
                 soft_policy = plain_softmax_from_logits(logits_eval)
-                
-               
+
+
 
 
             # Evaluating both policies through the benchmark evaluator.
@@ -582,8 +584,8 @@ def train_behavior_cloning(benchmark, seed, results_dir, config):
 
         # Appending the row to the training history.
         history.append(row)
-        
-        
+
+
     # After training:
     # Restoring the best checkpoint if one was captured.
     if best_state is not None:
@@ -625,7 +627,7 @@ def train_behavior_cloning(benchmark, seed, results_dir, config):
 
 
 def train_cql(benchmark, seed, results_dir, config): # CQL is value-learning.
-    
+
     """
     Training the conservative offline value-learning baseline.
 
@@ -692,7 +694,7 @@ def train_cql(benchmark, seed, results_dir, config): # CQL is value-learning.
 
     # Main training loop.
     for epoch in range(1, epochs + 1):
-        
+
         # Enabling training mode for the main model.
         model.train()
 
@@ -717,7 +719,7 @@ def train_cql(benchmark, seed, results_dir, config): # CQL is value-learning.
         td_loss = torch.mean((q_values - bellman_target) ** 2)  # TD loss. It trains Q-values to match Bellman targets.
 
         # Conservative penalty discouraging unsupported value inflation.
-        conservative_loss = cql_regularizer(q_values, expert, admissible_mask=None) 
+        conservative_loss = cql_regularizer(q_values, expert, admissible_mask=None)
 
         # Total CQL objective.
         loss = td_loss + cql_alpha * conservative_loss # Bellman error + conservative penalty
@@ -733,7 +735,7 @@ def train_cql(benchmark, seed, results_dir, config): # CQL is value-learning.
 
         # Soft-update the target network.
         soft_update(target_model, model, tau)
-           
+
         # Keepping the target network in eval mode after update.
         target_model.eval()
 
@@ -756,8 +758,8 @@ def train_cql(benchmark, seed, results_dir, config): # CQL is value-learning.
 
                 # Converting Q-values to a deterministic greedy policy.
                 greedy_policy = benchmark.greedy_policy_from_q_unmasked(q_now)
-                
-                # CQL chooses the highest Q-value action. it can choose inadmissible actions 
+
+                # CQL chooses the highest Q-value action. it can choose inadmissible actions
 
             # Evaluating the greedy policy.
             metrics = benchmark.exact_policy_evaluation(greedy_policy)
@@ -809,9 +811,9 @@ def train_cql(benchmark, seed, results_dir, config): # CQL is value-learning.
 
 
 def _actor_critic_common_setup(benchmark, config, use_cost_head):
-    
+
     """ This builds shared setup for VOAC and LAADAN-AC. Because both use OfflineActorCriticNet """
-    
+
     # Reading device.
     device = benchmark.device
 
@@ -834,8 +836,8 @@ def _actor_critic_common_setup(benchmark, config, use_cost_head):
         dropout=float(config.get("dropout", 0.10)),
         use_cost_head=use_cost_head,
     ).to(device)
-        
-        
+
+
     # Copying weights from main to target.
     target_model.load_state_dict(model.state_dict())
 
@@ -859,13 +861,13 @@ def _actor_critic_common_setup(benchmark, config, use_cost_head):
 
 
 def train_voac(benchmark, seed, results_dir, config):
-    
-    """ VOAC = Vanilla Offline Actor-Critic. It has: 
+
+    """ VOAC = Vanilla Offline Actor-Critic. It has:
     actor
     critic Q1
     critic Q2
-    target network 
-    
+    target network
+
     It does not have since it's the ablation:
 
     action mask
@@ -873,8 +875,8 @@ def train_voac(benchmark, seed, results_dir, config):
     expert KL
     smoothness penalty
     Lagrangian safety """
-    
-    
+
+
     # Setting random seeds.
     benchmark.set_seed(seed)
 
@@ -882,9 +884,9 @@ def train_voac(benchmark, seed, results_dir, config):
     model, target_model, tensors = _actor_critic_common_setup(benchmark, config, use_cost_head=False)
 
     # Actor parameters are only the actor encoder and actor head.
-    actor_params = list(model.actor_encoder.parameters()) + list(model.actor_head.parameters()) 
-    
-    # Actor parameters are: 
+    actor_params = list(model.actor_encoder.parameters()) + list(model.actor_head.parameters())
+
+    # Actor parameters are:
     # actor encoder weights
     # actor head weights
 
@@ -894,15 +896,15 @@ def train_voac(benchmark, seed, results_dir, config):
         + list(model.q1_head.parameters())
         + list(model.q2_head.parameters())
     )
-    
+
     # Critic parameters are:
     # critic encoder weights
     # Q1 head weights
     # Q2 head weights
 
 
-    # VOAC USES TWO OPTIMISERS 
-    
+    # VOAC USES TWO OPTIMISERS
+
     # Separating optimizer for the actor.
     actor_optimizer = torch.optim.Adam(
         actor_params,
@@ -942,7 +944,7 @@ def train_voac(benchmark, seed, results_dir, config):
         # Setting main model to training mode.
         model.train()
 
-       
+
         # Critic update
 
         with torch.no_grad():
@@ -952,7 +954,7 @@ def train_voac(benchmark, seed, results_dir, config):
             # Building the target policy distribution from target actor logits.
             next_probs = plain_softmax_from_logits(target_outputs["logits"])
             next_log_probs = plain_log_softmax_from_logits(target_outputs["logits"])
-            
+
             # Build target actor’s soft policy. No mask.
 
             # Reading both target critics.
@@ -961,7 +963,7 @@ def train_voac(benchmark, seed, results_dir, config):
 
             # Using the minimum of the two critics for a more conservative target.
             min_q_next = torch.min(q1_next, q2_next)
-            
+
             """ Take the lower of Q1 and Q2. This reduces over-optimistic value estimates."""
 
             # Computing soft value target for next state.
@@ -989,7 +991,7 @@ def train_voac(benchmark, seed, results_dir, config):
 
         # Total critic loss is the sum of both critic errors.
         critic_loss = q1_loss + q2_loss
-        
+
         # Train both critics to match Bellman target.
 
         # Backpropagate critic loss.
@@ -1004,7 +1006,7 @@ def train_voac(benchmark, seed, results_dir, config):
         # Update critic weights.
 
         # Actor update
-        
+
         # Resetting actor gradients.
         actor_optimizer.zero_grad()
 
@@ -1013,9 +1015,9 @@ def train_voac(benchmark, seed, results_dir, config):
         logits = outputs["logits"]
         probs = plain_softmax_from_logits(logits)
         log_probs = plain_log_softmax_from_logits(logits)
-        
-        # Actor produces an unmasked soft policy. 
-        
+
+        # Actor produces an unmasked soft policy.
+
         q1 = outputs["q1"]
         q2 = outputs["q2"]
 
@@ -1023,10 +1025,10 @@ def train_voac(benchmark, seed, results_dir, config):
         min_q = torch.min(q1, q2)  # Use conservative lower Q estimate.
 
         # Actor objective:
-        
+
         # maximising value while accounting for entropy regularisation.
         actor_loss = torch.mean(torch.sum(probs * (entropy_coef * log_probs - min_q), dim=1))
-        
+
         # Because optimiser minimises loss, this means: maximise Q-value and encourage entropy
 
         # Backpropagate actor loss.
@@ -1116,7 +1118,7 @@ def train_voac(benchmark, seed, results_dir, config):
 
 
 def train_laadan_ac(benchmark, seed, results_dir, config):
-    
+
     """
     Train the proposed LAADAN-AC model.
 
@@ -1132,7 +1134,7 @@ def train_laadan_ac(benchmark, seed, results_dir, config):
     Primary evaluation uses masked greedy action selection for a fair comparison
     against deterministic CQL testing. Soft masked metrics are stored as extras.
     """
-    
+
     # Setting random seeds.
     benchmark.set_seed(seed)
 
@@ -1151,7 +1153,7 @@ def train_laadan_ac(benchmark, seed, results_dir, config):
     )
     # Actor and critic/cost are trained separately.
 
-    # two adam optimizers 
+    # two adam optimizers
     # Actor optimizer.
     actor_optimizer = torch.optim.Adam(
         actor_params,
@@ -1167,18 +1169,18 @@ def train_laadan_ac(benchmark, seed, results_dir, config):
     )
 
     # Reading LAADAN hyperparameters.
-    gamma = float(config.get("gamma", 1.0)) # 1.0 means future survival is fully considered across the finite horizon. 
-    tau = float(config.get("tau", 0.01)) # Target network update speed. Smaller tau = slower, more stable target updates. 
+    gamma = float(config.get("gamma", 1.0)) # 1.0 means future survival is fully considered across the finite horizon.
+    tau = float(config.get("tau", 0.01)) # Target network update speed. Smaller tau = slower, more stable target updates.
     entropy_coef = float(config.get("entropy_coef", 0.001)) # This prevents policy from becoming too rigid too early.
-    conservative_alpha = float(config.get("conservative_alpha", 0.25)) # Higher value = critic becomes more cautious. too high can reduce return 
+    conservative_alpha = float(config.get("conservative_alpha", 0.25)) # Higher value = critic becomes more cautious. too high can reduce return
     expert_kl_weight = float(config.get("expert_kl_weight", 0.005)) # Strength of expert-policy regularisation. Higher = behave more like expert/BC, Lower = more freedom for RL optimisation.
     smoothness_weight = float(config.get("smoothness_weight", 0.001)) # Penalty for action choices far from expert-supported mean action. Higher = smoother/more conservative action patterns.
     cost_budget = float(config.get("cost_budget", 0.0)) # expected unsafe cost should be zero
     lagrange_lr = float(config.get("lagrange_lr", 0.0002))
-    lagrange_value = float(config.get("lagrange_init", 0.0)) 
+    lagrange_value = float(config.get("lagrange_init", 0.0))
     # Lagrangian multiplier controls how strongly unsafe cost is penalised.
     # If expected cost rises above budget, lagrange value increases.
-    
+
     epochs = int(config.get("epochs", 300))
     eval_every = int(config.get("eval_every", 10))
 
@@ -1240,9 +1242,9 @@ def train_laadan_ac(benchmark, seed, results_dir, config):
 
 
         # Critic update
-        
+
         # Get current Q and cost predictions.
-    
+
         critic_optimizer.zero_grad()
 
         outputs = model(x)
@@ -1274,23 +1276,23 @@ def train_laadan_ac(benchmark, seed, results_dir, config):
 
         # Critic step.
         critic_optimizer.step()
- 
+
         # Calculate gradients, clip them, update critic/cost weights.
-      
+
         # Actor update
-       
+
         actor_optimizer.zero_grad()
 
         outputs = model(x)
         logits = outputs["logits"]
-        
+
         # Start actor update.
 
         # Actor policy after masking.
         probs = masked_softmax_from_logits(logits, admissible)
         log_probs = masked_log_softmax_from_logits(logits, admissible)
-        
-        # The actor only assigns probability to admissible actions. 
+
+        # The actor only assigns probability to admissible actions.
 
         q1 = outputs["q1"]
         q2 = outputs["q2"]
@@ -1322,7 +1324,7 @@ def train_laadan_ac(benchmark, seed, results_dir, config):
             - entropy_coef * entropy # encourage some policy spread/exploration
             + lagrange_value * expected_cost # penalise unsafe expected cost
             + expert_kl_weight * expert_kl # stay close to expert policy
-            + smoothness_weight * expected_smoothness # avoid rough/unusual action choices 
+            + smoothness_weight * expected_smoothness # avoid rough/unusual action choices
         )
 
         # Backpropagate actor objective.
@@ -1333,10 +1335,10 @@ def train_laadan_ac(benchmark, seed, results_dir, config):
 
         # Actor step.
         actor_optimizer.step()
-        
-        # Update actor weights. 
 
-        # Update target network. 
+        # Update actor weights.
+
+        # Update target network.
         soft_update(target_model, model, tau)
 
         # Keeping target model in eval mode.
@@ -1422,14 +1424,14 @@ def train_laadan_ac(benchmark, seed, results_dir, config):
     }
 
 
-def aggregate_seed_metrics(run_list): 
-    
+def aggregate_seed_metrics(run_list):
+
     """
     Aggregate per-seed metrics into mean/std/95% CI/min/max summaries.
 
     This is the main multi-seed summary used for tables and bar charts.
     """
-    
+
     # If no runs exist, return an empty summary.
     if not run_list:
         return {}
@@ -1472,14 +1474,14 @@ def aggregate_seed_metrics(run_list):
     return summary
 
 
-def aggregate_histories(run_list, metric_names): 
-    
+def aggregate_histories(run_list, metric_names):
+
     """
     Building mean/std/95% CI history curves across seeds for selected metrics.
 
     Missing values remain NaN so plotting code can skip them cleanly.
     """
-    
+
     # If there are no runs, return an empty result.
     if not run_list:
         return {}
@@ -1550,8 +1552,8 @@ def aggregate_histories(run_list, metric_names):
     return result
 
 
-def best_policy_from_runs(run_list, use_analysis_policy=False): 
-    
+def best_policy_from_runs(run_list, use_analysis_policy=False):
+
     """
     Returning the policy from the seed with the highest survival rate.
     """

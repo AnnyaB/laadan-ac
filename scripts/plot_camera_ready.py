@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""Generate the camera-ready figure set from frozen result artifacts."""
+
 
 from __future__ import annotations
 
@@ -15,10 +17,10 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 
 PRODUCERS = {
-    "combined": ROOT / "archive/plotting_provenance/plot_camera_ready_figures_combined.py",
-    "three": ROOT / "archive/plotting_provenance/plot_three_elite_camera_ready.py",
-    "v3": ROOT / "archive/plotting_provenance/plot_camera_ready_figures_v3.py",
-    "safety": ROOT / "archive/plotting_provenance/plot_elite_fixed_schedule_safety.py",
+    "combined": ROOT / "scripts/_plotting/main_and_animation.py",
+    "three": ROOT / "scripts/_plotting/paired_diagnostics.py",
+    "v3": ROOT / "scripts/_plotting/eicu.py",
+    "safety": ROOT / "scripts/_plotting/safety.py",
 }
 
 

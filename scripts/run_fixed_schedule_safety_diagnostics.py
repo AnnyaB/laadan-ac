@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
-"""Safety-failure diagnostics using only fixed-schedule checkpoints.
-
-All quantitative diagnostic summaries are computed across the pre-specified five
-seeds (42--46). Qualitative state/Q-value/trajectory panels use one predeclared
-illustrative seed (42 by default) rather than selecting a visually favourable
-run. No model is retrained and no benchmark metric is used for checkpoint or
-seed selection in this script.
-"""
+"""Compute fixed-schedule safety diagnostics from pre-specified checkpoints and seeds."""
 from __future__ import annotations
 
 import argparse
