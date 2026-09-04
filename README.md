@@ -3,10 +3,10 @@
 
 [Riya Basak](https://github.com/AnnyaB), [Manal Helal](https://github.com/mhelal)
 
-**Accepted to ICaTAS 2026 — camera-ready manuscript in preparation.**
+**Accepted to ICaTAS 2026**
 
 <p align="center">
-  <b>[ <a href="results/fixed_schedule_2026">Results &amp; Checkpoints</a> | <a href="data">Data</a> | <a href="figures/camera_ready">Figures</a> ]</b>
+  <b>[ <a href="results/fixed_schedule_2026">Results &amp; Checkpoints</a> | <a href="data">Data</a> ]</b>
 </p>
 
 <br>
@@ -19,7 +19,7 @@
 
 ## Abstract
 
-Offline treatment-policy learning can obtain high benchmark return while selecting actions that violate a benchmark-defined admissible action set. LAADAN-AC studies a narrower objective: enforce admissibility directly at the actor interface while retaining return and expert alignment. The framework integrates hard action masking with an offline actor-critic backbone, twin reward critics, conservative critic regularisation, expert-policy KL shaping, a state-action smoothness proxy, and Lagrangian cost pressure. The contribution is the admissibility-aware actor interface, its integration with these policy-shaping terms, and the accompanying empirical analysis rather than any individual regulariser in isolation.
+Offline treatment-policy learning can obtain *high* benchmark return while selecting actions that *violate* a benchmark-defined admissible action set. Lagrangian Admissibility-Aware Deep Action-Nudging Actor-Critic (**LAADAN-AC**) studies a narrower objective: enforce admissibility directly at the actor interface while retaining return and expert alignment. The framework integrates hard action masking with an offline actor-critic backbone, twin reward critics, conservative critic regularisation, expert-policy KL shaping, a state-action smoothness proxy, and Lagrangian cost pressure. The contribution is the admissibility-aware actor interface, its integration with these policy-shaping terms, and the accompanying empirical analysis rather than any individual regulariser in isolation.
 
 All headline experiments use a predetermined epoch-1000 checkpoint with five random training seeds (42–46). The benchmark evaluator is not used for checkpoint selection, early stopping, seed selection, or hyperparameter adaptation. On ICU-Sepsis, LAADAN-AC reaches **0.7927 ± 0.0012** return, **0.0000%** selected-action inadmissibility, and **0.9540 ± 0.0032** expert argmax agreement. A paired five-seed comparison against post-hoc masked VOAC shows a **+0.0275 ± 0.0021** return difference and **+0.2568 ± 0.0022** expert-agreement difference while both methods retain zero selected-action inadmissibility after masking. Component ablations show that the hard mask is the direct mechanism enforcing admissibility, while the remaining terms primarily shape the return–alignment operating point. A constructed eICU-CRD Demo MDP is included as an exploratory cross-source portability check.
 
@@ -37,11 +37,11 @@ The released evaluation focuses on three quantities together:
 - **Selected-action admissibility** under the benchmark action mask.
 - **Expert alignment**, measured by expert argmax agreement and distributional deviation.
 
-The benchmark admissibility signal is a property of the released MDP interface; it should not be interpreted as a clinical safety guarantee or treatment-optimality claim.
+The benchmark admissibility signal is a property of the *released MDP interface*; it should **not** be interpreted as a clinical safety guarantee or treatment-optimality claim.
 
 ## Results
 
-All values below are means ± **95% t-CI across five random training seeds**. These intervals quantify variability across training initialisations, not patient- or population-level uncertainty.
+All values below are means ± **95% t-CI across five random training seeds**. These intervals quantify variability across training initialisations.
 
 | Method | Return | Inadmissibility (%) | Expert argmax match | KL to expert |
 |---|---:|---:|---:|---:|
@@ -67,7 +67,7 @@ Post-hoc masking and LAADAN-AC both produce zero selected-action inadmissibility
 
 ### Component ablation
 
-The ablations make the roles of the individual terms explicit. The masking-only actor-critic reaches **0.7974 ± 0.0026** return with zero inadmissibility but **0.7488 ± 0.0035** expert agreement. Removing the conservative critic increases return to **0.8067 ± 0.0009**, again with zero inadmissibility, while expert agreement falls to **0.7473 ± 0.0025**. The full objective therefore should not be read as a return-maximising variant: it selects a different return–admissibility–alignment operating point. Removing the action mask produces non-zero inadmissibility, confirming that the mask is the direct feasibility mechanism in the reported benchmark.
+The ablations make the roles of the individual terms explicit. The masking-only actor-critic reaches **0.7974 ± 0.0026** return with zero inadmissibility but **0.7488 ± 0.0035** expert agreement. Removing the conservative critic increases return to **0.8067 ± 0.0009**, again with zero inadmissibility, while expert agreement falls to **0.7473 ± 0.0025**. The full objective therefore should not be read as a return-maximising variant: it selects a different return–admissibility–alignment operating point. Removing the action mask produces non-zero inadmissibility, confirming that the *mask* is the direct feasibility mechanism in the reported benchmark.
 
 <p align="center">
   <img src="figures/camera_ready/main/fig4_full_component_ablation.png" width="84%" alt="LAADAN-AC component ablation">
@@ -75,7 +75,7 @@ The ablations make the roles of the individual terms explicit. The masking-only 
 
 ### Cross-source portability
 
-The constructed eICU-CRD Demo MDP is used only as an exploratory portability check. It contains 202 states, 25 actions, and 22-dimensional state features, compared with 716 states, 25 actions, and 47-dimensional features in ICU-Sepsis. On this MDP, LAADAN-AC obtains **0.7329 ± 0.0008** return, zero selected-action inadmissibility, and **0.9984 ± 0.0006** expert argmax agreement. These results are not presented as external clinical validation.
+The constructed eICU-CRD Demo MDP is used as an exploratory portability check. It contains 202 states, 25 actions, and 22-dimensional state features, compared with 716 states, 25 actions, and 47-dimensional features in ICU-Sepsis. On this MDP, LAADAN-AC obtains **0.7329 ± 0.0008** return, zero selected-action inadmissibility, and **0.9984 ± 0.0006** expert argmax agreement.
 
 <p align="center">
   <img src="figures/camera_ready/appendix/figA1_cross_source_portability.png" width="86%" alt="Cross-source portability comparison">
@@ -84,8 +84,6 @@ The constructed eICU-CRD Demo MDP is used only as an exploratory portability che
 ## Using the code
 
 ### Installation
-
-The released checkpoints are stored with Git LFS.
 
 ```bash
 git lfs install
@@ -99,7 +97,7 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-The camera-ready experiments were run with Python 3.12.13, NumPy 2.0.2, PyTorch 2.10.0+cu128, CUDA 12.8, and 2× Tesla T4 GPUs. Per-run environment and provenance records are stored with the fixed-schedule results.
+The experiments were run with Python 3.12.13, NumPy 2.0.2, PyTorch 2.10.0+cu128, CUDA 12.8, and 2× Tesla T4 GPUs. Per-run environment and provenance records are stored with the fixed-schedule results.
 
 ### Data
 
@@ -149,19 +147,7 @@ python scripts/run_fixed_schedule_safety_diagnostics.py \
   --device auto
 ```
 
-### Camera-ready figures
-
-All final paper and appendix figures, including the trajectory animation, are generated through one public plotting entrypoint:
-
-```bash
-python scripts/plot_camera_ready.py \
-  --results-root results/fixed_schedule_2026 \
-  --out-dir figures/camera_ready
-```
-
 ### Validation
-
-The validators recompute aggregate statistics, check all five seeds, verify the fixed epoch-1000 checkpoint rule, confirm that benchmark evaluation was not used for model selection, and verify hashes of the processed input data.
 
 ```bash
 python scripts/validate_fixed_schedule_results.py \
@@ -181,13 +167,11 @@ python -m pytest -q tests
 
 ## Checkpoints and provenance
 
-The fixed camera-ready evidence is under [`results/fixed_schedule_2026/`](results/fixed_schedule_2026/). Each trained seed directory contains the saved model, training history, final metrics, and provenance where applicable. The release records the checkpoint rule, evaluated epoch, environment, and input-data hashes needed to audit the reported results.
+The evidence is under [`results/fixed_schedule_2026/`](results/fixed_schedule_2026/). Each trained seed directory contains the saved model, training history, final metrics, and provenance where applicable. The release records the checkpoint rule, evaluated epoch, environment, and input-data hashes needed to audit the reported results.
 
-Submission-stage experiments are retained under `results/archive/blind_review/` and `archive/blind_review/` for provenance. They are not used for the camera-ready quantitative claims.
+Previous experiments are retained under `results/archive/blind_review/` and `archive/blind_review/` for provenance.
 
 ## Citation
-
-Until the camera-ready paper has a public paper URL, please cite the repository:
 
 ```bibtex
 @misc{basak2026laadanac,
@@ -201,9 +185,6 @@ Until the camera-ready paper has a public paper URL, please cite the repository:
 
 The citation metadata is also available in [`CITATION.bib`](CITATION.bib) and [`CITATION.cff`](CITATION.cff).
 
-## Scope
-
-This repository is a benchmark research implementation for offline treatment-policy learning. It is not a clinical decision-support system and is not intended to guide patient treatment.
 
 ## Contact
 
