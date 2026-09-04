@@ -1,3 +1,5 @@
+<div align="center">
+
 # LAADAN-AC
 ### Beyond Survival in Admissible Offline Treatment-Policy Learning
 
@@ -9,6 +11,8 @@
   <b>[ <a href="results/fixed_schedule_2026">Results &amp; Checkpoints</a> | <a href="data">Data</a> ]</b>
 </p>
 
+</div>
+
 <br>
 
 <p align="center">
@@ -19,9 +23,9 @@
 
 ## Abstract
 
-Offline treatment-policy learning can obtain *high* benchmark return while selecting actions that *violate* a benchmark-defined admissible action set. Lagrangian Admissibility-Aware Deep Action-Nudging Actor-Critic (**LAADAN-AC**) studies a narrower objective: enforce admissibility directly at the actor interface while retaining return and expert alignment. The framework integrates hard action masking with an offline actor-critic backbone, twin reward critics, conservative critic regularisation, expert-policy KL shaping, a state-action smoothness proxy, and Lagrangian cost pressure. The contribution is the admissibility-aware actor interface, its integration with these policy-shaping terms, and the accompanying empirical analysis rather than any individual regulariser in isolation.
+What does it mean for an offline treatment policy to be reliable? Contemporary offline reinforcement-learning studies often summarize policy quality through expected return, yet high return alone does not reveal whether selected actions remain within a benchmark-defined admissible set or preserve alignment with expert behaviour. We study this gap through **Lagrangian Admissibility-Aware Deep Action-Nudging Actor-Critic (LAADAN-AC)**, an admissibility-constrained offline actor-critic framework that places the feasible-action interface directly inside policy learning. We instantiate this framework with hard action masking, twin reward critics, conservative critic regularisation, expert-policy KL shaping, a state-action smoothness proxy, and Lagrangian cost pressure. In LAADAN-AC, the hard mask restricts policy support to admissible actions, while the remaining terms shape how the policy trades return and expert alignment within that interface. The contribution therefore lies in the admissibility-aware actor interface, its integration with these established components, and the resulting empirical analysis rather than in any single regulariser in isolation.
 
-All headline experiments use a predetermined epoch-1000 checkpoint with five random training seeds (42–46). The benchmark evaluator is not used for checkpoint selection, early stopping, seed selection, or hyperparameter adaptation. On ICU-Sepsis, LAADAN-AC reaches **0.7927 ± 0.0012** return, **0.0000%** selected-action inadmissibility, and **0.9540 ± 0.0032** expert argmax agreement. A paired five-seed comparison against post-hoc masked VOAC shows a **+0.0275 ± 0.0021** return difference and **+0.2568 ± 0.0022** expert-agreement difference while both methods retain zero selected-action inadmissibility after masking. Component ablations show that the hard mask is the direct mechanism enforcing admissibility, while the remaining terms primarily shape the return–alignment operating point. A constructed eICU-CRD Demo MDP is included as an exploratory cross-source portability check.
+We evaluate all headline models at a predetermined epoch-1000 checkpoint across five random training seeds (42–46), without using the benchmark evaluator for checkpoint selection, early stopping, seed selection, or hyperparameter adaptation. On ICU-Sepsis, LAADAN-AC achieves **0.7927 ± 0.0012** return, **0.0000%** selected-action inadmissibility, and **0.9540 ± 0.0032** expert argmax agreement. In a paired five-seed comparison with post-hoc masked VOAC, training under the admissibility interface improves return by **+0.0275 ± 0.0021** and expert agreement by **+0.2568 ± 0.0022**, while both policies remain admissible after masking. Component ablations further show that the hard mask is the direct mechanism enforcing zero selected-action inadmissibility, whereas the other terms primarily shape the return–alignment operating point. We also test the same framework on a constructed eICU-CRD Demo MDP as an exploratory cross-source portability study. Together, these results show how admissibility, return, and expert alignment can be evaluated as distinct but coupled properties of offline treatment-policy learning.
 
 ## Overview
 
