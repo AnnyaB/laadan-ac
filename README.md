@@ -175,7 +175,7 @@ python -m pytest -q tests
 
 The evidence is under [`results/fixed_schedule_2026/`](results/fixed_schedule_2026/). Each trained seed directory contains the saved model, training history, final metrics, and provenance where applicable. The release records the checkpoint rule, evaluated epoch, environment, and input-data hashes needed to audit the reported results.
 
-Previous experiments are retained under `results/archive/blind_review/` and `archive/blind_review/` for provenance.
+Earlier experiments—including the original and relaxed-soft-regularisation settings—are retained under `results/archive/blind_review/` and `archive/blind_review/`.
 
 ## Citation
 
