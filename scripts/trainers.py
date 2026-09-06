@@ -497,9 +497,7 @@ def train_behavior_cloning(benchmark, seed, results_dir, config):
 
     # Preparing per-epoch logging structures.
     history = []
-    best_survival = -1.0
-    best_state = None
-    best_metrics = None
+    final_metrics = None
 
     # Recording wall-clock start time.
     start_time = time.time()
@@ -547,7 +545,7 @@ def train_behavior_cloning(benchmark, seed, results_dir, config):
         }
 
         # Running evaluation at the chosen interval or at the final epoch.
-        if epoch % eval_every == 0 or epoch == epochs:   # Evaluate every 10 epochs and at the final epoch.
+        if epoch % eval_every == 0 or epoch == epochs:   # Under the fixed schedule, eval_every > epochs, so only the final epoch is evaluated.
 
             # Switching to evaluation mode so dropout is disabled.
             model.eval()
@@ -576,31 +574,24 @@ def train_behavior_cloning(benchmark, seed, results_dir, config):
             # Adding evaluation metrics into the current history row.
             row.update(metrics)
 
-            # Saving checkpoint state if this is the best survival so far. The best checkpoint is selected by survival rate.
-            if metrics["survival_rate"] > best_survival:
-                best_survival = metrics["survival_rate"]
-                best_state = {key: value.detach().cpu() for key, value in model.state_dict().items()}
-                best_metrics = metrics
+            # The reported checkpoint is the pre-specified final training epoch.
+            if epoch == epochs:
+                final_metrics = metrics
 
         # Appending the row to the training history.
         history.append(row)
 
 
-    # After training:
-    # Restoring the best checkpoint if one was captured.
-    if best_state is not None:
-        model.load_state_dict(best_state)
-
-    # Computing final policy outputs from the restored best model.
+    # Computing final policy outputs from the final trained model.
     model.eval()
     with torch.no_grad():
         logits_final = model(x)
         final_policy = greedy_policy_from_logits(logits_final)
         final_soft_policy = plain_softmax_from_logits(logits_final)
 
-    # If for some reason no evaluation was recorded, compute metrics now.
-    if best_metrics is None:
-        best_metrics = evaluate_policy_set(
+    # If for some reason the final evaluation was not recorded, compute it now.
+    if final_metrics is None:
+        final_metrics = evaluate_policy_set(
             benchmark,
             policy_numpy(final_policy),
             soft_policy=policy_numpy(final_soft_policy),
@@ -610,7 +601,7 @@ def train_behavior_cloning(benchmark, seed, results_dir, config):
     seed_dir = os.path.join(results_dir, "bc", "seed_" + str(seed))
 
     # Saving checkpoint, history, and metrics.
-    save_model_run(seed_dir, model, history, best_metrics)
+    save_model_run(seed_dir, model, history, final_metrics)
 
     # Returning a structured result dictionary.
     return {
@@ -620,7 +611,7 @@ def train_behavior_cloning(benchmark, seed, results_dir, config):
         "policy": policy_numpy(final_policy),
         "analysis_policy": policy_numpy(final_soft_policy),
         "history": history,
-        "metrics": best_metrics,
+        "metrics": final_metrics,
         "train_time_seconds": float(time.time() - start_time),
         "convergence_epoch_95": epoch_to_fraction_of_best(history, "survival_rate", 0.95),
     }
@@ -687,9 +678,7 @@ def train_cql(benchmark, seed, results_dir, config): # CQL is value-learning.
 
     # Preparing tracking variables.
     history = []
-    best_survival = -1.0
-    best_state = None
-    best_metrics = None
+    final_metrics = None
     start_time = time.time()
 
     # Main training loop.
@@ -747,7 +736,7 @@ def train_cql(benchmark, seed, results_dir, config): # CQL is value-learning.
             "cql_loss": float(conservative_loss.item()),
         }
 
-        # Periodic evaluation.
+        # Evaluation. Under the fixed schedule, eval_every > epochs, so this runs only at the final epoch.
         if epoch % eval_every == 0 or epoch == epochs:
             # Disable dropout in the main model.
             model.eval()
@@ -767,34 +756,28 @@ def train_cql(benchmark, seed, results_dir, config): # CQL is value-learning.
             # Merging metrics into the row.
             row.update(metrics)
 
-            # Saving best checkpoint if survival improved.
-            if metrics["survival_rate"] > best_survival:
-                best_survival = metrics["survival_rate"]
-                best_state = {key: value.detach().cpu() for key, value in model.state_dict().items()}
-                best_metrics = metrics
+            # The reported checkpoint is the pre-specified final training epoch.
+            if epoch == epochs:
+                final_metrics = metrics
 
         # Appending row to history.
         history.append(row)
 
-    # Restoring best checkpoint.
-    if best_state is not None:
-        model.load_state_dict(best_state)
-
-    # Final policy extraction from best restored model.
+    # Final policy extraction from the final trained model.
     model.eval()
     with torch.no_grad():
         q_final = model(x).detach().cpu().numpy()
         final_policy = benchmark.greedy_policy_from_q_unmasked(q_final)
 
-    # Fallback in case best metrics were never set.
-    if best_metrics is None:
-        best_metrics = benchmark.exact_policy_evaluation(final_policy)
+    # Fallback in case final metrics were not recorded.
+    if final_metrics is None:
+        final_metrics = benchmark.exact_policy_evaluation(final_policy)
 
     # Output folder for this seed.
     seed_dir = os.path.join(results_dir, "cql", "seed_" + str(seed))
 
     # Saving run outputs.
-    save_model_run(seed_dir, model, history, best_metrics)
+    save_model_run(seed_dir, model, history, final_metrics)
 
     # Returning structured run result.
     return {
@@ -804,7 +787,7 @@ def train_cql(benchmark, seed, results_dir, config): # CQL is value-learning.
         "policy": final_policy,
         "analysis_policy": final_policy,
         "history": history,
-        "metrics": best_metrics,
+        "metrics": final_metrics,
         "train_time_seconds": float(time.time() - start_time),
         "convergence_epoch_95": epoch_to_fraction_of_best(history, "survival_rate", 0.95),
     }
@@ -934,9 +917,7 @@ def train_voac(benchmark, seed, results_dir, config):
 
     # Preparing tracking structures.
     history = []
-    best_survival = -1.0
-    best_state = None
-    best_metrics = None
+    final_metrics = None
     start_time = time.time()
 
     # Main epoch loop.
@@ -1055,7 +1036,7 @@ def train_voac(benchmark, seed, results_dir, config):
             "q2_loss": float(q2_loss.item()),
         }
 
-        # Periodic evaluation.
+        # Evaluation. Under the fixed schedule, eval_every > epochs, so this runs only at the final epoch.
         if epoch % eval_every == 0 or epoch == epochs:
             model.eval()
             with torch.no_grad():
@@ -1071,18 +1052,12 @@ def train_voac(benchmark, seed, results_dir, config):
 
             row.update(metrics)
 
-            # Saving best checkpoint.
-            if metrics["survival_rate"] > best_survival:
-                best_survival = metrics["survival_rate"]
-                best_state = {key: value.detach().cpu() for key, value in model.state_dict().items()}
-                best_metrics = metrics
+            # The reported checkpoint is the pre-specified final training epoch.
+            if epoch == epochs:
+                final_metrics = metrics
 
         # Storing row.
         history.append(row)
-
-    # Restoring best checkpoint.
-    if best_state is not None:
-        model.load_state_dict(best_state)
 
     # Final policy extraction.
     model.eval()
@@ -1091,9 +1066,9 @@ def train_voac(benchmark, seed, results_dir, config):
         final_policy = greedy_policy_from_logits(logits_final)
         final_soft_policy = plain_softmax_from_logits(logits_final)
 
-    # Fallback metric computation
-    if best_metrics is None:
-        best_metrics = evaluate_policy_set(
+    # Fallback metric computation.
+    if final_metrics is None:
+        final_metrics = evaluate_policy_set(
             benchmark,
             policy_numpy(final_policy),
             soft_policy=policy_numpy(final_soft_policy),
@@ -1101,7 +1076,7 @@ def train_voac(benchmark, seed, results_dir, config):
 
     # Saving run output
     seed_dir = os.path.join(results_dir, "voac", "seed_" + str(seed))
-    save_model_run(seed_dir, model, history, best_metrics)
+    save_model_run(seed_dir, model, history, final_metrics)
 
     # Returning structured result.
     return {
@@ -1111,7 +1086,7 @@ def train_voac(benchmark, seed, results_dir, config):
         "policy": policy_numpy(final_policy),
         "analysis_policy": policy_numpy(final_soft_policy),
         "history": history,
-        "metrics": best_metrics,
+        "metrics": final_metrics,
         "train_time_seconds": float(time.time() - start_time),
         "convergence_epoch_95": epoch_to_fraction_of_best(history, "survival_rate", 0.95),
     }
@@ -1196,9 +1171,7 @@ def train_laadan_ac(benchmark, seed, results_dir, config):
 
     # Tracking structures.
     history = []
-    best_survival = -1.0
-    best_state = None
-    best_metrics = None
+    final_metrics = None
     start_time = time.time()
 
     # Main epoch loop.
@@ -1362,7 +1335,7 @@ def train_laadan_ac(benchmark, seed, results_dir, config):
             "smoothness": float(torch.mean(expected_smoothness).item()),
         }
 
-        # Periodic evaluation.
+        # Evaluation. Under the fixed schedule, eval_every > epochs, so this runs only at the final epoch.
         if epoch % eval_every == 0 or epoch == epochs:
             model.eval()
             with torch.no_grad():
@@ -1378,18 +1351,12 @@ def train_laadan_ac(benchmark, seed, results_dir, config):
 
             row.update(metrics)
 
-            # Saving best checkpoint if survival improves.
-            if metrics["survival_rate"] > best_survival:
-                best_survival = metrics["survival_rate"]
-                best_state = {key: value.detach().cpu() for key, value in model.state_dict().items()}
-                best_metrics = metrics
+            # The reported checkpoint is the pre-specified final training epoch.
+            if epoch == epochs:
+                final_metrics = metrics
 
         # Storing row in history.
         history.append(row)
-
-    # Restoring best checkpoint.
-    if best_state is not None:
-        model.load_state_dict(best_state)
 
     # Final policy extraction.
     model.eval()
@@ -1398,9 +1365,9 @@ def train_laadan_ac(benchmark, seed, results_dir, config):
         final_policy = masked_greedy_policy_from_logits(logits_final, admissible)
         final_soft_policy = masked_softmax_from_logits(logits_final, admissible)
 
-    # Fallback metric computation if none was stored.
-    if best_metrics is None:
-        best_metrics = evaluate_policy_set(
+    # Fallback metric computation if the final evaluation was not recorded.
+    if final_metrics is None:
+        final_metrics = evaluate_policy_set(
             benchmark,
             policy_numpy(final_policy),
             soft_policy=policy_numpy(final_soft_policy),
@@ -1408,7 +1375,7 @@ def train_laadan_ac(benchmark, seed, results_dir, config):
 
     # Save the run.
     seed_dir = os.path.join(results_dir, "laadan_ac", "seed_" + str(seed))
-    save_model_run(seed_dir, model, history, best_metrics)
+    save_model_run(seed_dir, model, history, final_metrics)
 
     # Returning structured result dictionary.
     return {
@@ -1418,7 +1385,7 @@ def train_laadan_ac(benchmark, seed, results_dir, config):
         "policy": policy_numpy(final_policy),
         "analysis_policy": policy_numpy(final_soft_policy),
         "history": history,
-        "metrics": best_metrics,
+        "metrics": final_metrics,
         "train_time_seconds": float(time.time() - start_time),
         "convergence_epoch_95": epoch_to_fraction_of_best(history, "survival_rate", 0.95),
     }
@@ -1576,5 +1543,4 @@ def best_policy_from_runs(run_list, use_analysis_policy=False):
     if use_analysis_policy:
         return run_list[best_index].get("analysis_policy", run_list[best_index]["policy"])
     return run_list[best_index]["policy"]
-
 
