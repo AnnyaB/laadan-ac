@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-"""Validate fixed-schedule artifacts, aggregates, and checkpoint-level reproducibility invariants."""
+
+
 from __future__ import annotations
 
 import argparse
@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Dict, List, Sequence
 
 import numpy as np
+
 
 SEEDS = (42, 43, 44, 45, 46)
 MAIN_METHOD_DIRS = ("bc", "cql", "voac", "laadan_ac")
@@ -52,6 +53,7 @@ T_CRIT_95 = {
 }
 
 
+# validation
 def load_json(path: Path):
     with path.open("r", encoding="utf-8") as handle:
         return json.load(handle)
@@ -122,6 +124,7 @@ def assert_close(actual: float, expected: float, label: str, atol: float = 1e-10
         raise AssertionError(f"{label}: {actual} != {expected}")
 
 
+# validate data manifest
 def validate_data_manifest(result_root: Path, data_dir: Path) -> None:
     recorded = load_json(result_root / "data_sha256.json")
     current = recursive_manifest(data_dir)
@@ -137,6 +140,7 @@ def validate_data_manifest(result_root: Path, data_dir: Path) -> None:
         )
 
 
+# validate main runs
 def validate_main_runs(root: Path) -> Dict[str, List[Dict[str, str]]]:
     rows = load_csv(root / "aggregate" / "per_seed_metrics.csv")
     methods = {row["method"] for row in rows}
@@ -186,12 +190,14 @@ def validate_main_runs(root: Path) -> Dict[str, List[Dict[str, str]]]:
     return grouped
 
 
+# validate zero posthoc inadmissibility
 def validate_zero_posthoc_inadmissibility(grouped: Dict[str, List[Dict[str, str]]]) -> None:
     for row in grouped["Post-hoc Masked VOAC"]:
         if abs(float(row["inadmissibility_rate"])) > 1e-12:
             raise AssertionError(f"Post-hoc masked VOAC is inadmissible: {row}")
 
 
+# validate aggregate summary
 def validate_aggregate_summary(root: Path, grouped: Dict[str, List[Dict[str, str]]]) -> None:
     saved = load_json(root / "aggregate" / "main_summary.json")
     if "convergence_epoch_95" in json.dumps(saved):
@@ -215,6 +221,7 @@ def validate_aggregate_summary(root: Path, grouped: Dict[str, List[Dict[str, str
                 assert_close(recorded[field], value, f"{method}/{metric}/{field}")
 
 
+# validate paired summary
 def validate_paired_summary(root: Path, grouped: Dict[str, List[Dict[str, str]]]) -> None:
     saved = load_json(root / "aggregate" / "paired_laadan_minus_posthoc_voac.json")
     if saved["seeds"] != list(SEEDS):
@@ -244,6 +251,7 @@ def validate_paired_summary(root: Path, grouped: Dict[str, List[Dict[str, str]]]
                 assert_close(recorded[field], value, f"paired/{metric}/{field}")
 
 
+# validate ablations
 def validate_ablations(root: Path, expected_level: str) -> None:
     if expected_level == "none":
         return
@@ -269,8 +277,8 @@ def validate_ablations(root: Path, expected_level: str) -> None:
         for row in method_rows:
             numeric_row(row)
 
-    # The full LAADAN row must be exactly the frozen main LAADAN seed metrics,
-    # not a separately retrained duplicate.
+
+
     main_laadan = {
         int(row["seed"]): numeric_row(row)
         for row in load_csv(root / "aggregate" / "per_seed_metrics.csv")
@@ -304,6 +312,7 @@ def validate_ablations(root: Path, expected_level: str) -> None:
                     raise AssertionError(f"Missing ablation artifact: {seed_dir / filename}")
 
 
+# validate figures
 def validate_figures(root: Path, minimum_count: int = 5) -> None:
     figure_dir = root / "figures"
     if not figure_dir.is_dir():
@@ -322,13 +331,16 @@ def validate_figures(root: Path, minimum_count: int = 5) -> None:
         raise AssertionError(f"Unexpected non-PNG figures: {non_png}")
 
 
+# arguments
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--root", default="results/fixed_schedule_2026/icu_sepsis")
+    parser.add_argument("--root", default="results/main/icu_sepsis")
     parser.add_argument("--data-dir", default="data/icu_sepsis")
     parser.add_argument("--ablations", choices=["none", "core", "full"], default="full")
     parser.add_argument("--skip-figures", action="store_true")
     return parser.parse_args()
+
+
 
 
 def main():

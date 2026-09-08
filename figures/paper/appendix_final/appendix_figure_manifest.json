@@ -1,0 +1,98 @@
+{
+  "figure_protocol": "LAADAN-AC camera-ready appendix publication-style v3",
+  "git_head_at_plot_time": "8f4e561108d22b4fd46ad8530bf20057d18bb310",
+  "results_root": "/Users/riyabasak_15/Downloads/laadan-ac-camera-ready-work/results/fixed_schedule_2026",
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "ci": "95% t-CI across five random training seeds (t_0.975,4 = 2.776)",
+  "benchmark_model_selection": "No benchmark-return/admissibility field is permitted before epoch 1000 in training histories.",
+  "inputs": [
+    {
+      "path": "results/fixed_schedule_2026/eicu_demo/aggregate/per_seed_metrics.csv",
+      "sha256": "2dcc92234683d046a67a72fa8ff6cc3082abd78b79ec2840b2a7ab8e73f5c6d7"
+    },
+    {
+      "path": "results/fixed_schedule_2026/eicu_demo/main_fixed_schedule/laadan_ac/seed_42/history.csv",
+      "sha256": "90e13adb2e0408f3802edc61301e86b16e0514d649c1c44da2d870713009f10e"
+    },
+    {
+      "path": "results/fixed_schedule_2026/eicu_demo/main_fixed_schedule/laadan_ac/seed_43/history.csv",
+      "sha256": "d483d1cde11a80fe660f351e99bf9bb3d992fd3bc73165430a63f30bc1e3f4d0"
+    },
+    {
+      "path": "results/fixed_schedule_2026/eicu_demo/main_fixed_schedule/laadan_ac/seed_44/history.csv",
+      "sha256": "d344c4e3b24ec5025f682d6cba3550a2372dec16531a3259d82f6ccc8b8676d8"
+    },
+    {
+      "path": "results/fixed_schedule_2026/eicu_demo/main_fixed_schedule/laadan_ac/seed_45/history.csv",
+      "sha256": "4bdb9c4990df541e9792b32d0819c579d4a41d31b204da851f98d7799bead2a8"
+    },
+    {
+      "path": "results/fixed_schedule_2026/eicu_demo/main_fixed_schedule/laadan_ac/seed_46/history.csv",
+      "sha256": "39304a7334a7ab48fba7eb1f244e3e7d539d6b13bcd191fdd67666e855e5dd82"
+    },
+    {
+      "path": "results/fixed_schedule_2026/icu_sepsis/aggregate/per_seed_metrics.csv",
+      "sha256": "1199dddf26b96210ec99fed7099e89a53aef9aedc71e781bf732e3b8743f39eb"
+    },
+    {
+      "path": "results/fixed_schedule_2026/icu_sepsis/main_fixed_schedule/laadan_ac/seed_42/history.csv",
+      "sha256": "cad16ef4cdddc0ced66f2439bfc72b4c9d23256265f612909989c8235fd52976"
+    },
+    {
+      "path": "results/fixed_schedule_2026/icu_sepsis/main_fixed_schedule/laadan_ac/seed_43/history.csv",
+      "sha256": "20e78545535a8cda8822d41aa14c72a7a2b5ce2f486dc3f14c5d44655ad2fc49"
+    },
+    {
+      "path": "results/fixed_schedule_2026/icu_sepsis/main_fixed_schedule/laadan_ac/seed_44/history.csv",
+      "sha256": "d5cd85c055ee9488eb59a71621730b791d7182895748314a2c56c5bfb470c774"
+    },
+    {
+      "path": "results/fixed_schedule_2026/icu_sepsis/main_fixed_schedule/laadan_ac/seed_45/history.csv",
+      "sha256": "c71605d19f541e6b4d80cf5cd755401f4822846cf1bfa1199c8f9babc54abfaa"
+    },
+    {
+      "path": "results/fixed_schedule_2026/icu_sepsis/main_fixed_schedule/laadan_ac/seed_46/history.csv",
+      "sha256": "eb4fe7ac94bfc2196ba43fdc0cb04f52239004d480973058ccb482db4c770cd6"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "figures/camera_ready/appendix_final/figA1_eicu_detailed_fixed_schedule.png",
+      "sha256": "eb3cb1e0a5571c0eb1eb42876f36cebce6eb5a6a9d25e1396cf45ae2cbadb35c"
+    },
+    {
+      "path": "figures/camera_ready/appendix_final/figA1_eicu_detailed_fixed_schedule.pdf",
+      "sha256": "839f74ac3b69925e1f6443405a5f1f3b76d7c73bc900b8553d725bd5bf995e79"
+    },
+    {
+      "path": "figures/camera_ready/appendix_final/figB1_posthoc_intervention_diagnostics.png",
+      "sha256": "2a5223d27352745bb8fe9c108b700172b65720b9cc05811c065d9af7c4f62729"
+    },
+    {
+      "path": "figures/camera_ready/appendix_final/figB1_posthoc_intervention_diagnostics.pdf",
+      "sha256": "004ee2b3ac2359c5991ed0f3aa6c34c50f74784cb221540290f9cd0c2daa3bed"
+    },
+    {
+      "path": "figures/camera_ready/appendix_final/figB2_policy_distribution_admissibility.png",
+      "sha256": "82f2e86a82ff0decedc74b5171b24273d5bfcc84bf4bdb05b2a35b7afebcbe44"
+    },
+    {
+      "path": "figures/camera_ready/appendix_final/figB2_policy_distribution_admissibility.pdf",
+      "sha256": "62349831964494f286b9dbe72241fcd2efbff5e3e009b85be9929b1716742a5c"
+    },
+    {
+      "path": "figures/camera_ready/appendix_final/figC1_training_objective_dynamics.png",
+      "sha256": "a0e1de947375c0301f1e9c0c5fba0f4ac40d304dc5d0ea86a2ef3a66895d38d1"
+    },
+    {
+      "path": "figures/camera_ready/appendix_final/figC1_training_objective_dynamics.pdf",
+      "sha256": "57cf8c048c3d73000651087f695bf8872baca2520e5c9c1d428da9edab65272f"
+    }
+  ]
+}

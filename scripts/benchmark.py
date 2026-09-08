@@ -1,4 +1,4 @@
-"""Load tabular benchmark MDPs and perform exact finite-horizon policy evaluation."""
+
 
 
 import json
@@ -12,6 +12,11 @@ import numpy as np
 import torch
 
 
+
+
+
+# benchmark
+# evaluation
 class ICUSepsisOfflineBenchmark:
 
 
@@ -25,39 +30,39 @@ class ICUSepsisOfflineBenchmark:
 
         self.use_one_hot_states = bool(use_one_hot_states)
 
-        # Transition tensor p(s, a, s').
-        # Will later have shape [num_states, num_actions, num_states].
+
+
         self.transition = None
 
-        # Reward assigned by next state.
-        # In this benchmark, the reward depends only on the state transitioned into.
+
+
         self.reward_by_next_state = None
 
-        # Initial-state distribution d0(s).
+
         self.initial_state_dist = None
 
-        # Released expert policy from the benchmark.
+
         self.expert_policy = None
 
-        # Binary admissibility mask indicating which actions are considered
-        # supported / admissible in each state.
+
+
         self.admissible_mask = None
 
-        # State feature matrix used as neural-network input.
+
         self.state_features = None
 
-        # Number of states in the benchmark MDP.
+
         self.num_states = 0
 
-        # Number of discrete actions in the benchmark MDP.
+
         self.num_actions = 0
 
-        # Dimensionality of the chosen state feature representation.
+
         self.feature_dim = 0
 
-        # Default terminal-state indices used by the released ICU-Sepsis files.
-        # These are kept as defaults, but checked later in case a future release
-        # changes the exact terminal-state numbering.
+
+
+
         self.death_state = 713
         self.survival_state = 714
 
@@ -65,31 +70,31 @@ class ICUSepsisOfflineBenchmark:
 
         self._load_all()
 
-        # If terminal indices ever change in another benchmark release, recover
-        # them from the reward structure.
+
+
         self._fix_terminal_indices_if_needed()
 
-        # Building terminal-state mask after terminal indices are known.
+
         self._build_terminal_mask()
 
-        # Precomputing expected immediate reward for each (state, action) pair.
-        #
-        # transition has shape [S, A, S]
-        # reward_by_next_state has shape [S]
+
+
+
+
 
         self.reward_sa = self.transition @ self.reward_by_next_state
 
-        # Define an immediate cost table:
-        # admissible actions - cost 0
-        # inadmissible actions - cost 1
 
-        # This is used later for safety-related analysis and constraints.
+
+
+
+
         self.immediate_cost = 1.0 - self.admissible_mask.astype(np.float32)
 
-        # Filter the expert policy through admissibility, then renormalise it.
+
         self.expert_safe = self._safe_expert_policy()
 
-        # Computing the expert-supported mean action index per state.
+
         self.expert_mean_action = np.sum(
             self.expert_safe * np.arange(self.num_actions, dtype=np.float32)[None, :],
             axis=1,
@@ -106,33 +111,33 @@ class ICUSepsisOfflineBenchmark:
 
         self.initial_state_dist_t = torch.as_tensor(self.initial_state_dist, dtype=torch.float32, device=self.device)
 
-        # Admissibility mask
+
         self.admissible_mask_t = torch.as_tensor(
             self.admissible_mask.astype(np.float32),
             dtype=torch.float32,
             device=self.device,
         )
 
-        # Terminal-state mask
+
         self.terminal_mask_t = torch.as_tensor(
             self.terminal_mask.astype(np.float32),
             dtype=torch.float32,
             device=self.device,
         )
 
-        # State features
+
         self.state_features_t = torch.as_tensor(self.state_features, dtype=torch.float32, device=self.device)
 
-        # Original expert policy
+
         self.expert_policy_t = torch.as_tensor(self.expert_policy, dtype=torch.float32, device=self.device)
 
-        # Admissibility-filtered expert policy
+
         self.expert_safe_t = torch.as_tensor(self.expert_safe, dtype=torch.float32, device=self.device)
 
-        # Immediate inadmissibility cost table
+
         self.immediate_cost_t = torch.as_tensor(self.immediate_cost, dtype=torch.float32, device=self.device)
 
-        # Smoothness proxy cost table
+
         self.smoothness_cost_t = torch.as_tensor(self.smoothness_cost, dtype=torch.float32, device=self.device)
 
     def _resolve_path(self, filename):
@@ -292,7 +297,7 @@ class ICUSepsisOfflineBenchmark:
 
         values = values / safe
 
-        # Replacing any zero row with a uniform distribution.
+
         for row_index in range(values.shape[0]):
             if zero_rows[row_index]:
                 values[row_index] = 1.0 / float(values.shape[1])
@@ -404,23 +409,23 @@ class ICUSepsisOfflineBenchmark:
 
         masked = self.masked_logits(logits, admissible_mask_t)
 
-        # Then applying softmax to obtain a valid policy distribution.
+
         return torch.softmax(masked, dim=1)
 
     def greedy_policy_from_q(self, q_values):
 
         q_values = np.asarray(q_values, dtype=np.float32).copy()
 
-        # Forcing inadmissible actions to a huge negative score so they cannot win.
+
         q_values[self.admissible_mask == 0] = -1e9
 
-        # Initialising one-hot policy matrix.
+
         policy = np.zeros((self.num_states, self.num_actions), dtype=np.float32)
 
-        # Best action per state.
+
         best_actions = np.argmax(q_values, axis=1)
 
-        # Putting probability 1.0 on the chosen action in each state.
+
         policy[np.arange(self.num_states), best_actions] = 1.0
 
         return policy
@@ -430,13 +435,13 @@ class ICUSepsisOfflineBenchmark:
 
         q_values = np.asarray(q_values, dtype=np.float32)
 
-        # Initialising one-hot policy matrix.
+
         policy = np.zeros((self.num_states, self.num_actions), dtype=np.float32)
 
-        # Choosing highest-valued action in each state.
+
         best_actions = np.argmax(q_values, axis=1)
 
-        # Putting probability 1.0 on the chosen action.
+
         policy[np.arange(self.num_states), best_actions] = 1.0
 
         return policy
@@ -491,7 +496,7 @@ class ICUSepsisOfflineBenchmark:
 
         payload = {}
 
-        # Evaluating each reference policy exactly.
+
         for name, policy in self.reference_policies(gamma=gamma, horizon=horizon).items():
             payload[name] = self.exact_policy_evaluation(policy, horizon=horizon)
 
@@ -510,52 +515,52 @@ class ICUSepsisOfflineBenchmark:
 
         immediate_reward = np.sum(policy * self.reward_sa, axis=1)
 
-        # One-step probability of transitioning directly into survival state.
+
         immediate_survival = p_pi[:, self.survival_state]
 
-        # Expected one-step inadmissibility cost under the policy.
+
         immediate_cost = np.sum(policy * self.immediate_cost, axis=1)
 
-        # Non-terminal length contribution: 1 step for non-terminal states, 0 for terminal.
+
         immediate_length = 1.0 - self.terminal_mask.astype(np.float32)
 
-        # Initialising finite-horizon value-like vectors.
+
         value = np.zeros(self.num_states, dtype=np.float32)
         survival = np.zeros(self.num_states, dtype=np.float32)
         length = np.zeros(self.num_states, dtype=np.float32)
         cost = np.zeros(self.num_states, dtype=np.float32)
 
-        # Non-terminal mask again, used to stop backup through terminal states.
+
         mask = 1.0 - self.terminal_mask.astype(np.float32)
 
-        # Finite-horizon backward recursion.
+
         for _ in range(horizon):
             value = mask * (immediate_reward + p_pi @ value)
             survival = mask * (immediate_survival + p_pi @ survival)
             length = mask * (immediate_length + p_pi @ length)
             cost = mask * (immediate_cost + p_pi @ cost)
 
-        # Aggregating state-wise values under initial-state distribution.
+
         avg_return = float(self.initial_state_dist @ value)
         survival_rate = float(self.initial_state_dist @ survival)
         avg_length = float(self.initial_state_dist @ length)
         expected_cost = float(self.initial_state_dist @ cost)
 
-        # Defining inadmissibility rate as expected cost per expected step.
+
         inadmissibility_rate = 0.0 if avg_length <= 1e-12 else expected_cost / avg_length
 
-        # Mortality is 1 minus survival.
+
         mortality_rate = 1.0 - survival_rate
 
-        # Normalised state weights for policy-analysis metrics.
+
         state_weights = self.initial_state_dist / max(1e-12, float(np.sum(self.initial_state_dist)))
 
-        # Comparing greedy action of model vs greedy action of safe expert.
+
         expert_argmax = np.argmax(self.expert_safe, axis=1)
         model_argmax = np.argmax(policy, axis=1)
         argmax_match = float(np.sum(state_weights * (expert_argmax == model_argmax).astype(np.float32)))
 
-        # Computing weighted KL(expert_safe || policy) per state, then average.
+
         kl = np.sum(
             state_weights[:, None]
             * self.expert_safe
@@ -564,13 +569,13 @@ class ICUSepsisOfflineBenchmark:
         )
         mean_kl_to_expert = float(np.sum(kl))
 
-        # Computing weighted policy entropy.
+
         entropy = -np.sum(state_weights[:, None] * policy * np.log(policy + 1e-8))
 
-        # Computing expected action index in each state.
+
         expected_action = np.sum(policy * np.arange(self.num_actions, dtype=np.float32)[None, :], axis=1)
 
-        # Comparing expected action index against expert-supported mean action.
+
         action_deviation_from_expert = float(
             np.sum(state_weights * np.abs(expected_action - self.expert_mean_action))
         )

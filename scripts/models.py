@@ -1,4 +1,4 @@
-"""Neural policy and value models used by the offline-RL baselines and LAADAN-AC."""
+
 
 
 import torch
@@ -6,6 +6,11 @@ import torch
 import torch.nn as nn
 
 
+
+
+
+# models
+# state encoder
 class MLPEncoder(nn.Module):
 
 
@@ -27,10 +32,11 @@ class MLPEncoder(nn.Module):
             nn.ReLU(),
         )
 
-    def forward(self, x):      # x shape = [716, 47]
+    def forward(self, x):
 
         return self.net(x)
 
+# policy head
 class PolicyHead(nn.Module):
 
 
@@ -38,15 +44,16 @@ class PolicyHead(nn.Module):
 
         super().__init__()
 
-        # Single linear layer projecting latent features to action logits.
+
         self.linear = nn.Linear(latent_dim, num_actions)
 
 
     def forward(self, z):
 
-        return self.linear(z) # 25 logits
+        return self.linear(z)
 
 
+# q head
 class QHead(nn.Module):
 
 
@@ -61,6 +68,8 @@ class QHead(nn.Module):
         return self.linear(z)
 
 
+
+# bc model
 class BehaviorCloningNet(nn.Module):
 
 
@@ -75,7 +84,7 @@ class BehaviorCloningNet(nn.Module):
             dropout=dropout,
         )
 
-        self.policy_head = PolicyHead(latent_dim, num_actions) # 128 latent features -> 25 action logits
+        self.policy_head = PolicyHead(latent_dim, num_actions)
 
 
     def forward(self, x):
@@ -84,6 +93,8 @@ class BehaviorCloningNet(nn.Module):
 
         return self.policy_head(z)
 
+
+# cql model
 class ConservativeQNet(nn.Module):
 
 
@@ -96,9 +107,9 @@ class ConservativeQNet(nn.Module):
             hidden_dim=hidden_dim,
             latent_dim=latent_dim,
             dropout=dropout,
-        )  # converts the 47 state features into a 128-dimensional latent representation.
+        )
 
-        self.q_head = QHead(latent_dim, num_actions)  # This converts the 128 latent features into 25 Q-values.
+        self.q_head = QHead(latent_dim, num_actions)
 
 
     def forward(self, x):
@@ -107,9 +118,10 @@ class ConservativeQNet(nn.Module):
 
         return self.q_head(z)
 
-    """ state x -> latent representation z -> Q-values for all 25 actions
-    CQL later chooses the action with the highest Q-value. conservative penalty is not in models.py. It is in trainers.py. """
 
+
+
+# actor and twin critics
 class OfflineActorCriticNet(nn.Module):
 
     def __init__(
@@ -133,17 +145,7 @@ class OfflineActorCriticNet(nn.Module):
         )
 
 
-        """ For LAADAN-AC:
 
-            47 features
-            -> Linear(47,128)
-            -> ReLU
-            -> Dropout(0.10)
-            -> Linear(128,128)
-            -> ReLU
-            -> 128-dimensional latent representation
-
-            So, the actor's job is to understand the current ICU state before choosing an action."""
         self.critic_encoder = MLPEncoder(
             input_dim,
             hidden_dim=hidden_dim,
@@ -154,12 +156,12 @@ class OfflineActorCriticNet(nn.Module):
         self.actor_head = PolicyHead(latent_dim, num_actions)
 
 
-        # First reward/value critic head.
+
         self.q1_head = QHead(latent_dim, num_actions)
 
-        # Second reward/value critic head.
-        # Using two critics is common in actor-critic methods because it can
-        # reduce over-optimistic value estimates.
+
+
+
         self.q2_head = QHead(latent_dim, num_actions)
 
 
@@ -167,7 +169,7 @@ class OfflineActorCriticNet(nn.Module):
 
         self.cost_head = QHead(latent_dim, num_actions) if self.use_cost_head else None
 
-        # The cost head outputs: 25 cost estimates, for how unsafe/costly might each action be in this state
+
 
     def actor_logits(self, x):
 
@@ -179,15 +181,15 @@ class OfflineActorCriticNet(nn.Module):
 
         critic_latent = self.critic_encoder(x)
 
-        # First critic estimates one score per action.
+
         q1 = self.q1_head(critic_latent)
 
-        # Second critic estimates one score per action.
+
         q2 = self.q2_head(critic_latent)
 
-        # These produce two Q-value tables.
 
-        # If cost head exists, compute cost scores too; otherwise return None.
+
+
         cost = self.cost_head(critic_latent) if self.cost_head is not None else None
 
         return q1, q2, cost
@@ -207,20 +209,12 @@ class OfflineActorCriticNet(nn.Module):
         }
 
 
+
+
 @torch.no_grad()
+# target update
 def soft_update(target_module, source_module, tau):
 
     for target_param, source_param in zip(target_module.parameters(), source_module.parameters()):
 
         target_param.data.copy_(tau * source_param.data + (1.0 - tau) * target_param.data)
-        """
-        If:
-
-            tau = 0.01
-
-        then:
-
-            target = 1% new model + 99% old target
-
-        So the target network moves slowly. It makes Bellman target learning more stable,
-        because the target does not change too violently every epoch."""

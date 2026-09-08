@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-"""Run fixed-schedule LAADAN-AC component ablations at the predetermined final checkpoint."""
+
+
 from __future__ import annotations
 
 import argparse
@@ -13,23 +13,22 @@ from typing import Dict, List
 import numpy as np
 import torch
 
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS_DIR = REPO_ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from benchmark import ICUSepsisOfflineBenchmark  # noqa: E402
-from ablation_engine import BASE_LAADAN_CONFIG, BudgetedLagrangianExperiment  # noqa: E402
-from run_fixed_schedule import (  # noqa: E402
-    EPOCHS,
+from benchmark import ICUSepsisOfflineBenchmark
+from ablation_engine import BASE_LAADAN_CONFIG, BudgetedLagrangianExperiment
+from run_fixed_schedule import (
     FINAL_ONLY_EVAL_EVERY,
     SEEDS,
     ablation_variants,
     dump_json,
     validate_final_only_history,
 )
-from trainers import mean_ci95  # noqa: E402
-
+from trainers import mean_ci95
 DEFAULT_NEW_VARIANTS = ("no_expert_kl", "no_smoothness", "no_lagrangian", "no_mask")
 PERTURBATION_VARIANTS = {
     variant["folder"]: variant
@@ -42,6 +41,7 @@ DISPLAY_NAME_BY_FOLDER = {
 PERTURBATION_FOLDERS = tuple(DISPLAY_NAME_BY_FOLDER)
 
 
+# ablations
 def load_json(path: Path):
     with path.open("r", encoding="utf-8") as handle:
         return json.load(handle)
@@ -64,6 +64,7 @@ def write_csv(path: Path, rows: List[Dict]) -> None:
         writer.writerows(rows)
 
 
+# select device
 def choose_device(requested: str) -> str:
     if requested == "auto":
         return "cuda" if torch.cuda.is_available() else "cpu"
@@ -80,6 +81,7 @@ def existing_seed_dirs(ablation_root: Path, folder: str) -> List[int]:
     ]
 
 
+# run requested variants
 def run_requested_variants(
     benchmark,
     output_root: Path,
@@ -132,13 +134,14 @@ def numeric_metrics(metrics: Dict) -> Dict[str, float]:
     }
 
 
+# rebuild aggregates
 def rebuild_aggregates(output_root: Path) -> None:
     ablation_root = output_root / "ablations" / "lagrangian_frontier"
     rows: List[Dict] = []
     grouped_values: Dict[str, List[Dict[str, float]]] = {"Full LAADAN-AC": []}
 
-    # The full row is the same fixed-schedule LAADAN-AC model used in the main
-    # comparison; reusing these exact files avoids an unnecessary duplicate run.
+
+
     for seed in SEEDS:
         metrics_path = (
             output_root
@@ -179,11 +182,12 @@ def rebuild_aggregates(output_root: Path) -> None:
     write_csv(aggregate_dir / "ablation_per_seed_metrics.csv", rows)
 
 
+# arguments
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-dir", default="data/icu_sepsis")
     parser.add_argument(
-        "--output-root", default="results/fixed_schedule_2026/icu_sepsis"
+        "--output-root", default="results/main/icu_sepsis"
     )
     parser.add_argument("--device", choices=["auto", "cpu", "cuda"], default="auto")
     parser.add_argument(
@@ -200,6 +204,8 @@ def parse_args():
         help="Intentionally rerun and replace a complete existing perturbation. Off by default.",
     )
     return parser.parse_args()
+
+
 
 
 def main():

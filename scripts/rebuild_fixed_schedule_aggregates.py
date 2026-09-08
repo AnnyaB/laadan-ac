@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-"""Rebuild aggregate metrics from frozen per-seed fixed-schedule outputs."""
+
+
 from __future__ import annotations
 
 import argparse
@@ -11,13 +11,14 @@ from typing import Dict, List
 
 import numpy as np
 
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS_DIR = REPO_ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from run_fixed_schedule import SEEDS, dump_json, recursive_sha256_manifest  # noqa: E402
-from trainers import mean_ci95  # noqa: E402
+from run_fixed_schedule import SEEDS, dump_json, recursive_sha256_manifest
+from trainers import mean_ci95
 
 METHODS = [
     ("Behavior Cloning", "bc"),
@@ -28,6 +29,7 @@ METHODS = [
 POSTHOC_NAME = "Post-hoc Masked VOAC"
 
 
+# aggregation
 def load_json(path: Path):
     with path.open("r", encoding="utf-8") as handle:
         return json.load(handle)
@@ -60,8 +62,9 @@ def write_csv(path: Path, rows: List[Dict]) -> None:
         writer.writerows(rows)
 
 
+# aggregate clean
 def aggregate_clean(groups: Dict[str, List[Dict[str, float]]]) -> Dict:
-    """Aggregate with the same fields used by the released trainer summaries."""
+
     summary = {}
     for method, seed_metrics in groups.items():
         if len(seed_metrics) != len(SEEDS):
@@ -162,9 +165,10 @@ def rebuild(dataset_root: Path, data_dir: Path | None) -> None:
         dump_json(dataset_root / "data_sha256.json", recursive_sha256_manifest(data_dir))
 
 
+# arguments
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--root", default="results/fixed_schedule_2026/icu_sepsis")
+    parser.add_argument("--root", default="results/main/icu_sepsis")
     parser.add_argument("--data-dir", default="data/icu_sepsis")
     parser.add_argument(
         "--skip-data-manifest",
@@ -172,6 +176,8 @@ def parse_args():
         help="Do not refresh data_sha256.json.",
     )
     return parser.parse_args()
+
+
 
 
 def main():

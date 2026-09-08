@@ -1,35 +1,27 @@
-"""Utilities for state-, action-, value-, and trajectory-level policy diagnostics."""
 
-# safety_failure_analysis.py
 
-# This script performs the safety-failure analysis for the
-# ICU-Sepsis LAADAN-AC.
 
-# Libraries used in this script:
-
-# Importing argparse so the script can receive command-line arguments such as
-# --data-dir, --results-dir, --device and --num-trajectories.
 import argparse
-# Importing csv so the script can write editable table files for the paper.
+
 import csv
 
-# Importing json so the script can read run_config.json and write the final
-# manifest file listing all generated outputs.
+
+
 import json
 
-# Importing os so the script can build file paths, check whether files exist,
-# and create output folders.
+
+
 import os
 
-# Importing matplotlib so the script can create the analysis figure and save
-# it as a high-resolution PNG.
+
+
 import matplotlib.pyplot as plt
 
-# Importing NumPy for arrays, softmax calculations, PCA projection, trajectory
-# sampling, and table calculations.
+
+
 import numpy as np
 
-# Importing PyTorch so final saved model checkpoints can be loaded and evaluated.
+
 import torch
 
 from trainers import (
@@ -40,26 +32,27 @@ from trainers import (
     policy_numpy,
 )
 
-# Importing the ICU-Sepsis benchmark wrapper used by the project.
-# This gives access to state features, transition probabilities, admissibility
-# masks, expert-safe policy, rewards and terminal states.
+
+
+
 from benchmark import ICUSepsisOfflineBenchmark
 
-# Importing the exact model classes used during training.
-# These are needed so the saved model.pt files can be loaded into matching
-# architectures before analysis.
+
+
+
 from models import BehaviorCloningNet, ConservativeQNet, OfflineActorCriticNet
 
 
-# Setting the figure resolution.
+
+
 PLOT_DPI = 600
 
-# Setting a tiny numerical constant used to avoid division-by-zero in softmax and
-# trajectory probability normalisation.
+
+
 EPS = 1e-8
 
-# Defining a fixed colour palette so plots remain visually consistent with the
-# rest of the project figures.
+
+
 PALETTE = {
     "Behavior Cloning": "#6baed6",
     "Conservative Q-Learning": "#08519c",
@@ -69,76 +62,66 @@ PALETTE = {
 }
 
 
+# diagnostics
 def ensure_dir(path):
-    """
-    Create a folder if it does not already exist.
-    """
 
-    # Checking whether the requested folder already exists.
+
     if not os.path.exists(path):
 
-        # Creating the folder when it is missing.
+
         os.makedirs(path)
 
 
+# select device
 def choose_device(requested):
-    """
-    Select CPU or CUDA in the same style as the existing project scripts.
-    """
 
-    # If the user explicitly requested CPU, use CPU.
+
+
+
     if requested == "cpu":
         return "cpu"
 
-    # If the user explicitly requested CUDA, check that CUDA is available.
+
     if requested == "cuda":
 
-        # Raising a clear error if CUDA was requested but no GPU is available.
+
         if not torch.cuda.is_available():
             raise RuntimeError("CUDA was requested but is not available.")
 
-        # Returning CUDA when it was requested and available.
+
         return "cuda"
 
-    # If the user selected auto, use CUDA when possible and otherwise fall back
-    # to CPU.
+
+
     return "cuda" if torch.cuda.is_available() else "cpu"
 
 
 def read_json_if_exists(path):
-    """
-    Load a JSON file if it exists, otherwise return an empty dictionary.
-    """
 
-    # Checking whether the JSON file exists.
+
+
     if not os.path.exists(path):
 
-        # Returning an empty dictionary keeps the script usable even if
-        # run_config.json is missing.
+
+
         return {}
 
-    # Opening the JSON file using UTF-8 encoding.
+
     with open(path, "r", encoding="utf-8") as handle:
 
-        # Loading and returning the JSON content as a Python dictionary.
+
         return json.load(handle)
 
 
 def get_config_block(config, name):
-    """
-    Read architecture settings from run_config.json with safe defaults.
-    """
 
-    # Reading the configuration block for one model family.
-    #
-    # Example:
-    # config["voac"]
+
     block = config.get(name, {})
 
-    # Returning the model architecture settings.
-    #
-    # If the config file does not contain these values, the same default values
-    # used by the project are used here.
+
+
+
+
     return {
         "hidden_dim": int(block.get("hidden_dim", 128)),
         "latent_dim": int(block.get("latent_dim", 128)),
@@ -147,121 +130,117 @@ def get_config_block(config, name):
 
 
 def find_model_path(final_models_dir, candidates):
-    """
-    Find the first existing model checkpoint for a list of possible folder names.
-    """
 
-    # Looping through possible folder names because some outputs may use slightly
-    # different naming conventions, for example "laadan_ac" or "laadan-ac".
+
     for folder in candidates:
 
-        # Building the expected checkpoint path for the current candidate folder.
+
         path = os.path.join(final_models_dir, folder, "model.pt")
 
-        # Returning the first checkpoint path that actually exists.
+
         if os.path.exists(path):
             return path, folder
 
-    # Returning None values when none of the candidate folders contain model.pt.
+
     return None, None
 
 
 def unpack_state_dict(loaded_object):
-    """
-    Extract a PyTorch state_dict from common checkpoint formats.
-    """
 
-    # Checking whether the loaded checkpoint is a dictionary.
+
+
+
+
     if isinstance(loaded_object, dict):
 
-        # Some training scripts save weights inside a nested key.
-        # This loop checks the most common names used for that nested dictionary.
+
+
         for key in ["state_dict", "model_state_dict", "model", "net", "weights"]:
 
-            # Returning the nested state dictionary when found.
+
             if key in loaded_object and isinstance(loaded_object[key], dict):
                 return loaded_object[key]
 
-        # If the dictionary itself maps parameter names directly to tensors, then
-        # it is already a raw PyTorch state_dict.
+
+
         raw_state = True
 
-        # Checking every value to confirm that all values are tensors.
+
         for value in loaded_object.values():
             if not torch.is_tensor(value):
                 raw_state = False
                 break
 
-        # Returning the object directly when it is already a raw state_dict.
+
         if raw_state:
             return loaded_object
 
-    # Raising a clear error when the checkpoint format is not recognised.
+
     raise ValueError("Could not find model weights inside checkpoint.")
 
 
 def clean_state_dict_keys(state_dict):
-    """
-    Remove DataParallel 'module.' prefixes if present.
-    """
 
-    # Creating a new dictionary for cleaned parameter names.
+
+
+
+
     cleaned = {}
 
-    # Looping through every saved parameter name and tensor.
+
     for key, value in state_dict.items():
 
-        # Removing the "module." prefix if the model was saved from DataParallel.
+
         if key.startswith("module."):
             cleaned[key[7:]] = value
 
-        # Keeping the key unchanged when no prefix exists.
+
         else:
             cleaned[key] = value
 
-    # Returning the cleaned state dictionary.
+
     return cleaned
 
 
 def load_checkpoint(model, model_path, device):
-    """
-    Load model weights and switch the model to evaluation mode.
-    """
 
-    # Loading the checkpoint onto the requested device.
+
+
+
+
     checkpoint = torch.load(model_path, map_location=device)
 
-    # Extracting and cleaning the saved model weights.
+
     state_dict = clean_state_dict_keys(unpack_state_dict(checkpoint))
 
-    # Loading the saved weights into the matching model architecture.
+
     model.load_state_dict(state_dict)
 
-    # Switching the model to evaluation mode so dropout is disabled.
+
     model.eval()
 
-    # Returning the loaded model.
+
     return model
 
 
 def tensor_to_numpy(value):
-    """
-    Convert a tensor to a NumPy array.
-    """
 
-    # If the value is a PyTorch tensor, detach it from the graph, move it to CPU,
-    # and convert it to NumPy.
+
+
+
+
+
     if torch.is_tensor(value):
         return value.detach().cpu().numpy()
 
-    # If the value is already array-like, convert it to a NumPy array.
+
     return np.asarray(value)
 
 
 def softmax(scores):
-    """
-    Numerically stable softmax for NumPy arrays.
-    """
+
+
+
     x = np.asarray(scores, dtype=np.float64)
     x = x - np.max(x, axis=1, keepdims=True)
     exp_x = np.exp(x)
@@ -269,17 +248,17 @@ def softmax(scores):
 
 
 def masked_softmax(scores, mask):
-    """
-    Softmax restricted to benchmark-admissible actions.
-    """
+
+
+
     safe_scores = np.where(mask > 0, scores, -1e9)
     return softmax(safe_scores)
 
 
 def greedy_policy(scores):
-    """
-    Convert action scores to a deterministic one-hot greedy policy.
-    """
+
+
+
     actions = np.argmax(scores, axis=1)
     policy = np.zeros_like(scores, dtype=np.float64)
     policy[np.arange(scores.shape[0]), actions] = 1.0
@@ -287,42 +266,42 @@ def greedy_policy(scores):
 
 
 def masked_greedy_policy(scores, mask):
-    """
-    Convert action scores to a deterministic policy after admissibility filtering.
-    """
+
+
+
     safe_scores = np.where(mask > 0, scores, -1e9)
     return greedy_policy(safe_scores)
 
 
 def policy_actions(policy):
-    """
-    Return the selected action index for each state.
-    """
+
+
+
     return np.argmax(policy, axis=1)
 
 
 def get_benchmark_array(benchmark, name):
-    """
-    Read a NumPy array from the benchmark object.
-    """
+
+
+
     value = getattr(benchmark, name)
     return tensor_to_numpy(value)
 
 
 def load_final_models(benchmark, final_models_dir, config, device):
-    """
-    Load the saved final checkpoints needed for the safety-failure analysis.
-    """
 
-    # Creating an empty dictionary to store the loaded model objects.
 
-    # The keys will be readable model names and the values will be PyTorch models.
+
+
+
+
+
     loaded = {}
 
-    # Looking for the final Behavior Cloning checkpoint.
+
     bc_path, _ = find_model_path(final_models_dir, ["bc"])
 
-    # Loading Behavior Cloning only if the checkpoint exists.
+
     if bc_path is not None:
         cfg = get_config_block(config, "bc")
         model = BehaviorCloningNet(
@@ -334,10 +313,10 @@ def load_final_models(benchmark, final_models_dir, config, device):
         ).to(device)
         loaded["Behavior Cloning"] = load_checkpoint(model, bc_path, device)
 
-    # Looking for the final Conservative Q-Learning checkpoint.
+
     cql_path, _ = find_model_path(final_models_dir, ["cql"])
 
-    # Loading CQL only if the checkpoint exists.
+
     if cql_path is not None:
         cfg = get_config_block(config, "cql")
         model = ConservativeQNet(
@@ -349,10 +328,10 @@ def load_final_models(benchmark, final_models_dir, config, device):
         ).to(device)
         loaded["Conservative Q-Learning"] = load_checkpoint(model, cql_path, device)
 
-    # Looking for the final Vanilla Offline Actor-Critic checkpoint.
+
     voac_path, _ = find_model_path(final_models_dir, ["voac"])
 
-    # Loading VOAC only if the checkpoint exists.
+
     if voac_path is not None:
         cfg = get_config_block(config, "voac")
         model = OfflineActorCriticNet(
@@ -365,13 +344,13 @@ def load_final_models(benchmark, final_models_dir, config, device):
         ).to(device)
         loaded["Vanilla Offline Actor-Critic"] = load_checkpoint(model, voac_path, device)
 
-    # Looking for the final LAADAN-AC checkpoint.
 
-    # Two folder-name options are checked because projects sometimes use either
-    # an underscore or a hyphen.
+
+
+
     laadan_path, _ = find_model_path(final_models_dir, ["laadan_ac", "laadan-ac"])
 
-    # Loading LAADAN-AC only if the checkpoint exists.
+
     if laadan_path is not None:
         cfg = get_config_block(config, "laadan_ac")
         model = OfflineActorCriticNet(
@@ -387,11 +366,12 @@ def load_final_models(benchmark, final_models_dir, config, device):
     return loaded
 
 
+# build policies
 def build_policies(benchmark, models):
-    """
-    Build analysis policies from the loaded final model checkpoints.
 
-    """
+
+
+
     policies = {}
 
     x = benchmark.state_features_t
@@ -478,17 +458,17 @@ def build_policies(benchmark, models):
     return policies
 
 def per_state_inadmissibility(policy, admissible_mask):
-    """
-    Compute inadmissibility probability for each state under a policy.
-    """
+
+
+
     cost = 1.0 - np.asarray(admissible_mask, dtype=np.float64)
     return np.sum(np.asarray(policy, dtype=np.float64) * cost, axis=1)
 
 
 def pca_two_components(features):
-    """
-    Compute a two-component PCA projection using only NumPy.
-    """
+
+
+
     x = np.asarray(features, dtype=np.float64)
     x = x - np.mean(x, axis=0, keepdims=True)
     _, _, vt = np.linalg.svd(x, full_matrices=False)
@@ -496,38 +476,38 @@ def pca_two_components(features):
 
 
 def get_terminal_mask(benchmark):
-    """
-    Return the benchmark terminal-state mask as a Boolean NumPy array.
-    """
+
+
+
     if hasattr(benchmark, "terminal_mask"):
         return np.asarray(benchmark.terminal_mask, dtype=bool)
     return tensor_to_numpy(benchmark.terminal_mask_t).astype(bool)
 
 
 def get_expert_policy(benchmark):
-    """
-    Return the expert-safe policy as a NumPy array.
-    """
+
+
+
     if hasattr(benchmark, "expert_safe"):
         return np.asarray(benchmark.expert_safe, dtype=np.float64)
     return tensor_to_numpy(benchmark.expert_safe_t).astype(np.float64)
 
 
 def write_state_table(path, benchmark, policies):
-    """
-    Save state-level inadmissibility and selected-action information.
-    """
 
-    # Reading the admissibility mask.
+
+
+
+
     mask = get_benchmark_array(benchmark, "admissible_mask")
 
-    # Reading which states are terminal states.
+
     terminal = get_terminal_mask(benchmark)
 
-    # Reading the benchmark expert-safe policy.
+
     expert = get_expert_policy(benchmark)
 
-    # Converting the expert policy into one selected action per state.
+
     expert_actions = policy_actions(expert)
 
     columns = ["state_id", "terminal", "expert_action"]
@@ -554,21 +534,21 @@ def write_state_table(path, benchmark, policies):
 
 
 def write_feature_distribution_table(path, benchmark, voac_policy):
-    """
-    Compare 47-dimensional feature means for VOAC-safe and VOAC-unsafe states.
-    """
 
-    # Reading the 47-dimensional state feature matrix.
+
+
+
+
     features = get_benchmark_array(benchmark, "state_features")
 
-    # Reading the admissibility mask.
+
     mask = get_benchmark_array(benchmark, "admissible_mask")
 
-    # Reading terminal-state flags so terminal states can be excluded from this
-    # feature-distribution comparison.
+
+
     terminal = get_terminal_mask(benchmark)
 
-    # Computing one inadmissibility value per state under VOAC.
+
     state_cost = per_state_inadmissibility(voac_policy, mask)
 
     unsafe = (state_cost > 0.5) & (~terminal)
@@ -606,17 +586,17 @@ def write_feature_distribution_table(path, benchmark, voac_policy):
 
 
 def write_action_tables(action_path, confusion_path, benchmark, policies):
-    """
-    Save action-level inadmissibility counts and expert/VOAC/LAADAN confusion counts.
-    """
 
-    # Reading the admissibility mask.
+
+
+
+
     mask = get_benchmark_array(benchmark, "admissible_mask")
 
-    # Reading terminal-state flags.
+
     terminal = get_terminal_mask(benchmark)
 
-    # Reading and converting the expert-safe policy to selected actions.
+
     expert = get_expert_policy(benchmark)
     expert_actions = policy_actions(expert)
 
@@ -667,17 +647,17 @@ def write_action_tables(action_path, confusion_path, benchmark, policies):
 
 
 def representative_unsafe_states(benchmark, voac_policy, k):
-    """
-    Pick representative non-terminal states where VOAC selects inadmissible actions.
-    """
 
-    # Reading the admissibility mask.
+
+
+
+
     mask = get_benchmark_array(benchmark, "admissible_mask")
 
-    # Reading terminal-state flags.
+
     terminal = get_terminal_mask(benchmark)
 
-    # Computing the per-state VOAC inadmissibility score.
+
     state_cost = per_state_inadmissibility(voac_policy, mask)
 
     order = np.argsort(-state_cost)
@@ -699,12 +679,12 @@ def representative_unsafe_states(benchmark, voac_policy, k):
 
 
 def write_q_value_table(path, benchmark, policies, state_ids):
-    """
-    Save Q-value rows for representative states and all action bins.
-    """
 
-    # Reading the admissibility mask so each action can be labelled as admissible
-    # or inadmissible in each representative state.
+
+
+
+
+
     mask = get_benchmark_array(benchmark, "admissible_mask")
 
     with open(path, "w", newline="", encoding="utf-8") as handle:
@@ -727,27 +707,27 @@ def write_q_value_table(path, benchmark, policies, state_ids):
 
 
 def transition_array(benchmark):
-    """
-    Return transition probabilities as a NumPy array.
-    """
+
+
+
     if hasattr(benchmark, "transition"):
         return np.asarray(benchmark.transition, dtype=np.float64)
     return tensor_to_numpy(benchmark.transition_t).astype(np.float64)
 
 
 def initial_state_distribution(benchmark):
-    """
-    Return the initial-state distribution as a NumPy array.
-    """
+
+
+
     if hasattr(benchmark, "initial_state_dist"):
         return np.asarray(benchmark.initial_state_dist, dtype=np.float64)
     return tensor_to_numpy(benchmark.initial_state_dist_t).astype(np.float64)
 
 
 def expected_reward_table(benchmark):
-    """
-    Return expected reward per state-action pair if available.
-    """
+
+
+
     if hasattr(benchmark, "reward_sa"):
         return np.asarray(benchmark.reward_sa, dtype=np.float64)
     if hasattr(benchmark, "reward_sa_t"):
@@ -756,26 +736,26 @@ def expected_reward_table(benchmark):
 
 
 def sample_trajectory(benchmark, policy, seed, initial_state=None):
-    """
-    Sample one trajectory from the benchmark MDP under a fixed policy.
-    """
 
-    # Creating a reproducible NumPy random generator.
+
+
+
+
     rng = np.random.default_rng(seed)
 
-    # Reading transition probabilities from the benchmark.
+
     transition = transition_array(benchmark)
 
-    # Reading the initial-state distribution.
+
     initial = initial_state_distribution(benchmark)
 
-    # Reading terminal-state flags.
+
     terminal = get_terminal_mask(benchmark)
 
-    # Reading the admissibility mask.
+
     mask = get_benchmark_array(benchmark, "admissible_mask")
 
-    # Reading the expected reward for each state-action pair.
+
     reward_sa = expected_reward_table(benchmark)
 
     if initial_state is None:
@@ -808,9 +788,9 @@ def sample_trajectory(benchmark, policy, seed, initial_state=None):
 
 
 def find_voac_failure_trajectory(benchmark, voac_policy, seed, attempts):
-    """
-    Find a sampled VOAC trajectory containing at least one inadmissible action.
-    """
+
+
+
     rng = np.random.default_rng(seed)
     initial = initial_state_distribution(benchmark)
 
@@ -826,12 +806,12 @@ def find_voac_failure_trajectory(benchmark, voac_policy, seed, attempts):
 
 
 def write_trajectory_tables(trajectory_path, timepoint_path, benchmark, policies, seed, attempts):
-    """
-    Save representative trajectory rows and timepoint-level inadmissibility counts.
-    """
 
-    # If either VOAC or LAADAN-AC is missing, this trajectory comparison cannot
-    # be created.
+
+
+
+
+
     if "Vanilla Offline Actor-Critic" not in policies or "LAADAN-AC" not in policies:
         return None
 
@@ -881,17 +861,17 @@ def write_trajectory_tables(trajectory_path, timepoint_path, benchmark, policies
 
 
 def plot_four_panel_figure(output_path, benchmark, policies, representative_states, trajectory_payload):
-    """
-    Create the four-panel figure requested for the manuscript.
-    """
 
-    # Reading the benchmark admissibility mask for all states and actions.
+
+
+
+
     mask = get_benchmark_array(benchmark, "admissible_mask")
 
-    # Reading the 47-dimensional state feature matrix.
+
     features = get_benchmark_array(benchmark, "state_features")
 
-    # Reading terminal-state flags so the PCA panel focuses on non-terminal states.
+
     terminal = get_terminal_mask(benchmark)
 
     voac_policy = policies["Vanilla Offline Actor-Critic"]["primary"]
@@ -987,17 +967,18 @@ def plot_four_panel_figure(output_path, benchmark, policies, representative_stat
 
 
 def write_manifest(path, files):
-    """
-    Save a manifest of generated analysis outputs.
-    """
+
+
+
     with open(path, "w", encoding="utf-8") as handle:
         json.dump(files, handle, indent=2)
 
 
+# arguments
 def parse_args():
-    """
-    Read command-line arguments.
-    """
+
+
+
     parser = argparse.ArgumentParser(description="Safety-failure analysis for LAADAN-AC figures.")
     parser.add_argument("--data-dir", required=True, help="Path to ICU-Sepsis benchmark files.")
     parser.add_argument("--results-dir", default="results", help="Root results directory.")
@@ -1009,15 +990,16 @@ def parse_args():
     return parser.parse_args()
 
 
-def main():
-    """
-    Run the full safety-failure analysis without retraining.
-    """
 
-    # Reading command-line arguments.
+def main():
+
+
+
+
+
     args = parse_args()
 
-    # Selecting the device requested by the user.
+
     device = choose_device(args.device)
 
     final_models_dir = args.final_models_dir
@@ -1112,6 +1094,6 @@ def main():
     for key in sorted(files.keys()):
         print("[FILE]", key + ":", files[key], flush=True)
 
-# Running the script only when this file is executed directly.
+
 if __name__ == "__main__":
     main()

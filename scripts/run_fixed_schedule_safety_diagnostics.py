@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-"""Compute fixed-schedule safety diagnostics from pre-specified checkpoints and seeds."""
+
+
 from __future__ import annotations
 
 import argparse
@@ -13,14 +13,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS_DIR = REPO_ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from benchmark import ICUSepsisOfflineBenchmark  # noqa: E402
-from models import BehaviorCloningNet, ConservativeQNet, OfflineActorCriticNet  # noqa: E402
-from safety_failure_analysis import (  # noqa: E402
+from benchmark import ICUSepsisOfflineBenchmark
+from models import BehaviorCloningNet, ConservativeQNet, OfflineActorCriticNet
+from safety_failure_analysis import (
     build_policies,
     get_benchmark_array,
     get_config_block,
@@ -35,7 +36,7 @@ from safety_failure_analysis import (  # noqa: E402
     write_state_table,
     write_trajectory_tables,
 )
-from trainers import mean_ci95  # noqa: E402
+from trainers import mean_ci95
 
 SEEDS = (42, 43, 44, 45, 46)
 PLOT_DPI = 600
@@ -57,6 +58,8 @@ plt.rcParams.update(
 )
 
 
+# diagnostics
+# select device
 def choose_device(requested: str) -> str:
     if requested == "auto":
         return "cuda" if torch.cuda.is_available() else "cpu"
@@ -95,7 +98,7 @@ def write_csv(path: Path, rows: List[Dict]) -> None:
 
 
 def instantiate_models(benchmark, config: Dict, root: Path, seed: int, device: str):
-    """Load the four epoch-1000 fixed-schedule checkpoints for one seed."""
+
     models = {}
 
     bc_cfg = get_config_block(config, "bc")
@@ -189,6 +192,7 @@ def seed_diagnostics(benchmark, policies: Dict, seed: int) -> Dict:
     }
 
 
+# aggregate seed rows
 def aggregate_seed_rows(rows: List[Dict]) -> Dict:
     metric_names = [key for key in rows[0] if key != "seed"]
     return {
@@ -226,7 +230,7 @@ def plot_fixed_diagnostic_figure(
     trajectory_payload,
     illustrative_seed: int,
 ) -> None:
-    """Create a four-panel fixed-checkpoint diagnostic with no seed cherry-picking."""
+
     mask = get_benchmark_array(benchmark, "admissible_mask")
     features = get_benchmark_array(benchmark, "state_features")
     terminal = get_terminal_mask(benchmark)
@@ -242,7 +246,7 @@ def plot_fixed_diagnostic_figure(
 
     fig, axes = plt.subplots(2, 2, figsize=(12.8, 8.0))
 
-    # A: distribution over all non-terminal states.
+
     order = np.argsort(voac_cost[nonterminal])[::-1]
     voac_sorted = voac_cost[nonterminal][order]
     post_sorted = posthoc_cost[nonterminal][order]
@@ -258,7 +262,7 @@ def plot_fixed_diagnostic_figure(
     clean_axis(axes[0, 0])
     panel_label(axes[0, 0], "A")
 
-    # B: state-space localization of VOAC violations.
+
     coords = pca_two_components(features)
     scatter = axes[0, 1].scatter(
         coords[nonterminal, 0],
@@ -275,7 +279,7 @@ def plot_fixed_diagnostic_figure(
     clean_axis(axes[0, 1])
     panel_label(axes[0, 1], "B")
 
-    # C: Q-value separation at a deterministic representative VOAC-failure state.
+
     state_id = representative_states[0]
     groups = []
     labels = []
@@ -305,7 +309,7 @@ def plot_fixed_diagnostic_figure(
         axes[1, 0].set_axis_off()
     panel_label(axes[1, 0], "C")
 
-    # D: a reproducibly sampled trajectory initialized identically for both policies.
+
     if trajectory_payload is not None:
         _, voac_rows, laadan_rows = trajectory_payload
         for name, rows in [("VOAC", voac_rows), ("LAADAN-AC", laadan_rows)]:
@@ -353,6 +357,7 @@ def plot_fixed_diagnostic_figure(
     plt.close(fig)
 
 
+# build illustrative outputs
 def build_illustrative_outputs(
     benchmark,
     policies: Dict,
@@ -411,20 +416,23 @@ def build_illustrative_outputs(
     return outputs
 
 
+# arguments
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-dir", default="data/icu_sepsis")
     parser.add_argument(
-        "--results-root", default="results/fixed_schedule_2026/icu_sepsis"
+        "--results-root", default="results/main/icu_sepsis"
     )
     parser.add_argument(
         "--output-dir",
-        default="results/fixed_schedule_2026/icu_sepsis/safety_diagnostics",
+        default="results/main/icu_sepsis/safety_diagnostics",
     )
     parser.add_argument("--device", choices=["auto", "cpu", "cuda"], default="auto")
     parser.add_argument("--illustrative-seed", type=int, choices=SEEDS, default=42)
     parser.add_argument("--num-trajectories", type=int, default=2000)
     return parser.parse_args()
+
+
 
 
 def main():

@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-"""Run the predetermined fixed-schedule protocol without evaluator-based model selection."""
+
+
 
 from __future__ import annotations
 
@@ -18,14 +18,15 @@ from typing import Dict, List
 import numpy as np
 import torch
 
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS_DIR = REPO_ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from benchmark import ICUSepsisOfflineBenchmark  # noqa: E402
-from experiment_config import DEFAULT_CONFIG  # noqa: E402
-from trainers import (  # noqa: E402
+from benchmark import ICUSepsisOfflineBenchmark
+from experiment_config import DEFAULT_CONFIG
+from trainers import (
     aggregate_seed_metrics,
     evaluate_policy_set,
     greedy_policy_from_logits,
@@ -39,16 +40,19 @@ from trainers import (  # noqa: E402
     train_laadan_ac,
     train_voac,
 )
-from ablation_engine import (  # noqa: E402
+from ablation_engine import (
     BASE_LAADAN_CONFIG,
     BudgetedLagrangianExperiment,
 )
+
+
 
 SEEDS = [42, 43, 44, 45, 46]
 EPOCHS = 1000
 FINAL_ONLY_EVAL_EVERY = EPOCHS + 1
 
 
+# experiments
 def sha256_file(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as handle:
@@ -58,7 +62,7 @@ def sha256_file(path: Path) -> str:
 
 
 def recursive_sha256_manifest(data_dir: Path) -> Dict[str, str]:
-    """Hash every input file recursively using paths relative to ``data_dir``."""
+
     manifest: Dict[str, str] = {}
     for path in sorted(p for p in data_dir.rglob("*") if p.is_file()):
         manifest[path.relative_to(data_dir).as_posix()] = sha256_file(path)
@@ -121,8 +125,8 @@ def write_csv(path: Path, rows: List[Dict]) -> None:
 def final_epoch_config(config: Dict) -> Dict:
     cfg = deepcopy(config)
     cfg["epochs"] = EPOCHS
-    # Baseline trainers evaluate on `epoch % eval_every == 0 or epoch == epochs`.
-    # eval_every > epochs => only the pre-specified final epoch is evaluated.
+
+
     cfg["eval_every"] = FINAL_ONLY_EVAL_EVERY
     return cfg
 
@@ -136,6 +140,7 @@ def evaluated_epochs(run: Dict) -> List[int]:
     return epochs
 
 
+# validate final only history
 def validate_final_only_history(run: Dict) -> None:
     epochs = evaluated_epochs(run)
     if epochs != [EPOCHS]:
@@ -172,8 +177,9 @@ def attach_provenance(
     )
 
 
+# aggregate runs
 def aggregate_runs(run_groups: Dict[str, List[Dict]]) -> Dict:
-    """Aggregate metrics that remain interpretable under final-only evaluation."""
+
     result: Dict[str, Dict] = {}
     for name, runs in run_groups.items():
         cleaned = []
@@ -205,8 +211,11 @@ def raw_seed_rows(run_groups: Dict[str, List[Dict]]) -> List[Dict]:
     return rows
 
 
+
+
+# post-hoc mask
 def posthoc_masked_voac(benchmark, voac_run: Dict) -> Dict:
-    """Evaluate one trained VOAC actor with masking only at action extraction."""
+
     model = voac_run["model"]
     model.eval()
     x = benchmark.state_features_t
@@ -375,6 +384,9 @@ def ablation_variants(level: str) -> List[Dict]:
     return variants
 
 
+
+
+# run dataset
 def run_dataset(
     data_dir: Path,
     output_dir: Path,
@@ -501,11 +513,12 @@ def run_dataset(
     print(f"\nCompleted {dataset_name}. Results: {output_dir}")
 
 
+# arguments
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--icu-data", default="data/icu_sepsis")
     parser.add_argument("--eicu-data", default="data/eicu_demo_mdp")
-    parser.add_argument("--output", default="results/fixed_schedule_2026")
+    parser.add_argument("--output", default="results/main")
     parser.add_argument("--device", choices=["cuda", "cpu", "auto"], default="auto")
     parser.add_argument("--datasets", choices=["icu", "eicu", "both"], default="icu")
     parser.add_argument(

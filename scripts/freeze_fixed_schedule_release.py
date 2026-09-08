@@ -1,4 +1,3 @@
-"""Freeze validated fixed-schedule artifacts and record release provenance."""
 
 
 from __future__ import annotations
@@ -12,9 +11,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Iterable, List
 
+
 SEEDS = (42, 43, 44, 45, 46)
 
 
+# provenance
 def load_json(path: Path):
     with path.open("r", encoding="utf-8") as handle:
         return json.load(handle)
@@ -136,13 +137,16 @@ def release_file_manifest(root: Path, excluded: Iterable[Path]) -> Dict[str, Dic
     return manifest
 
 
+# arguments
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--root", default="results/fixed_schedule_2026")
+    parser.add_argument("--root", default="results/main")
     parser.add_argument(
-        "--output", default="results/fixed_schedule_2026/release_manifest.json"
+        "--output", default="results/main/release_manifest.json"
     )
     return parser.parse_args()
+
+
 
 
 def main():

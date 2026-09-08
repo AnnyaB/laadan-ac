@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-"""Shared LAADAN-AC ablation engine used by the fixed-schedule experiments."""
+
+
 
 from __future__ import annotations
 
@@ -25,6 +25,9 @@ from trainers import (
     policy_numpy,
     save_model_run,
 )
+
+
+
 
 BASE_LAADAN_CONFIG = {
 
@@ -64,6 +67,10 @@ BASE_LAADAN_CONFIG = {
 }
 
 
+
+
+# BudgetedLagrangianExperiment
+# ablations
 class BudgetedLagrangianExperiment:
 
     def __init__(self, benchmark, results_dir, config):
@@ -228,8 +235,8 @@ class BudgetedLagrangianExperiment:
                 else:
                     cost_next = immediate_cost
 
-                # Computing the next-state value that combines Q-value, entropy
-                # and Lagrangian cost pressure.
+
+
                 next_v = torch.sum(
                     next_probs * (min_q_next - entropy_coef * next_log_probs - lagrange_value * cost_next),
                     dim=1,
@@ -237,10 +244,10 @@ class BudgetedLagrangianExperiment:
 
                 next_c = torch.sum(next_probs * cost_next, dim=1) * (1.0 - terminal)
 
-                # Building the Bellman target for reward/value Q-learning.
+
                 q_target = reward_sa + gamma * torch.einsum("san,n->sa", transition, next_v)
 
-                # Building the Bellman target for cost prediction.
+
                 c_target = immediate_cost + gamma * torch.einsum("san,n->sa", transition, next_c)
 
             critic_optimizer.zero_grad()
@@ -267,14 +274,14 @@ class BudgetedLagrangianExperiment:
                 cost_pred = immediate_cost
                 cost_loss = torch.tensor(0.0, device=self.benchmark.device)
 
-            # If conservative regularisation is enabled, penalise Q-values that
-            # inflate unsupported or non-expert actions.
+
+
             if use_conservative:
                 cql_q1 = cql_regularizer(q1, expert, admissible_mask=conservative_mask)
                 cql_q2 = cql_regularizer(q2, expert, admissible_mask=conservative_mask)
                 critic_loss = critic_loss + conservative_alpha * (cql_q1 + cql_q2)
 
-            # Otherwise, use zero placeholders for logging.
+
             else:
                 cql_q1 = torch.tensor(0.0, device=self.benchmark.device)
                 cql_q2 = torch.tensor(0.0, device=self.benchmark.device)

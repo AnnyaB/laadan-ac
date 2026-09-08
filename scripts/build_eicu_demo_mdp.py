@@ -1,4 +1,4 @@
-"""Construct the processed eICU Demo MDP used for cross-source portability experiments."""
+
 
 
 import argparse
@@ -19,6 +19,9 @@ from sklearn.cluster import MiniBatchKMeans
 from sklearn.preprocessing import StandardScaler
 
 
+
+# CSVTemplateWriter
+# cross-source data
 class CSVTemplateWriter:
 
 
@@ -153,6 +156,7 @@ class CSVTemplateWriter:
                     handle.write(" ".join([str(state)] + actions) + "\n")
 
 
+# EICUDemoMDPBuilder
 class EICUDemoMDPBuilder:
 
     def __init__(self, args):
@@ -1085,6 +1089,7 @@ class EICUDemoMDPBuilder:
         summary.to_csv(os.path.join(self.extras_dir, "build_summary.csv"), index=False)
 
 
+# arguments
 def parse_args():
 
     parser = argparse.ArgumentParser(
@@ -1176,6 +1181,8 @@ def parse_args():
     return parser.parse_args()
 
 
+
+
 def main():
 
     args = parse_args()
@@ -1190,4 +1197,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
