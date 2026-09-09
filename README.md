@@ -101,7 +101,7 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-The released experiments were produced with Python 3.12, NumPy 2.0.2 and PyTorch 2.10.0+cu128 in a Kaggle CUDA environment exposing NVIDIA Tesla T4 GPUs. Individual runs use a single CUDA device; per-run environment and provenance records are stored with the frozen results.
+The released experiments were produced with Python 3.12, NumPy 2.0.2 and PyTorch 2.10.0+cu128 in a Kaggle CUDA environment exposing NVIDIA Tesla T4 GPUs. Individual runs use a single CUDA device; per-run environment and provenance records are stored with the results.
 
 ### Data
 
@@ -185,20 +185,6 @@ The evidence is under [`results/main/`](results/main/). Each trained seed direct
 
 Earlier submission-era and exploratory experiments are retained under `archive/previous_experiments/`.
 
-
-## Repository structure
-
-~~~text
-assets/                         README and architecture assets
-data/                           Processed benchmark inputs
-figures/paper/                  Final paper and release figures
-scripts/                        Models, training, evaluation and release tools
-results/main/                   Frozen camera-ready results and checkpoints
-archive/previous_experiments/   Historical and submission-era experiments
-archive/plotting_provenance/    Figure-generation provenance
-archive/figures/legacy/         Historical figures
-tests/                          Release and implementation tests
-~~~
 
 ## Citation
 
