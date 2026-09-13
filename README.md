@@ -49,11 +49,11 @@ All values below are means ± **95% t-CI across five random training seeds**. Th
 
 | Method | Return | Inadmissibility (%) | Expert argmax match | KL to benchmark reference |
 |---|---:|---:|---:|---:|
-| Behavior Cloning | 0.7834 ± 0.0013 | 0.0000 | 0.9533 ± 0.0038 | 3.9481 ± 0.0038 |
+| Behavior Cloning | 0.7834 ± 0.0013 | 0.0000 | 0.9533 ± 0.0038 | **3.9481 ± 0.0038** |
 | CQL-regularised fitted-Q | 0.7761 ± 0.0024 | 0.0547 ± 0.0394 | 0.8545 ± 0.0126 | 4.1120 ± 0.0204 |
 | Vanilla Offline Actor-Critic | 0.7632 ± 0.0002 | 23.5677 ± 0.0904 | 0.0774 ± 0.0002 | 16.5103 ± 0.0014 |
 | Post-hoc Masked VOAC | 0.7652 ± 0.0015 | 0.0000 | 0.6972 ± 0.0014 | 5.0386 ± 0.0218 |
-| **LAADAN-AC** | **0.7927 ± 0.0012** | **0.0000** | **0.9540 ± 0.0032** | **3.9515 ± 0.0033** |
+| **LAADAN-AC** | **0.7927 ± 0.0012** | **0.0000** | **0.9540 ± 0.0032** | 3.9515 ± 0.0033 |
 
 Across the five released policy evaluations, LAADAN-AC combines the highest return with zero benchmark-defined selected-action inadmissibility and expert agreement comparable to Behavior Cloning.
 
