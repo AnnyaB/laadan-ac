@@ -26,10 +26,7 @@ class ICUSepsisOfflineBenchmark:
         self.use_one_hot_states = bool(use_one_hot_states)
 
 
-
         self.transition = None
-
-
 
         self.reward_by_next_state = None
 
@@ -38,8 +35,6 @@ class ICUSepsisOfflineBenchmark:
 
 
         self.expert_policy = None
-
-
 
         self.admissible_mask = None
 
@@ -55,9 +50,6 @@ class ICUSepsisOfflineBenchmark:
 
         self.feature_dim = 0
 
-
-
-
         self.death_state = 713
         self.survival_state = 714
 
@@ -65,24 +57,12 @@ class ICUSepsisOfflineBenchmark:
 
         self._load_all()
 
-
-
         self._fix_terminal_indices_if_needed()
-
 
         self._build_terminal_mask()
 
 
-
-
-
-
         self.reward_sa = self.transition @ self.reward_by_next_state
-
-
-
-
-
 
         self.immediate_cost = 1.0 - self.admissible_mask.astype(np.float32)
 
